@@ -1,24 +1,54 @@
 @import "tailwindcss";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
+/*═══════════════════════════════════════════
+  TOKENS
+═══════════════════════════════════════════*/
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --iv:   #f0fafa;
+  --iv2:  #e0f5f7;
+  --iv3:  #c8eef2;
+  --gn:   #004d5e;
+  --gn2:  #007a96;
+  --gn3:  #00AECC;
+  --gn-gl:rgba(0,77,94,.08);
+  --cu:   #F5A623;
+  --cu-l: #F0C040;
+  --cu-d: #c07d10;
+  --cu-gl:rgba(245,166,35,.12);
+  --gd:   #29C4D8;
+  --ink:  #0a1a1f;
+  --ink2: #1a3a42;
+  --ink3: #4a7a85;
+  --ink4: #8ab5be;
+  --line: rgba(0,77,94,.08);
+  --line2:rgba(0,77,94,.18);
+  --r:    18px;
+  --r-xl: 28px;
+  --tr:   all .35s cubic-bezier(.4,0,.2,1);
+  --sh:   0 4px 28px rgba(0,77,94,.10);
+  --sh-lg:0 18px 64px rgba(0,77,94,.18);
 }
+html{scroll-behavior:smooth}
+body{font-family:var(--font-inter),'Inter',sans-serif;background:var(--iv);color:var(--ink);overflow-x:hidden}
+a{text-decoration:none;color:inherit}
+ul{list-style:none}
+img{display:block;width:100%;height:100%;object-fit:cover}
+.container{max-width:1360px;margin:0 auto;padding:0 48px}
+.serif{font-family:var(--font-playfair),'Playfair Display',serif}
+.syne{font-family:var(--font-jakarta),'Plus Jakarta Sans',sans-serif}
+.material-symbols-rounded{font-family:'Material Symbols Rounded';font-weight:normal;font-style:normal;line-height:1;display:inline-flex;align-items:center;vertical-align:middle;user-select:none}
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-}
+/*─── Reveal ───*/
+.rv{opacity:0;transform:translateY(32px);transition:opacity .75s ease,transform .75s ease}
+.rv.in{opacity:1;transform:none}
+.rv-l{opacity:0;transform:translateX(-32px);transition:opacity .75s ease,transform .75s ease}
+.rv-l.in{opacity:1;transform:none}
+.rv-r{opacity:0;transform:translateX(32px);transition:opacity .75s ease,transform .75s ease}
+.rv-r.in{opacity:1;transform:none}
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
+/*─── Marquee ───*/
+@keyframes mq{from{transform:translateX(0)}to{transform:translateX(-50%)}}
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
-}
+/*─── Bounce ───*/
+@keyframes bounce{0%,100%{transform:translateY(0)}50%{transform:translateY(5px)}}
