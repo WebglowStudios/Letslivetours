@@ -1,3 +1,5 @@
+"use client";
+
 export default function SocialStrip() {
   const socials = [
     { name: "Instagram", handle: "@letslivetours", icon: "camera_alt", bgClass: "ig", bg: "linear-gradient(135deg,#f09433,#e6683c,#dc2743,#cc2366,#bc1888)" },

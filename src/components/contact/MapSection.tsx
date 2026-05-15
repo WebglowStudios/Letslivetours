@@ -1,3 +1,5 @@
+"use client";
+
 export default function MapSection() {
   const addressItems = [
     { icon: "location_on", text: "12 Travel Square, Bandra West, Mumbai, Maharashtra 400050" },
