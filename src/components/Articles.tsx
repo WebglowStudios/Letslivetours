@@ -13,7 +13,7 @@ export default function Articles() {
     <section id="articles" style={{ padding: "96px 0", background: "var(--iv)", borderTop: "1px solid var(--line)" }}>
       <div className="container">
         {/* Head */}
-        <div className="rv" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", position: "relative" }}>
+        <div className="rv art-head" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", position: "relative" }}>
           <div>
             <div className="syne" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "var(--cu)", display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ display: "block", width: 22, height: 1.5, background: "var(--cu)" }} />
@@ -80,6 +80,14 @@ export default function Articles() {
         @media (max-width: 768px) {
           .art-grid { grid-template-columns: 1fr !important; }
           .art-grid > div:first-child { grid-column: auto !important; }
+          .art-head {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 16px !important;
+          }
+          .art-card > div:first-child {
+            height: 220px !important;
+          }
         }
       `}</style>
     </section>

@@ -13,7 +13,7 @@ export default function VisaFree() {
     <section id="visa" style={{ padding: "96px 0", background: "var(--gn)" }}>
       <div className="container">
         {/* Head */}
-        <div className="rv" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 52, position: "relative" }}>
+        <div className="rv visa-head" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 52, position: "relative" }}>
           <div>
             <div className="syne" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "var(--gd)", display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ display: "block", width: 22, height: 1.5, background: "var(--gd)" }} />
@@ -77,6 +77,11 @@ export default function VisaFree() {
         @media (max-width: 768px) {
           .visa-grid {
             grid-template-columns: 1fr !important;
+          }
+          .visa-head {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 16px !important;
           }
         }
       `}</style>

@@ -30,6 +30,16 @@ export default function Navbar() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [dropdownOpen]);
 
+  // Prevent body scroll when mobile menu is open
+  useEffect(() => {
+    if (mobileMenuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [mobileMenuOpen]);
+
   const links = [
     { label: "Destinations", href: "/destinations" },
     { label: "Packages", href: "/destinations" },
@@ -45,6 +55,7 @@ export default function Navbar() {
 
   const handleLogout = async () => {
     setDropdownOpen(false);
+    setMobileMenuOpen(false);
     await logout();
   };
 
@@ -336,7 +347,7 @@ export default function Navbar() {
           </Link>
         )}
         <button
-          className="syne"
+          className="syne nav-book-btn"
           style={{
             padding: "9px 22px",
             background: "var(--cu)",
@@ -352,7 +363,148 @@ export default function Navbar() {
         >
           Book Now
         </button>
+
+        {/* Hamburger button */}
+        <button
+          className="nav-hamburger"
+          onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          style={{
+            display: "none",
+            alignItems: "center",
+            justifyContent: "center",
+            width: 40,
+            height: 40,
+            background: "transparent",
+            border: "none",
+            cursor: "pointer",
+            zIndex: 1100,
+          }}
+        >
+          <span className="material-symbols-rounded" style={{ fontSize: 28, color: scrolled ? "var(--ink)" : "var(--iv)" }}>
+            {mobileMenuOpen ? "close" : "menu"}
+          </span>
+        </button>
       </div>
+
+      {/* Mobile menu overlay */}
+      {mobileMenuOpen && (
+        <div className="nav-mobile-overlay" style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          bottom: 0,
+          background: "#fff",
+          zIndex: 1050,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+          justifyContent: "center",
+          padding: "72px 20px 40px",
+        }}>
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0, width: "100%" }}>
+            {links.map((link, i) => (
+              <Link
+                key={i}
+                href={link.href}
+                className="syne"
+                onClick={() => setMobileMenuOpen(false)}
+                style={{
+                  padding: 16,
+                  fontSize: 16,
+                  fontWeight: 600,
+                  color: "var(--ink2)",
+                  textDecoration: "none",
+                  letterSpacing: 0.5,
+                  width: "100%",
+                  textAlign: "center",
+                  borderBottom: "1px solid var(--line)",
+                }}
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 32, width: "100%", maxWidth: 280 }}>
+            {user ? (
+              <>
+                <div className="syne" style={{ textAlign: "center", fontSize: 14, fontWeight: 600, color: "var(--ink2)", marginBottom: 4 }}>
+                  Hi, {user.firstName}
+                </div>
+                <Link
+                  href="/dashboard"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="syne"
+                  style={{
+                    padding: "12px 24px",
+                    background: "transparent",
+                    border: "1.5px solid var(--line2)",
+                    borderRadius: 50,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: "var(--ink2)",
+                    textAlign: "center",
+                    textDecoration: "none",
+                  }}
+                >
+                  Dashboard
+                </Link>
+                <button
+                  onClick={handleLogout}
+                  className="syne"
+                  style={{
+                    padding: "12px 24px",
+                    background: "transparent",
+                    border: "1.5px solid #e53935",
+                    borderRadius: 50,
+                    fontSize: 13,
+                    fontWeight: 600,
+                    color: "#e53935",
+                    cursor: "pointer",
+                  }}
+                >
+                  Logout
+                </button>
+              </>
+            ) : (
+              <Link
+                href="/login"
+                onClick={() => setMobileMenuOpen(false)}
+                className="syne"
+                style={{
+                  padding: "12px 24px",
+                  background: "transparent",
+                  border: "1.5px solid var(--line2)",
+                  borderRadius: 50,
+                  fontSize: 13,
+                  fontWeight: 600,
+                  color: "var(--ink2)",
+                  textAlign: "center",
+                  textDecoration: "none",
+                }}
+              >
+                Sign In
+              </Link>
+            )}
+            <button
+              onClick={() => setMobileMenuOpen(false)}
+              className="syne"
+              style={{
+                padding: "12px 24px",
+                background: "var(--cu)",
+                border: "none",
+                borderRadius: 50,
+                fontSize: 13,
+                fontWeight: 700,
+                color: "#fff",
+                cursor: "pointer",
+              }}
+            >
+              Book Now
+            </button>
+          </div>
+        </div>
+      )}
 
       <style jsx>{`
         .nav-links-list {
@@ -361,8 +513,15 @@ export default function Navbar() {
         @media (max-width: 768px) {
           .nav-links-list,
           .nav-sign-btn,
-          .nav-user-btn {
+          .nav-user-btn,
+          .nav-book-btn {
             display: none !important;
+          }
+          .nav-hamburger {
+            display: flex !important;
+          }
+          #nav {
+            padding: 0 20px !important;
           }
         }
         .nav-link-item::after {

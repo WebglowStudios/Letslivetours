@@ -64,7 +64,7 @@ export default function Footer() {
         </div>
 
         {/* Bottom */}
-        <div style={{ padding: "22px 0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+        <div className="ft-bottom-bar" style={{ padding: "22px 0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <div style={{ fontSize: 12, color: "rgba(249,246,240,.25)" }}>© 2026 LetsLive Tours. All rights reserved.</div>
           <div style={{ display: "flex", gap: 22 }}>
             {["Privacy Policy", "Terms of Use", "Cookie Policy"].map((l, i) => (
@@ -93,6 +93,12 @@ export default function Footer() {
         }
         @media (max-width: 768px) {
           .ft-grid { grid-template-columns: 1fr !important; }
+          .ft-bottom-bar {
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+            gap: 12px !important;
+          }
         }
       `}</style>
     </footer>

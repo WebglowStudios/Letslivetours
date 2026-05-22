@@ -31,7 +31,7 @@ export default function Testimonials() {
         </div>
 
         {/* Polaroids */}
-        <div className="rv" style={{ display: "flex", gap: 20, justifyContent: "center", alignItems: "center", flexWrap: "wrap", padding: "20px 0", marginTop: 52 }}>
+        <div className="rv polaroid-wrap" style={{ display: "flex", gap: 20, justifyContent: "center", alignItems: "center", flexWrap: "wrap", padding: "20px 0", marginTop: 52 }}>
           {testimonials.map((t, i) => (
             <div key={i} className="polaroid-card" style={{
               background: "#fff", padding: "14px 14px 48px",
@@ -69,6 +69,18 @@ export default function Testimonials() {
         }
         .polaroid-card:hover img {
           filter: brightness(1.08) saturate(1.2);
+        }
+        @media (max-width: 768px) {
+          .polaroid-wrap {
+            flex-direction: column !important;
+            align-items: center !important;
+          }
+          .polaroid-card {
+            width: 100% !important;
+            max-width: 300px !important;
+            transform: none !important;
+            margin-top: 0 !important;
+          }
         }
       `}</style>
     </section>

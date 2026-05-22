@@ -18,7 +18,7 @@ export default function Destinations() {
     <section id="destinations" style={{ padding: "96px 0", background: "var(--iv)" }}>
       <div className="container">
         {/* Section head */}
-        <div className="rv" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 52, position: "relative" }}>
+        <div className="rv dest-head" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 52, position: "relative" }}>
           <div>
             <div className="syne" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "var(--cu)", display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ display: "block", width: 22, height: 1.5, background: "var(--cu)" }} />
@@ -31,10 +31,10 @@ export default function Destinations() {
               Hover to explore — our most-loved destinations, each a universe unto itself.
             </p>
           </div>
-          <a href="#" className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 13, fontWeight: 600, color: "var(--gn2)", borderBottom: "1.5px solid var(--gn-gl)", paddingBottom: 2 }}>
+          <a href="#" className="syne dest-all-link" style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 13, fontWeight: 600, color: "var(--gn2)", borderBottom: "1.5px solid var(--gn-gl)", paddingBottom: 2 }}>
             All destinations <span className="material-symbols-rounded" style={{ fontSize: 16 }}>arrow_forward</span>
           </a>
-          <div className="syne" style={{ position: "absolute", top: -30, right: 0, fontSize: 140, fontWeight: 800, color: "rgba(0,77,94,.04)", lineHeight: 1, pointerEvents: "none", letterSpacing: -5 }}>01</div>
+          <div className="syne dest-watermark" style={{ position: "absolute", top: -30, right: 0, fontSize: 140, fontWeight: 800, color: "rgba(0,77,94,.04)", lineHeight: 1, pointerEvents: "none", letterSpacing: -5 }}>01</div>
         </div>
 
         {/* Cards */}
@@ -99,13 +99,24 @@ export default function Destinations() {
 
       <style jsx>{`
         @media (max-width: 768px) {
+          .dest-head {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 16px !important;
+          }
+          .dest-watermark {
+            display: none !important;
+          }
+          .dest-all-link {
+            margin-top: 8px !important;
+          }
           .dest-row {
             flex-direction: column !important;
             height: auto !important;
           }
           .dest-row > div {
             min-width: unset !important;
-            height: 260px !important;
+            height: 280px !important;
             flex: unset !important;
           }
         }

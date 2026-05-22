@@ -191,7 +191,7 @@ export default function Hero() {
             </div>
           </div>
         ))}
-        <div className="syne" style={{
+        <div className="syne hero-scroll-text" style={{
           display: "flex", alignItems: "center", gap: 8, marginLeft: "auto", padding: "0 32px",
           color: "rgba(249,246,240,.35)", fontSize: 10, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase",
         }}>
@@ -213,10 +213,26 @@ export default function Hero() {
           .hero-bottom-bar { right: 0 !important; }
         }
         @media (max-width: 768px) {
+          .hero-content-wrap { padding: 0 0 120px 20px !important; }
           .hero-content-wrap h1 { font-size: clamp(48px, 10vw, 80px) !important; }
-          .hero-search-bar { flex-direction: column !important; }
+          .hero-search-bar { flex-direction: column !important; padding: 16px 18px !important; }
           .hs-field { border-right: none !important; border-bottom: 1px solid rgba(249,246,240,.12) !important; }
-          .hero-bottom-bar > div { display: none !important; }
+          .hero-bottom-bar {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr !important;
+          }
+          .hero-bottom-bar > div {
+            display: flex !important;
+            padding: 12px 16px !important;
+            border-right: 1px solid rgba(249,246,240,.1) !important;
+            border-bottom: 1px solid rgba(249,246,240,.1) !important;
+          }
+          .hero-bottom-bar > div .serif {
+            font-size: 20px !important;
+          }
+          .hero-bottom-bar .hero-scroll-text {
+            display: none !important;
+          }
         }
       `}</style>
     </section>

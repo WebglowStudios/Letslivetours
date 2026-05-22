@@ -39,7 +39,7 @@ export default function Packages() {
     <section id="packages" style={{ padding: "96px 0", background: "var(--gn)" }}>
       <div className="container">
         {/* Head */}
-        <div className="rv" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 52 }}>
+        <div className="rv pkg-head" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 52 }}>
           <div>
             <div className="syne" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "var(--gd)", display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ display: "block", width: 22, height: 1.5, background: "var(--gd)" }} />
@@ -139,6 +139,11 @@ export default function Packages() {
         }
         @media (max-width: 768px) {
           .pkg-grid { grid-template-columns: 1fr !important; }
+          .pkg-head {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+            gap: 16px !important;
+          }
         }
       `}</style>
     </section>

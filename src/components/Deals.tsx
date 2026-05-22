@@ -26,7 +26,7 @@ export default function Deals() {
   return (
     <section id="deals" className="deals-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: 560 }}>
       {/* Left */}
-      <div className="rv-l" style={{ background: "var(--iv2)", padding: "84px 72px", display: "flex", flexDirection: "column", justifyContent: "center", position: "relative", overflow: "hidden" }}>
+      <div className="rv-l deals-left" style={{ background: "var(--iv2)", padding: "84px 72px", display: "flex", flexDirection: "column", justifyContent: "center", position: "relative", overflow: "hidden" }}>
         <div className="syne" style={{ position: "absolute", bottom: -30, right: -10, fontSize: 200, fontWeight: 800, color: "rgba(0,77,94,.04)", lineHeight: 1, pointerEvents: "none", letterSpacing: -8 }}>40</div>
         <div className="syne" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "var(--cu)", marginBottom: 20 }}>Limited Time Offer</div>
         <div className="serif" style={{ fontSize: "clamp(44px, 6vw, 80px)", fontWeight: 700, lineHeight: 0.95, letterSpacing: -2, color: "var(--ink)" }}>
@@ -55,7 +55,7 @@ export default function Deals() {
       </div>
 
       {/* Right */}
-      <div className="rv-r" style={{ background: "var(--gn)", padding: "84px 64px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", position: "relative", overflow: "hidden" }}>
+      <div className="rv-r deals-right" style={{ background: "var(--gn)", padding: "84px 64px", display: "flex", flexDirection: "column", justifyContent: "center", alignItems: "center", textAlign: "center", position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: "-60%", left: "50%", transform: "translateX(-50%)", width: 600, height: 600, borderRadius: "50%", background: "radial-gradient(circle, rgba(0,174,204,.15) 0%, transparent 65%)", pointerEvents: "none" }} />
         <div style={{ background: "var(--cu)", color: "#fff", borderRadius: 50, padding: "12px 32px", marginBottom: 32, display: "inline-block" }}>
           <strong className="serif" style={{ fontSize: 48, fontWeight: 700, lineHeight: 1, display: "block", color: "#fff" }}>40%</strong>
@@ -70,9 +70,9 @@ export default function Deals() {
             { v: time.s, l: "Secs" },
           ].map((t, i) => (
             <div key={i} style={{ display: "flex", alignItems: "flex-end", gap: 8 }}>
-              {i > 0 && <div className="serif" style={{ fontSize: 44, fontWeight: 400, color: "rgba(249,246,240,.2)", paddingBottom: 18 }}>:</div>}
-              <div style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "rgba(249,246,240,.07)", border: "1px solid rgba(249,246,240,.1)", borderRadius: 16, padding: "18px 22px", minWidth: 80 }}>
-                <div className="serif" style={{ fontSize: 56, fontWeight: 700, lineHeight: 1, color: "#fff" }}>{t.v}</div>
+              {i > 0 && <div className="serif deals-colon" style={{ fontSize: 44, fontWeight: 400, color: "rgba(249,246,240,.2)", paddingBottom: 18 }}>:</div>}
+              <div className="deals-timer-box" style={{ display: "flex", flexDirection: "column", alignItems: "center", background: "rgba(249,246,240,.07)", border: "1px solid rgba(249,246,240,.1)", borderRadius: 16, padding: "18px 22px", minWidth: 80 }}>
+                <div className="serif deals-timer-num" style={{ fontSize: 56, fontWeight: 700, lineHeight: 1, color: "#fff" }}>{t.v}</div>
                 <div className="syne" style={{ fontSize: 9, fontWeight: 700, letterSpacing: 2.5, textTransform: "uppercase", color: "rgba(249,246,240,.4)", marginTop: 4 }}>{t.l}</div>
               </div>
             </div>
@@ -84,6 +84,13 @@ export default function Deals() {
       <style jsx>{`
         @media (max-width: 1100px) {
           .deals-grid { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 768px) {
+          .deals-left { padding: 48px 24px !important; }
+          .deals-right { padding: 48px 24px !important; }
+          .deals-timer-num { font-size: 36px !important; }
+          .deals-timer-box { min-width: 60px !important; padding: 14px 16px !important; }
+          .deals-colon { font-size: 28px !important; }
         }
       `}</style>
     </section>

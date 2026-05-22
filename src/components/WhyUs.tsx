@@ -13,7 +13,7 @@ export default function WhyUs() {
   return (
     <section id="why" style={{ padding: "96px 0", background: "var(--iv)" }}>
       <div className="container">
-        <div className="rv" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 52, position: "relative" }}>
+        <div className="rv why-head" style={{ display: "flex", alignItems: "flex-end", justifyContent: "space-between", marginBottom: 52, position: "relative" }}>
           <div>
             <div className="syne" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "var(--cu)", display: "flex", alignItems: "center", gap: 10 }}>
               <span style={{ display: "block", width: 22, height: 1.5, background: "var(--cu)" }} />
@@ -92,6 +92,10 @@ export default function WhyUs() {
         }
         @media (max-width: 768px) {
           .why-grid { grid-template-columns: 1fr !important; }
+          .why-head {
+            flex-direction: column !important;
+            align-items: flex-start !important;
+          }
         }
       `}</style>
     </section>

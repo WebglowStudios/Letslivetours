@@ -75,7 +75,7 @@ export default function Newsletter() {
 
           {/* Right */}
           <div className="rv-r">
-            <div style={{ background: "rgba(249,246,240,.07)", backdropFilter: "blur(20px)", border: "1px solid rgba(249,246,240,.15)", borderRadius: "var(--r-xl)", padding: 40 }}>
+            <div className="nl-form-wrap" style={{ background: "rgba(249,246,240,.07)", backdropFilter: "blur(20px)", border: "1px solid rgba(249,246,240,.15)", borderRadius: "var(--r-xl)", padding: 40 }}>
               {!success ? (
                 <form onSubmit={handleSubmit}>
                   <div className="serif" style={{ fontSize: 26, fontWeight: 600, color: "#fff", marginBottom: 26 }}>Join Our Travel Club</div>
@@ -150,6 +150,10 @@ export default function Newsletter() {
       <style jsx>{`
         @media (max-width: 1100px) {
           .nl-inner { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 768px) {
+          #newsletter { padding: 64px 0 !important; }
+          .nl-form-wrap { padding: 24px !important; }
         }
       `}</style>
     </section>
