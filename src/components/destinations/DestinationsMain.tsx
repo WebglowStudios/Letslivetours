@@ -1,10 +1,29 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import { useState, useMemo, useEffect } from "react";
 import DestinationsHeader from "./DestinationsHeader";
 import Sidebar from "./Sidebar";
 import DestinationCard from "./DestinationCard";
-import { destinations } from "./destinationsData";
+import { destinations as staticDestinations } from "./destinationsData";
+import { api } from "@/lib/api";
+import type { Destination } from "./DestinationCard";
+
+function getCatIcon(cat: string): string {
+  const icons: Record<string, string> = {
+    beach: "beach_access",
+    city: "location_city",
+    mountain: "landscape",
+    adventure: "hiking",
+    cultural: "museum",
+    wildlife: "forest",
+    tropical: "sunny",
+  };
+  return icons[cat] || "travel_explore";
+}
+
+function formatPrice(price: number): string {
+  return "₹" + price.toLocaleString("en-IN");
+}
 
 export default function DestinationsMain() {
   const [activeCat, setActiveCat] = useState("all");
@@ -13,6 +32,41 @@ export default function DestinationsMain() {
   const [maxPrice, setMaxPrice] = useState(300000);
   const [sort, setSort] = useState("popular");
   const [listView, setListView] = useState(true);
+  const [destinations, setDestinations] = useState<Destination[]>(staticDestinations);
+  const [apiLoading, setApiLoading] = useState(true);
+
+  useEffect(() => {
+    async function fetchDestinations() {
+      try {
+        const res = await api.get("/destinations");
+        if (res.status === "success" && res.data && Array.isArray(res.data)) {
+          const mapped: Destination[] = res.data.map((d: Record<string, unknown>) => ({
+            name: (d.name as string) || "",
+            slug: (d.slug as string) || "",
+            img: Array.isArray(d.images) && d.images.length > 0 ? (d.images[0] as string) : "",
+            cat: (d.category as string) || "beach",
+            catIcon: getCatIcon((d.category as string) || "beach"),
+            region: (d.region as string) || "",
+            desc: (d.description as string) || "",
+            season: (d.bestSeason as string) || "Year-round",
+            packages: "View packages",
+            rating: d.rating != null ? String(d.rating) : "4.5",
+            reviews: d.reviewCount != null ? String(d.reviewCount) : "0",
+            price: (d.startingPrice as number) || 0,
+            priceLabel: formatPrice((d.startingPrice as number) || 0),
+          }));
+          if (mapped.length > 0) {
+            setDestinations(mapped);
+          }
+        }
+      } catch {
+        // Fallback to static data (already set)
+      } finally {
+        setApiLoading(false);
+      }
+    }
+    fetchDestinations();
+  }, []);
 
   const filtered = useMemo(() => {
     let results = destinations.filter((d) => {
@@ -29,7 +83,7 @@ export default function DestinationsMain() {
     else if (sort === "rating") results.sort((a, b) => parseFloat(b.rating) - parseFloat(a.rating));
 
     return results;
-  }, [activeCat, search, checkedCats, maxPrice, sort]);
+  }, [activeCat, search, checkedCats, maxPrice, sort, destinations]);
 
   const clearFilters = () => {
     setActiveCat("all");
@@ -92,7 +146,12 @@ export default function DestinationsMain() {
               </div>
 
               {/* Grid */}
-              {filtered.length > 0 ? (
+              {apiLoading ? (
+                <div style={{ textAlign: "center", padding: "60px 20px" }}>
+                  <span className="material-symbols-rounded" style={{ fontSize: 36, color: "var(--gn2)", animation: "mq 1s linear infinite" }}>progress_activity</span>
+                  <p className="syne" style={{ marginTop: 12, fontSize: 13, color: "var(--ink3)" }}>Loading destinations...</p>
+                </div>
+              ) : filtered.length > 0 ? (
                 <div style={{ display: "grid", gridTemplateColumns: listView ? "1fr" : "repeat(3, 1fr)", gap: 20 }} className="dest-results-grid">
                   {filtered.map((d, i) => (
                     <DestinationCard key={i} dest={d} listView={listView} />

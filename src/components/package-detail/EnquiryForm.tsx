@@ -1,17 +1,54 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import { api } from "@/lib/api";
 
 export default function EnquiryForm() {
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (e: FormEvent) => {
+  // Form state
+  const [name, setName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [travelDate, setTravelDate] = useState("");
+  const [message, setMessage] = useState("");
+
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
-    setTimeout(() => {
-      setSubmitted(false);
-      (e.target as HTMLFormElement).reset();
-    }, 3000);
+    setError("");
+    setLoading(true);
+
+    try {
+      const res = await api.post("/enquiries", {
+        type: "booking",
+        firstName: name,
+        email,
+        phone,
+        travelDate: travelDate || undefined,
+        message: message || undefined,
+        source: "website",
+      });
+
+      if (res.status === "success") {
+        setSubmitted(true);
+        setTimeout(() => {
+          setSubmitted(false);
+          setName("");
+          setEmail("");
+          setPhone("");
+          setTravelDate("");
+          setMessage("");
+        }, 3000);
+      } else {
+        setError(res.message || "Something went wrong. Please try again.");
+      }
+    } catch {
+      setError("Network error. Please check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -30,6 +67,13 @@ export default function EnquiryForm() {
       >
         Send an Enquiry
       </h3>
+
+      {error && (
+        <div style={{ padding: "10px 14px", background: "rgba(229,57,53,.08)", border: "1px solid rgba(229,57,53,.2)", borderRadius: 8, marginBottom: 14, fontSize: 12.5, color: "#e53935", display: "flex", alignItems: "center", gap: 8 }}>
+          <span className="material-symbols-rounded" style={{ fontSize: 16 }}>error</span>
+          {error}
+        </div>
+      )}
 
       <form onSubmit={handleSubmit}>
         <div style={{ marginBottom: 14 }}>
@@ -51,6 +95,8 @@ export default function EnquiryForm() {
             type="text"
             placeholder="e.g. Rahul Sharma"
             required
+            value={name}
+            onChange={(e) => setName(e.target.value)}
             style={{
               width: "100%",
               fontFamily: "var(--font-inter), 'Inter', sans-serif",
@@ -85,6 +131,8 @@ export default function EnquiryForm() {
             type="email"
             placeholder="your@email.com"
             required
+            value={email}
+            onChange={(e) => setEmail(e.target.value)}
             style={{
               width: "100%",
               fontFamily: "var(--font-inter), 'Inter', sans-serif",
@@ -119,6 +167,8 @@ export default function EnquiryForm() {
             type="tel"
             placeholder="+91 98765 43210"
             required
+            value={phone}
+            onChange={(e) => setPhone(e.target.value)}
             style={{
               width: "100%",
               fontFamily: "var(--font-inter), 'Inter', sans-serif",
@@ -151,6 +201,8 @@ export default function EnquiryForm() {
           <input
             className="form-input"
             type="date"
+            value={travelDate}
+            onChange={(e) => setTravelDate(e.target.value)}
             style={{
               width: "100%",
               fontFamily: "var(--font-inter), 'Inter', sans-serif",
@@ -183,6 +235,8 @@ export default function EnquiryForm() {
           <textarea
             className="form-input"
             placeholder="Any special requirements or questions..."
+            value={message}
+            onChange={(e) => setMessage(e.target.value)}
             style={{
               width: "100%",
               fontFamily: "var(--font-inter), 'Inter', sans-serif",
@@ -202,13 +256,14 @@ export default function EnquiryForm() {
 
         <button
           type="submit"
+          disabled={loading || submitted}
           className="syne form-submit-btn"
           style={{
             width: "100%",
             fontSize: 14,
             fontWeight: 700,
             color: "#fff",
-            background: submitted ? "var(--gn3)" : "var(--gn)",
+            background: submitted ? "var(--gn3)" : loading ? "var(--ink4)" : "var(--gn)",
             padding: 13,
             borderRadius: 50,
             transition: "var(--tr)",
@@ -219,13 +274,14 @@ export default function EnquiryForm() {
             justifyContent: "center",
             gap: 8,
             border: "none",
-            cursor: "pointer",
+            cursor: loading || submitted ? "not-allowed" : "pointer",
+            opacity: loading ? 0.7 : 1,
           }}
         >
           <span className="material-symbols-rounded" style={{ fontSize: 18 }}>
-            {submitted ? "check_circle" : "send"}
+            {submitted ? "check_circle" : loading ? "hourglass_empty" : "send"}
           </span>
-          {submitted ? "Enquiry Sent!" : "Send Enquiry"}
+          {submitted ? "Enquiry Sent!" : loading ? "Sending..." : "Send Enquiry"}
         </button>
       </form>
 
@@ -238,7 +294,7 @@ export default function EnquiryForm() {
         .form-input::placeholder {
           color: var(--ink4);
         }
-        .form-submit-btn:hover {
+        .form-submit-btn:hover:not(:disabled) {
           background: var(--gn2) !important;
           transform: translateY(-1px);
         }

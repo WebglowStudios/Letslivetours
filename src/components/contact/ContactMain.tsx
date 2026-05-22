@@ -1,10 +1,22 @@
 "use client";
 
-import { useState } from "react";
+import { useState, FormEvent } from "react";
+import { api } from "@/lib/api";
 
 export default function ContactMain() {
   const [activeTab, setActiveTab] = useState<"general" | "booking" | "support">("general");
   const [submitted, setSubmitted] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+
+  // Form state
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [phone, setPhone] = useState("");
+  const [destination, setDestination] = useState("");
+  const [travelDate, setTravelDate] = useState("");
+  const [message, setMessage] = useState("");
 
   const tabs: { key: "general" | "booking" | "support"; label: string }[] = [
     { key: "general", label: "General Enquiry" },
@@ -27,6 +39,36 @@ export default function ContactMain() {
 
   const showDest = activeTab === "general" || activeTab === "booking";
   const showDate = activeTab === "booking";
+
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
+
+    try {
+      const res = await api.post("/enquiries", {
+        type: activeTab,
+        firstName,
+        lastName,
+        email,
+        phone,
+        destination: showDest ? destination : undefined,
+        travelDate: showDate ? travelDate : undefined,
+        message,
+        source: "website",
+      });
+
+      if (res.status === "success") {
+        setSubmitted(true);
+      } else {
+        setError(res.message || "Something went wrong. Please try again.");
+      }
+    } catch {
+      setError("Network error. Please check your connection and try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <section style={{ padding: "100px 0", background: "var(--iv)" }}>
@@ -83,15 +125,24 @@ export default function ContactMain() {
           <div className="rv-r">
             <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: "var(--r-xl)", padding: 48, boxShadow: "var(--sh)" }}>
               {!submitted ? (
-                <>
+                <form onSubmit={handleSubmit}>
                   <div className="serif" style={{ fontSize: 28, fontWeight: 600, color: "var(--ink)", marginBottom: 6 }}>Send Us a Message</div>
                   <div style={{ fontSize: 14, color: "var(--ink3)", marginBottom: 32, lineHeight: 1.6 }}>Fill in the form and a travel expert will get back to you within 2 hours.</div>
+
+                  {/* Error message */}
+                  {error && (
+                    <div style={{ padding: "12px 16px", background: "rgba(229,57,53,.08)", border: "1px solid rgba(229,57,53,.2)", borderRadius: 10, marginBottom: 20, fontSize: 13, color: "#e53935", display: "flex", alignItems: "center", gap: 8 }}>
+                      <span className="material-symbols-rounded" style={{ fontSize: 18 }}>error</span>
+                      {error}
+                    </div>
+                  )}
 
                   {/* Tabs */}
                   <div style={{ display: "flex", gap: 8, marginBottom: 32, background: "var(--iv2)", borderRadius: 50, padding: 5 }}>
                     {tabs.map((tab) => (
                       <button
                         key={tab.key}
+                        type="button"
                         onClick={() => setActiveTab(tab.key)}
                         className="syne"
                         style={{
@@ -119,28 +170,28 @@ export default function ContactMain() {
                   <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
                     <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                       <label className="syne" style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--ink3)" }}>First Name</label>
-                      <input type="text" placeholder="Rahul" style={{ padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, color: "var(--ink)", fontSize: 14, outline: "none", transition: "border-color .2s, box-shadow .2s", width: "100%" }} />
+                      <input type="text" placeholder="Rahul" value={firstName} onChange={(e) => setFirstName(e.target.value)} required style={{ padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, color: "var(--ink)", fontSize: 14, outline: "none", transition: "border-color .2s, box-shadow .2s", width: "100%" }} />
                     </div>
                     <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                       <label className="syne" style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--ink3)" }}>Last Name</label>
-                      <input type="text" placeholder="Gupta" style={{ padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, color: "var(--ink)", fontSize: 14, outline: "none", transition: "border-color .2s, box-shadow .2s", width: "100%" }} />
+                      <input type="text" placeholder="Gupta" value={lastName} onChange={(e) => setLastName(e.target.value)} required style={{ padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, color: "var(--ink)", fontSize: 14, outline: "none", transition: "border-color .2s, box-shadow .2s", width: "100%" }} />
                     </div>
                   </div>
 
                   <div style={{ marginBottom: 20, display: "flex", flexDirection: "column", gap: 7 }}>
                     <label className="syne" style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--ink3)" }}>Email Address</label>
-                    <input type="email" placeholder="you@example.com" style={{ padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, color: "var(--ink)", fontSize: 14, outline: "none", transition: "border-color .2s, box-shadow .2s", width: "100%" }} />
+                    <input type="email" placeholder="you@example.com" value={email} onChange={(e) => setEmail(e.target.value)} required style={{ padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, color: "var(--ink)", fontSize: 14, outline: "none", transition: "border-color .2s, box-shadow .2s", width: "100%" }} />
                   </div>
 
                   <div style={{ marginBottom: 20, display: "flex", flexDirection: "column", gap: 7 }}>
                     <label className="syne" style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--ink3)" }}>Phone Number</label>
-                    <input type="tel" placeholder="+91 98765 43210" style={{ padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, color: "var(--ink)", fontSize: 14, outline: "none", transition: "border-color .2s, box-shadow .2s", width: "100%" }} />
+                    <input type="tel" placeholder="+91 98765 43210" value={phone} onChange={(e) => setPhone(e.target.value)} style={{ padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, color: "var(--ink)", fontSize: 14, outline: "none", transition: "border-color .2s, box-shadow .2s", width: "100%" }} />
                   </div>
 
                   {showDest && (
                     <div style={{ marginBottom: 20, display: "flex", flexDirection: "column", gap: 7 }}>
                       <label className="syne" style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--ink3)" }}>Destination of Interest</label>
-                      <select defaultValue="" style={{ padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, color: "var(--ink)", fontSize: 14, outline: "none", transition: "border-color .2s, box-shadow .2s", width: "100%", appearance: "none", cursor: "pointer" }}>
+                      <select value={destination} onChange={(e) => setDestination(e.target.value)} style={{ padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, color: "var(--ink)", fontSize: 14, outline: "none", transition: "border-color .2s, box-shadow .2s", width: "100%", appearance: "none", cursor: "pointer" }}>
                         <option value="" disabled>Select a destination…</option>
                         <option>Dubai</option>
                         <option>Bali</option>
@@ -157,26 +208,28 @@ export default function ContactMain() {
                   {showDate && (
                     <div style={{ marginBottom: 20, display: "flex", flexDirection: "column", gap: 7 }}>
                       <label className="syne" style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--ink3)" }}>Preferred Travel Date</label>
-                      <input type="date" style={{ padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, color: "var(--ink)", fontSize: 14, outline: "none", transition: "border-color .2s, box-shadow .2s", width: "100%" }} />
+                      <input type="date" value={travelDate} onChange={(e) => setTravelDate(e.target.value)} style={{ padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, color: "var(--ink)", fontSize: 14, outline: "none", transition: "border-color .2s, box-shadow .2s", width: "100%" }} />
                     </div>
                   )}
 
                   <div style={{ marginBottom: 20, display: "flex", flexDirection: "column", gap: 7 }}>
                     <label className="syne" style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--ink3)" }}>Your Message</label>
-                    <textarea placeholder="Tell us about your dream trip, questions, or anything else…" style={{ padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, color: "var(--ink)", fontSize: 14, outline: "none", transition: "border-color .2s, box-shadow .2s", width: "100%", resize: "vertical", minHeight: 120, lineHeight: 1.6 }} />
+                    <textarea placeholder="Tell us about your dream trip, questions, or anything else…" value={message} onChange={(e) => setMessage(e.target.value)} style={{ padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, color: "var(--ink)", fontSize: 14, outline: "none", transition: "border-color .2s, box-shadow .2s", width: "100%", resize: "vertical", minHeight: 120, lineHeight: 1.6 }} />
                   </div>
 
                   <button
-                    onClick={() => setSubmitted(true)}
+                    type="submit"
+                    disabled={loading}
                     className="syne"
-                    style={{ width: "100%", padding: 16, background: "var(--cu)", border: "none", borderRadius: 12, color: "#fff", fontSize: 14, fontWeight: 700, letterSpacing: 0.5, cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "var(--tr)", boxShadow: "0 8px 28px rgba(245,166,35,.35)", marginTop: 8 }}
+                    style={{ width: "100%", padding: 16, background: loading ? "var(--ink4)" : "var(--cu)", border: "none", borderRadius: 12, color: "#fff", fontSize: 14, fontWeight: 700, letterSpacing: 0.5, cursor: loading ? "not-allowed" : "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "var(--tr)", boxShadow: "0 8px 28px rgba(245,166,35,.35)", marginTop: 8, opacity: loading ? 0.7 : 1 }}
                   >
-                    <span className="material-symbols-rounded">send</span>Send Message
+                    <span className="material-symbols-rounded">{loading ? "hourglass_empty" : "send"}</span>
+                    {loading ? "Sending..." : "Send Message"}
                   </button>
                   <div style={{ fontSize: 11.5, color: "var(--ink4)", textAlign: "center", marginTop: 14, lineHeight: 1.6 }}>
                     By submitting, you agree to our <a href="#" style={{ color: "var(--gn2)", textDecoration: "underline" }}>Privacy Policy</a>. No spam, ever.
                   </div>
-                </>
+                </form>
               ) : (
                 <div style={{ textAlign: "center", padding: "40px 20px" }}>
                   <div style={{ width: 72, height: 72, borderRadius: "50%", background: "rgba(74,194,138,.12)", border: "2px solid rgba(74,194,138,.3)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>

@@ -16,10 +16,28 @@ export default function ScrollReveal() {
       { threshold: 0.1 }
     );
 
-    const elements = document.querySelectorAll(".rv, .rv-l, .rv-r");
-    elements.forEach((el) => observer.observe(el));
+    const observeElements = () => {
+      const elements = document.querySelectorAll(".rv:not(.in), .rv-l:not(.in), .rv-r:not(.in)");
+      elements.forEach((el) => observer.observe(el));
+    };
 
-    return () => observer.disconnect();
+    // Initial observe
+    observeElements();
+
+    // Re-observe when DOM changes (for dynamically loaded content)
+    const mutationObserver = new MutationObserver(() => {
+      observeElements();
+    });
+
+    mutationObserver.observe(document.body, {
+      childList: true,
+      subtree: true,
+    });
+
+    return () => {
+      observer.disconnect();
+      mutationObserver.disconnect();
+    };
   }, []);
 
   return null;
