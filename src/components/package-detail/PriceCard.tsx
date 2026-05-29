@@ -1,5 +1,8 @@
 "use client";
 
+import Link from "next/link";
+import { useParams } from "next/navigation";
+
 const metaRows = [
   { icon: "calendar_today", label: "Duration:", value: "7 Nights / 8 Days" },
   { icon: "hotel", label: "Stay:", value: "5-Star Hotels" },
@@ -15,6 +18,9 @@ const trustBadges = [
 ];
 
 export default function PriceCard() {
+  const params = useParams();
+  const slug = params?.slug as string || "dubai-luxury-escape";
+
   return (
     <div
       style={{
@@ -138,7 +144,8 @@ export default function PriceCard() {
       </div>
 
       {/* Book button */}
-      <button
+      <Link
+        href={`/book/${slug}`}
         className="syne price-book-btn"
         style={{
           width: "100%",
@@ -153,10 +160,13 @@ export default function PriceCard() {
           marginBottom: 10,
           border: "none",
           cursor: "pointer",
+          textDecoration: "none",
+          textAlign: "center",
+          display: "block",
         }}
       >
         Book This Package
-      </button>
+      </Link>
 
       {/* Callback button */}
       <button

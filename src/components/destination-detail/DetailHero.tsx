@@ -17,7 +17,11 @@ const stats = [
   { val: "Oct\u2013Apr", lbl: "Best Season" },
 ];
 
-export default function DetailHero() {
+interface DetailHeroProps {
+  destinationName?: string;
+}
+
+export default function DetailHero({ destinationName = "Dubai" }: DetailHeroProps) {
   const [idx, setIdx] = useState(0);
 
   useEffect(() => {
@@ -42,13 +46,13 @@ export default function DetailHero() {
           <span style={{ color: "rgba(255,255,255,.3)" }}>\u203A</span>
           <a href="/destinations" style={{ color: "rgba(255,255,255,.6)" }}>Destinations</a>
           <span style={{ color: "rgba(255,255,255,.3)" }}>\u203A</span>
-          <span style={{ color: "rgba(255,255,255,.9)" }}>Dubai</span>
+          <span style={{ color: "rgba(255,255,255,.9)" }}>{destinationName}</span>
         </div>
         <div className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--cu)", color: "#fff", fontSize: 11, fontWeight: 800, letterSpacing: 2, textTransform: "uppercase", padding: "6px 16px", borderRadius: 50, marginBottom: 18, width: "fit-content", boxShadow: "0 4px 18px rgba(245,166,35,.45)" }}>
           <span className="material-symbols-rounded" style={{ fontSize: 16 }}>local_offer</span>Up to 30% Off \u2014 Limited Time
         </div>
         <h1 className="serif" style={{ fontSize: "clamp(48px, 7vw, 88px)", fontWeight: 700, color: "#fff", lineHeight: 1.05, marginBottom: 12 }}>
-          Discover<br /><em style={{ fontStyle: "italic", color: "var(--cu-l)" }}>Dubai</em>
+          Discover<br /><em style={{ fontStyle: "italic", color: "var(--cu-l)" }}>{destinationName}</em>
         </h1>
         <p style={{ fontSize: 17, color: "rgba(255,255,255,.75)", marginBottom: 32, maxWidth: 480, lineHeight: 1.6 }}>
           Where golden deserts meet futuristic skylines \u2014 an experience unlike any other.

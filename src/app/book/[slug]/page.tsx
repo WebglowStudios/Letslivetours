@@ -4,14 +4,13 @@ import { useState, useEffect, useMemo, FormEvent } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
-import AuthGuard from "@/components/auth/AuthGuard";
 
 interface PackageData {
   _id: string;
   name: string;
   slug: string;
   destination?: { name: string };
-  duration: string;
+  duration: { nights: number; days: number } | string;
   price: number;
   images: string[];
   description?: string;
@@ -92,6 +91,12 @@ function BookingContent() {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!pkg) return;
+
+    // Check if user is logged in before booking
+    if (!user) {
+      router.push(`/login?redirect=/book/${slug}`);
+      return;
+    }
 
     setSubmitError("");
     setSubmitting(true);
@@ -186,7 +191,7 @@ function BookingContent() {
               )}
               <div style={{ display: "flex", alignItems: "center", gap: 5, fontSize: 13, color: "var(--ink3)", marginBottom: 16 }}>
                 <span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--gn2)" }}>schedule</span>
-                {pkg.duration}
+                {typeof pkg.duration === "object" ? `${pkg.duration.nights}N / ${pkg.duration.days}D` : pkg.duration}
               </div>
               <div style={{ borderTop: "1px solid var(--line)", paddingTop: 16 }}>
                 <div className="syne" style={{ fontSize: 10, color: "var(--ink4)", letterSpacing: 1, textTransform: "uppercase", marginBottom: 4 }}>Price per person</div>
@@ -349,9 +354,5 @@ function BookingContent() {
 }
 
 export default function BookPage() {
-  return (
-    <AuthGuard>
-      <BookingContent />
-    </AuthGuard>
-  );
+  return <BookingContent />;
 }

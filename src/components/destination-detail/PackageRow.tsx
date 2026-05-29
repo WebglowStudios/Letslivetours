@@ -1,12 +1,14 @@
 "use client";
 
 import { useRef } from "react";
+import Link from "next/link";
 
 interface PkgCard {
   img: string;
   badge: string;
   badgeCls: string;
   name: string;
+  slug?: string;
   duration: string;
   hotel: string;
   stars: string;
@@ -89,7 +91,7 @@ export default function PackageRow({ eyebrow, title, titleEm, subtitle, cards, a
                       <div style={{ fontSize: 12, color: "var(--ink4)", textDecoration: "line-through" }}>{c.origPrice}</div>
                       <div className="serif" style={{ fontSize: 20, fontWeight: 700, color: "var(--gn)", lineHeight: 1 }}>{c.price} <small style={{ fontFamily: "var(--font-inter),'Inter',sans-serif", fontSize: 11, fontWeight: 400, color: "var(--ink3)" }}>{c.perUnit}</small></div>
                     </div>
-                    <button className="syne" style={{ fontSize: 12, fontWeight: 700, color: "#fff", background: "var(--gn)", padding: "9px 18px", borderRadius: 50, border: "none", cursor: "pointer", transition: "var(--tr)" }}>Book Now</button>
+                    <Link href={`/packages/${c.slug || c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '')}`} className="syne" style={{ fontSize: 12, fontWeight: 700, color: "#fff", background: "var(--gn)", padding: "9px 18px", borderRadius: 50, border: "none", cursor: "pointer", transition: "var(--tr)", textDecoration: "none", display: "inline-block" }}>Book Now</Link>
                   </div>
                 </div>
               </div>
