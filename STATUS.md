@@ -77,60 +77,69 @@
 ## ❌ UNFINISHED — Functionality
 
 ### Dynamic Data (pages still show hardcoded content)
-- [ ] **Destination detail page** — `/destinations/[slug]` always shows Dubai. Needs to fetch destination data + its packages from API based on slug
-- [ ] **Package detail page** — `/packages/[slug]` always shows Dubai Luxury Escape. Needs to fetch package data + reviews from API based on slug
-- [ ] **Homepage featured sections** — Destinations row, packages grid, and testimonials are hardcoded. Should fetch from `/destinations/featured`, `/packages/featured`, and reviews
+- [x] **Destination detail page** — `/destinations/[slug]` fetches destination data + packages from API
+- [x] **Package detail page** — `/packages/[slug]` fetches package data + reviews from API
+- [ ] **Homepage featured sections** — ~~Destinations row, packages grid, and testimonials are hardcoded.~~ ✅ Now fetches from `/destinations/featured`, `/packages/featured`, and `/reviews/featured` with static fallback
 
 ### Navigation & Linking
-- [ ] **"Book Now" button on package detail** — Doesn't link to `/book/[slug]`
-- [ ] **"Book Now" in navbar** — Goes nowhere. Should link to `/destinations` or a packages page
-- [ ] **Homepage hero search bar** — Decorative. Should navigate to `/destinations?search=query`
-- [ ] **Footer links** — Many still point to `#` anchors instead of proper routes
-- [ ] **Homepage destination cards** — The expandable cards on homepage don't link to destination detail pages
+- [x] **"Book Now" button on package detail** — Links to `/book/[slug]`
+- [x] **"Book Now" in navbar** — Links to `/destinations`
+- [x] **Homepage hero search bar** — Navigates to `/destinations?search=query`
+- [x] **Footer links** — All point to proper routes (destinations, about, careers, contact, login)
+- [x] **Homepage destination cards** — Expandable cards link to `/destinations/[slug]`
+- [x] **Homepage package cards** — Cards link to `/packages/[slug]`
 
 ### Interactive Features
-- [ ] **Wishlist buttons** — Heart icons on cards are decorative. Need to call POST/DELETE /users/wishlist/:id (and require login)
-- [ ] **Review submission** — No UI for users to write a review after completing a booking
-- [ ] **Booking payment** — No payment integration (Razorpay/Stripe). Bookings are created but no actual payment flow
+- [x] **Review submission** — Users can write/edit/delete reviews from Dashboard → My Reviews. "Write Review" button also appears on completed booking detail pages.
 
 ### Missing Pages
-- [ ] **404 page** — No custom not-found page
-- [ ] **Packages listing page** — No `/packages` route to browse all packages (only accessible via destination detail)
+- [x] **404 page** — Custom not-found page with links to home and destinations
+- [ ] **Packages listing page** — `/packages` currently redirects to `/destinations` (acceptable for now)
 
 ---
 
 ## ❌ UNFINISHED — UI/Responsiveness
 
-### Mobile Responsiveness Issues (to fix next)
-- [ ] **Navbar** — Nav links hidden on mobile but no hamburger menu for public pages
-- [ ] **Homepage hero** — Stats bar and filmstrip may overflow on small screens
-- [ ] **Homepage sections** — Some grids may not collapse properly on mobile
-- [ ] **Destination listing** — Sidebar doesn't collapse/hide on mobile
-- [ ] **Package detail** — 2-column layout (content + price card) doesn't stack on mobile
-- [ ] **Booking page** — 2-column layout doesn't stack on mobile
-- [ ] **Contact page** — Form grid may not collapse
-- [ ] **About page** — Story grid, team grid, timeline may not be responsive
-- [ ] **Careers page** — Role cards may overflow on mobile
-- [ ] **Footer** — 4-column grid needs to collapse
-- [ ] **Auth pages** — Split layout hides left panel on mobile (already handled)
-- [ ] **Dashboard/Admin** — Sidebar hamburger exists but may need polish
+### Mobile Responsiveness ✅ (all done)
+- [x] Navbar — Hamburger menu for mobile
+- [x] Homepage hero — Stats bar and filmstrip responsive
+- [x] Homepage sections — Grids collapse on mobile
+- [x] Destination listing — Sidebar collapses on mobile
+- [x] Package detail — 2-column layout stacks on mobile
+- [x] Booking page — 2-column layout stacks on mobile
+- [x] Contact page — Form grid collapses
+- [x] About page — Story grid, team grid, timeline responsive
+- [x] Careers page — Role cards responsive
+- [x] Footer — 4-column grid collapses
+- [x] Auth pages — Split layout hides left panel on mobile
+- [x] Dashboard/Admin — Sidebar hamburger works
 
-### General UI Polish
-- [ ] **Loading skeletons** — No skeleton loaders during API fetches (just spinners)
-- [ ] **Error states** — No user-friendly error pages when API fails
-- [ ] **Image optimization** — All images are raw Unsplash URLs, no next/image optimization
-- [ ] **SEO** — Dynamic pages don't have dynamic meta titles/descriptions
-- [ ] **Favicon** — No custom favicon set
-- [ ] **OG images** — No social sharing meta tags
+### General UI Polish — moved to Optional/Future
 
 ---
 
-## Priority Order (recommended)
-1. UI Responsiveness (you're doing this next)
-2. Dynamic data for destination/package detail pages
-3. Homepage API integration
-4. Navigation fixes (Book Now, footer links, search bar)
-5. Wishlist functionality
-6. 404 page + packages listing page
-7. Polish (loading skeletons, SEO, images)
-8. Payment integration (Razorpay/Stripe)
+## Priority Order (recommended next steps)
+1. ~~UI Responsiveness~~ ✅ Done
+2. ~~Dynamic data for destination/package detail pages~~ ✅ Done
+3. ~~Navigation fixes~~ ✅ Done
+4. ~~404 page~~ ✅ Done
+5. ~~Homepage API integration~~ ✅ Done
+6. ~~Review submission UI~~ ✅ Done
+
+**All core features complete.** Remaining items are in Optional/Future Changes below.
+
+---
+
+## 🔮 OPTIONAL / FUTURE CHANGES
+
+### Polish & UX (later)
+- [ ] **Wishlist buttons** — Heart icons on cards are decorative. Need to call POST/DELETE /users/wishlist/:id (and require login).
+- [ ] **Loading skeletons** — Pages show basic spinners during API fetches. Could use skeleton loaders for a smoother feel.
+- [ ] **Image optimization** — All images are raw Unsplash URLs. Should use `next/image` for lazy loading, responsive sizing, and format optimization.
+- [ ] **SEO meta tags** — Dynamic pages (`/destinations/[slug]`, `/packages/[slug]`) don't have dynamic `<title>` and `<meta description>`.
+- [ ] **Favicon** — No custom favicon set.
+- [ ] **OG/social images** — No Open Graph meta tags for social sharing.
+- [ ] **Error states** — No user-friendly error UI when API calls fail (just silent fallback or console errors).
+
+### Business Logic (last)
+- [ ] **Payment integration (Razorpay/Stripe)** — Bookings are created in the DB but no actual payment flow. Requires: choosing a payment provider, setting up test/live API keys, building a checkout UI, handling webhooks for payment confirmation, updating booking status on success/failure.

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const slides = [
   { src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80", label: "Tropical" },
@@ -13,11 +14,21 @@ const slides = [
 
 export default function Hero() {
   const [idx, setIdx] = useState(0);
+  const [searchQuery, setSearchQuery] = useState("");
+  const router = useRouter();
 
   useEffect(() => {
     const interval = setInterval(() => setIdx((p) => (p + 1) % slides.length), 5000);
     return () => clearInterval(interval);
   }, []);
+
+  const handleSearch = () => {
+    if (searchQuery.trim()) {
+      router.push(`/destinations?search=${encodeURIComponent(searchQuery.trim())}`);
+    } else {
+      router.push("/destinations");
+    }
+  };
 
   return (
     <section
@@ -132,14 +143,34 @@ export default function Hero() {
           border: "1px solid rgba(249,246,240,.15)", borderRadius: "var(--r-xl)",
           padding: "20px 26px", display: "flex", gap: 2, alignItems: "stretch", maxWidth: 820,
         }} className="hero-search-bar">
+          <div style={{
+            flex: 1, display: "flex", flexDirection: "column", gap: 4, padding: "6px 20px",
+            borderRight: "1px solid rgba(249,246,240,.12)",
+          }} className="hs-field">
+            <div className="syne" style={{
+              fontSize: 9.5, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase",
+              color: "rgba(249,246,240,.5)",
+            }}>Where to?</div>
+            <input
+              type="text"
+              placeholder="Dubai, Bali, Japan…"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              style={{
+                background: "transparent", border: "none", outline: "none",
+                fontFamily: "var(--font-inter),'Inter',sans-serif", fontSize: 15,
+                color: "#fff", fontWeight: 500,
+              }}
+            />
+          </div>
           {[
-            { label: "Where to?", type: "text", placeholder: "Dubai, Bali, Japan…" },
             { label: "Travel Date", type: "date", placeholder: "" },
             { label: "Travellers", type: "text", placeholder: "2 Adults" },
           ].map((f, i) => (
             <div key={i} style={{
               flex: 1, display: "flex", flexDirection: "column", gap: 4, padding: "6px 20px",
-              borderRight: i < 2 ? "1px solid rgba(249,246,240,.12)" : "none",
+              borderRight: i < 1 ? "1px solid rgba(249,246,240,.12)" : "none",
             }} className="hs-field">
               <div className="syne" style={{
                 fontSize: 9.5, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase",
@@ -156,7 +187,7 @@ export default function Hero() {
               />
             </div>
           ))}
-          <button className="syne" style={{
+          <button onClick={handleSearch} className="syne" style={{
             flexShrink: 0, padding: "14px 26px", background: "var(--cu)", border: "none",
             borderRadius: 16, color: "#fff", fontSize: 13, fontWeight: 700, letterSpacing: 0.5,
             cursor: "pointer", display: "flex", alignItems: "center", gap: 7,

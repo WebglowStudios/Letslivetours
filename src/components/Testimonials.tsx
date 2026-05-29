@@ -1,6 +1,18 @@
 "use client";
 
-const testimonials = [
+import { useEffect, useState } from "react";
+
+interface ReviewData {
+  _id: string;
+  rating: number;
+  title?: string;
+  text: string;
+  user?: { firstName: string; lastName: string; avatar?: string };
+  package?: { name: string; slug: string };
+  destination?: { name: string; slug: string };
+}
+
+const fallbackTestimonials = [
   { img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80", text: "\u201CAbsolutely magical honeymoon. Every detail was perfect.\u201D", name: "Priya Sharma", trip: "Bali Package" },
   { img: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80", text: "\u201CDubai family trip was flawless. Kids loved every moment!\u201D", name: "Rajesh Mehta", trip: "Dubai Package" },
   { img: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80", text: "\u201CJapan in blossom season was a dream. Curated flawlessly.\u201D", name: "Ananya Nair", trip: "Japan Package" },
@@ -9,10 +21,47 @@ const testimonials = [
   { img: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800&q=80", text: "\u201CPhuket beaches were breathtaking. Best trip of my life!\u201D", name: "Arjun Kapoor", trip: "Thailand Package" },
 ];
 
+const destImages: Record<string, string> = {
+  dubai: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80",
+  singapore: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=800&q=80",
+  japan: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80",
+  bali: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
+  maldives: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80",
+  thailand: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800&q=80",
+};
+
 const rotations = ["-3.5deg", "2deg", "-1.5deg", "3deg", "-2.5deg", "1.8deg"];
 const margins = ["0px", "40px", "-20px", "50px", "10px", "30px"];
 
 export default function Testimonials() {
+  const [testimonials, setTestimonials] = useState(fallbackTestimonials);
+
+  useEffect(() => {
+    const fetchReviews = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews/featured`);
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data && json.data.length > 0) {
+            const mapped = json.data.slice(0, 6).map((r: ReviewData) => {
+              const destSlug = r.destination?.slug || r.destination?.name?.toLowerCase() || "";
+              const img = destImages[destSlug] || "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80";
+              const name = r.user ? `${r.user.firstName} ${r.user.lastName}` : "Traveller";
+              const trip = r.package?.name || r.destination?.name || "Package";
+              // Truncate text for display
+              const displayText = r.text.length > 120 ? `\u201C${r.text.slice(0, 120)}…\u201D` : `\u201C${r.text}\u201D`;
+              return { img, text: displayText, name, trip };
+            });
+            setTestimonials(mapped);
+          }
+        }
+      } catch {
+        // Use fallback
+      }
+    };
+    fetchReviews();
+  }, []);
+
   return (
     <section id="testimonials" style={{ padding: "100px 0", background: "var(--iv2)", position: "relative", overflow: "hidden" }}>
       {/* BG text */}
@@ -37,7 +86,7 @@ export default function Testimonials() {
               background: "#fff", padding: "14px 14px 48px",
               boxShadow: "0 8px 36px rgba(0,77,94,.12)", width: 240, flexShrink: 0,
               transition: "var(--tr)", cursor: "pointer", position: "relative",
-              border: "1px solid var(--line)", transform: `rotate(${rotations[i]})`, marginTop: margins[i],
+              border: "1px solid var(--line)", transform: `rotate(${rotations[i % rotations.length]})`, marginTop: margins[i % margins.length],
             }}>
               <div style={{ width: "100%", height: 180, overflow: "hidden", borderRadius: 4 }}>
                 <img src={t.img} alt={t.name} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "filter .4s" }} />

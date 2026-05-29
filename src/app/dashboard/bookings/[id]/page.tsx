@@ -281,6 +281,33 @@ export default function BookingDetailPage() {
         </div>
       )}
 
+      {/* Write Review Button (for completed bookings) */}
+      {(booking.status === "completed" || booking.status === "confirmed") && (
+        <div style={{ marginTop: canCancel ? 16 : 32 }}>
+          <Link
+            href="/dashboard/reviews"
+            className="syne"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "14px 28px",
+              background: "var(--cu)",
+              color: "#fff",
+              border: "none",
+              borderRadius: "var(--r)",
+              fontSize: 14,
+              fontWeight: 600,
+              textDecoration: "none",
+              transition: "var(--tr)",
+            }}
+          >
+            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>rate_review</span>
+            Write a Review
+          </Link>
+        </div>
+      )}
+
       {/* Cancel Modal */}
       {showCancelModal && (
         <div

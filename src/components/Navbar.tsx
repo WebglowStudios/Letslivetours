@@ -346,7 +346,8 @@ export default function Navbar() {
             Sign In
           </Link>
         )}
-        <button
+        <Link
+          href="/destinations"
           className="syne nav-book-btn"
           style={{
             padding: "9px 22px",
@@ -359,10 +360,11 @@ export default function Navbar() {
             border: "none",
             cursor: "pointer",
             transition: "var(--tr)",
+            textDecoration: "none",
           }}
         >
           Book Now
-        </button>
+        </Link>
 
         {/* Hamburger button */}
         <button
@@ -486,7 +488,8 @@ export default function Navbar() {
                 Sign In
               </Link>
             )}
-            <button
+            <Link
+              href="/destinations"
               onClick={() => setMobileMenuOpen(false)}
               className="syne"
               style={{
@@ -498,10 +501,12 @@ export default function Navbar() {
                 fontWeight: 700,
                 color: "#fff",
                 cursor: "pointer",
+                textDecoration: "none",
+                textAlign: "center",
               }}
             >
               Book Now
-            </button>
+            </Link>
           </div>
         </div>
       )}

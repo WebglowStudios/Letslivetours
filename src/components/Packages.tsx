@@ -1,37 +1,87 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import Link from "next/link";
 
-const tabs = ["All", "Dubai", "Singapore", "Japan", "Bali", "Thailand"];
-const tabValues = ["all", "dubai", "sg", "japan", "bali", "thailand"];
+interface PackageData {
+  _id: string;
+  name: string;
+  slug: string;
+  destination?: { name: string; slug: string } | string;
+  images: string[];
+  heroImage?: string;
+  duration: { nights: number; days: number };
+  hotelRating?: string;
+  price: number;
+  originalPrice?: number;
+  rating: number;
+  reviewCount: number;
+  badge?: string;
+  category?: string;
+}
 
-const packages = [
-  { dest: "dubai", region: "Dubai · UAE", name: "Dubai Luxury Escape — Burj Khalifa & Desert Safari", dur: "7N / 8D", hotel: "5-Star", rating: "4.9", reviews: "312", price: "₹1,24,999", badge: "Bestseller", badgeCls: "" },
-  { dest: "dubai", region: "Dubai · UAE", name: "Dubai City & Dhow Cruise Getaway", dur: "5N / 6D", hotel: "4-Star", rating: "4.8", reviews: "219", price: "₹89,999", badge: "Hot Deal", badgeCls: "hot" },
-  { dest: "sg", region: "Singapore · SE Asia", name: "Singapore Classic with Universal Studios", dur: "5N / 6D", hotel: "4-Star", rating: "4.8", reviews: "401", price: "₹72,999", badge: "Popular", badgeCls: "" },
-  { dest: "japan", region: "Japan · East Asia", name: "Japan Cherry Blossom Season Special", dur: "9N / 10D", hotel: "4-Star", rating: "5.0", reviews: "178", price: "₹1,14,999", badge: "New", badgeCls: "" },
-  { dest: "bali", region: "Bali · Indonesia", name: "Bali Honeymoon Private Villa Retreat", dur: "6N / 7D", hotel: "5-Star", rating: "4.9", reviews: "524", price: "₹64,999", badge: "Top Rated", badgeCls: "green" },
-  { dest: "thailand", region: "Thailand · SE Asia", name: "Bangkok & Phuket Beach Holiday", dur: "6N / 7D", hotel: "4-Star", rating: "4.8", reviews: "374", price: "₹54,999", badge: "Bestseller", badgeCls: "" },
-  { dest: "bali", region: "Maldives · South Asia", name: "Maldives Overwater Bungalow Experience", dur: "5N / 6D", hotel: "5-Star", rating: "5.0", reviews: "209", price: "₹1,19,999", badge: "All-Inclusive", badgeCls: "" },
-  { dest: "sg", region: "Singapore · SE Asia", name: "Singapore + Sentosa Island Luxury Package", dur: "6N / 7D", hotel: "5-Star", rating: "4.9", reviews: "188", price: "₹1,05,000", badge: "Premium", badgeCls: "" },
+const fallbackPackages: PackageData[] = [
+  { _id: "1", name: "Dubai Luxury Escape — Burj Khalifa & Desert Safari", slug: "dubai-luxury-escape-burj-khalifa-desert-safari", destination: { name: "Dubai", slug: "dubai" }, images: ["https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80"], duration: { nights: 7, days: 8 }, hotelRating: "5-Star", price: 124999, rating: 4.9, reviewCount: 312, badge: "Bestseller" },
+  { _id: "2", name: "Dubai City & Dhow Cruise Getaway", slug: "dubai-city-dhow-cruise-getaway", destination: { name: "Dubai", slug: "dubai" }, images: ["https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80"], duration: { nights: 5, days: 6 }, hotelRating: "4-Star", price: 89999, rating: 4.8, reviewCount: 219, badge: "Hot Deal" },
+  { _id: "3", name: "Singapore Classic with Universal Studios", slug: "singapore-classic-with-universal-studios", destination: { name: "Singapore", slug: "singapore" }, images: ["https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=800&q=80"], duration: { nights: 5, days: 6 }, hotelRating: "4-Star", price: 72999, rating: 4.8, reviewCount: 401, badge: "Popular" },
+  { _id: "4", name: "Japan Cherry Blossom Season Special", slug: "japan-cherry-blossom-season-special", destination: { name: "Japan", slug: "japan" }, images: ["https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80"], duration: { nights: 9, days: 10 }, hotelRating: "4-Star", price: 114999, rating: 5.0, reviewCount: 178, badge: "New" },
+  { _id: "5", name: "Bali Honeymoon Private Villa Retreat", slug: "bali-honeymoon-private-villa-retreat", destination: { name: "Bali", slug: "bali" }, images: ["https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80"], duration: { nights: 6, days: 7 }, hotelRating: "5-Star", price: 64999, rating: 4.9, reviewCount: 524, badge: "Top Rated" },
+  { _id: "6", name: "Bangkok & Phuket Beach Holiday", slug: "bangkok-phuket-beach-holiday", destination: { name: "Thailand", slug: "thailand" }, images: ["https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800&q=80"], duration: { nights: 6, days: 7 }, hotelRating: "4-Star", price: 54999, rating: 4.8, reviewCount: 374, badge: "Bestseller" },
+  { _id: "7", name: "Maldives Overwater Bungalow Experience", slug: "maldives-overwater-bungalow-experience", destination: { name: "Maldives", slug: "maldives" }, images: ["https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80"], duration: { nights: 5, days: 6 }, hotelRating: "5-Star", price: 119999, rating: 5.0, reviewCount: 209, badge: "All-Inclusive" },
+  { _id: "8", name: "Singapore + Sentosa Island Luxury Package", slug: "singapore-sentosa-island-luxury-package", destination: { name: "Singapore", slug: "singapore" }, images: ["https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=800&q=80"], duration: { nights: 6, days: 7 }, hotelRating: "5-Star", price: 105000, rating: 4.9, reviewCount: 188, badge: "Premium" },
 ];
-
-const imgMap: Record<string, string> = {
-  dubai: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80",
-  sg: "https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=800&q=80",
-  japan: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80",
-  bali: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80",
-  thailand: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800&q=80",
-};
 
 export default function Packages() {
   const [active, setActive] = useState("all");
+  const [packages, setPackages] = useState<PackageData[]>(fallbackPackages);
 
-  const filtered = active === "all" ? packages : packages.filter((p) => p.dest === active);
+  useEffect(() => {
+    const fetchPackages = async () => {
+      try {
+        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/packages/featured`);
+        if (res.ok) {
+          const json = await res.json();
+          if (json.data && json.data.length > 0) {
+            setPackages(json.data);
+          }
+        }
+      } catch {
+        // Use fallback data
+      }
+    };
+    fetchPackages();
+  }, []);
 
-  const getBadgeStyle = (cls: string): React.CSSProperties => {
-    if (cls === "hot") return { background: "rgba(212,168,83,.2)", borderColor: "rgba(212,168,83,.4)", color: "var(--gd)" };
-    if (cls === "green") return { background: "rgba(74,194,138,.15)", borderColor: "rgba(74,194,138,.3)", color: "#4AC28A" };
+  const getDestName = (pkg: PackageData): string => {
+    if (typeof pkg.destination === "object" && pkg.destination?.name) {
+      return pkg.destination.name.toLowerCase();
+    }
+    return "";
+  };
+
+  const filtered = active === "all" ? packages : packages.filter((p) => getDestName(p) === active);
+
+  const getDestLabel = (pkg: PackageData): string => {
+    if (typeof pkg.destination === "object" && pkg.destination?.name) {
+      return pkg.destination.name;
+    }
+    return "";
+  };
+
+  // Build dynamic tabs from available destinations
+  const destNames = [...new Set(packages.map(getDestName).filter(Boolean))];
+  const tabs = ["All", ...destNames.map(n => n.charAt(0).toUpperCase() + n.slice(1))];
+  const tabValues = ["all", ...destNames];
+
+  const formatPrice = (price: number): string => {
+    return "₹" + price.toLocaleString("en-IN");
+  };
+
+  const getBadgeStyle = (badge?: string): React.CSSProperties => {
+    if (!badge) return { background: "rgba(255,255,255,.15)", borderColor: "rgba(255,255,255,.22)", color: "#fff" };
+    const lower = badge.toLowerCase();
+    if (lower.includes("hot") || lower.includes("deal")) return { background: "rgba(212,168,83,.2)", borderColor: "rgba(212,168,83,.4)", color: "var(--gd)" };
+    if (lower.includes("top") || lower.includes("rated") || lower.includes("green")) return { background: "rgba(74,194,138,.15)", borderColor: "rgba(74,194,138,.3)", color: "#4AC28A" };
     return { background: "rgba(255,255,255,.15)", borderColor: "rgba(255,255,255,.22)", color: "#fff" };
   };
 
@@ -52,9 +102,9 @@ export default function Packages() {
               Every package crafted by destination experts — no cookie-cutter itineraries.
             </p>
           </div>
-          <a href="#" className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 13, fontWeight: 600, color: "var(--gd)", borderBottom: "1.5px solid rgba(212,168,83,.25)", paddingBottom: 2 }}>
+          <Link href="/destinations" className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 13, fontWeight: 600, color: "var(--gd)", borderBottom: "1.5px solid rgba(212,168,83,.25)", paddingBottom: 2, textDecoration: "none" }}>
             All packages <span className="material-symbols-rounded" style={{ fontSize: 16 }}>arrow_forward</span>
-          </a>
+          </Link>
         </div>
 
         {/* Tabs */}
@@ -80,47 +130,53 @@ export default function Packages() {
 
         {/* Grid */}
         <div className="rv pkg-grid" style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16 }}>
-          {filtered.map((pkg, i) => (
-            <div key={i} className="pc-card" style={{
-              background: "rgba(249,246,240,.04)", border: "1px solid rgba(249,246,240,.1)",
-              borderRadius: "var(--r)", overflow: "hidden", cursor: "pointer",
-              transition: "var(--tr)", display: "flex", flexDirection: "column",
-            }}>
-              {/* Image */}
-              <div style={{ height: 210, position: "relative", overflow: "hidden" }}>
-                <img src={imgMap[pkg.dest]} alt={pkg.name} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .55s" }} />
-                <div style={{ position: "absolute", top: 12, left: 12, right: 12, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
-                  <span className="syne" style={{ ...getBadgeStyle(pkg.badgeCls), display: "inline-flex", alignItems: "center", gap: 6, padding: "3px 11px", borderRadius: 50, fontSize: 9, fontWeight: 700, letterSpacing: 2.5, textTransform: "uppercase", backdropFilter: "blur(8px)", border: "1px solid" }}>
-                    {pkg.badge}
-                  </span>
-                  <button style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(0,77,94,.55)", backdropFilter: "blur(8px)", border: "1px solid rgba(249,246,240,.15)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "var(--tr)" }}>
-                    <span className="material-symbols-rounded" style={{ fontSize: 16, color: "rgba(249,246,240,.7)" }}>favorite_border</span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Body */}
-              <div style={{ padding: 18, flex: 1, display: "flex", flexDirection: "column" }}>
-                <div className="syne" style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--cu)", marginBottom: 7 }}>{pkg.region}</div>
-                <div className="serif" style={{ fontSize: 18, fontWeight: 600, color: "var(--iv)", lineHeight: 1.3, marginBottom: 10 }}>{pkg.name}</div>
-                <div style={{ display: "flex", gap: 12, fontSize: 12, color: "rgba(249,246,240,.45)", marginBottom: 10, flexWrap: "wrap" }}>
-                  <span style={{ display: "flex", alignItems: "center", gap: 3 }}><span className="material-symbols-rounded" style={{ fontSize: 13, color: "var(--cu)" }}>calendar_today</span>{pkg.dur}</span>
-                  <span style={{ display: "flex", alignItems: "center", gap: 3 }}><span className="material-symbols-rounded" style={{ fontSize: 13, color: "var(--cu)" }}>hotel</span>{pkg.hotel}</span>
-                </div>
-                <div style={{ display: "flex", alignItems: "center", gap: 2, color: "var(--gd)", marginBottom: 14 }}>
-                  {[...Array(5)].map((_, j) => <span key={j} className="material-symbols-rounded" style={{ fontSize: 13 }}>star</span>)}
-                  <span style={{ fontSize: 11, color: "rgba(249,246,240,.35)", marginLeft: 5 }}>({pkg.rating} · {pkg.reviews})</span>
-                </div>
-                <div style={{ marginTop: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "1px solid rgba(249,246,240,.1)", paddingTop: 14 }}>
-                  <div>
-                    <div style={{ fontSize: 10, color: "rgba(249,246,240,.35)", letterSpacing: 0.5, marginBottom: 2 }}>from</div>
-                    <div className="serif" style={{ fontSize: 24, color: "var(--iv)", lineHeight: 1 }}>{pkg.price}<small style={{ fontFamily: "var(--font-inter),'Inter',sans-serif", fontSize: 12, color: "rgba(249,246,240,.35)" }}>/person</small></div>
+          {filtered.map((pkg, i) => {
+            const img = pkg.heroImage || pkg.images?.[0] || "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80";
+            return (
+              <Link key={pkg._id || i} href={`/packages/${pkg.slug}`} className="pc-card" style={{
+                background: "rgba(249,246,240,.04)", border: "1px solid rgba(249,246,240,.1)",
+                borderRadius: "var(--r)", overflow: "hidden", cursor: "pointer",
+                transition: "var(--tr)", display: "flex", flexDirection: "column",
+                textDecoration: "none",
+              }}>
+                {/* Image */}
+                <div style={{ height: 210, position: "relative", overflow: "hidden" }}>
+                  <img src={img} alt={pkg.name} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .55s" }} />
+                  <div style={{ position: "absolute", top: 12, left: 12, right: 12, display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+                    {pkg.badge && (
+                      <span className="syne" style={{ ...getBadgeStyle(pkg.badge), display: "inline-flex", alignItems: "center", gap: 6, padding: "3px 11px", borderRadius: 50, fontSize: 9, fontWeight: 700, letterSpacing: 2.5, textTransform: "uppercase", backdropFilter: "blur(8px)", border: "1px solid" }}>
+                        {pkg.badge}
+                      </span>
+                    )}
+                    <span style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(0,77,94,.55)", backdropFilter: "blur(8px)", border: "1px solid rgba(249,246,240,.15)", display: "flex", alignItems: "center", justifyContent: "center", transition: "var(--tr)", marginLeft: "auto" }}>
+                      <span className="material-symbols-rounded" style={{ fontSize: 16, color: "rgba(249,246,240,.7)" }}>favorite_border</span>
+                    </span>
                   </div>
-                  <button className="syne" style={{ padding: "9px 18px", background: "var(--cu)", border: "none", borderRadius: 50, color: "#fff", fontSize: 11.5, fontWeight: 700, letterSpacing: 0.5, cursor: "pointer", transition: "var(--tr)" }}>Book Now</button>
                 </div>
-              </div>
-            </div>
-          ))}
+
+                {/* Body */}
+                <div style={{ padding: 18, flex: 1, display: "flex", flexDirection: "column" }}>
+                  <div className="syne" style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--cu)", marginBottom: 7 }}>{getDestLabel(pkg)}</div>
+                  <div className="serif" style={{ fontSize: 18, fontWeight: 600, color: "var(--iv)", lineHeight: 1.3, marginBottom: 10 }}>{pkg.name}</div>
+                  <div style={{ display: "flex", gap: 12, fontSize: 12, color: "rgba(249,246,240,.45)", marginBottom: 10, flexWrap: "wrap" }}>
+                    <span style={{ display: "flex", alignItems: "center", gap: 3 }}><span className="material-symbols-rounded" style={{ fontSize: 13, color: "var(--cu)" }}>calendar_today</span>{pkg.duration.nights}N / {pkg.duration.days}D</span>
+                    {pkg.hotelRating && <span style={{ display: "flex", alignItems: "center", gap: 3 }}><span className="material-symbols-rounded" style={{ fontSize: 13, color: "var(--cu)" }}>hotel</span>{pkg.hotelRating}</span>}
+                  </div>
+                  <div style={{ display: "flex", alignItems: "center", gap: 2, color: "var(--gd)", marginBottom: 14 }}>
+                    {[...Array(5)].map((_, j) => <span key={j} className="material-symbols-rounded" style={{ fontSize: 13 }}>star</span>)}
+                    <span style={{ fontSize: 11, color: "rgba(249,246,240,.35)", marginLeft: 5 }}>({pkg.rating} · {pkg.reviewCount})</span>
+                  </div>
+                  <div style={{ marginTop: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "1px solid rgba(249,246,240,.1)", paddingTop: 14 }}>
+                    <div>
+                      <div style={{ fontSize: 10, color: "rgba(249,246,240,.35)", letterSpacing: 0.5, marginBottom: 2 }}>from</div>
+                      <div className="serif" style={{ fontSize: 24, color: "var(--iv)", lineHeight: 1 }}>{formatPrice(pkg.price)}<small style={{ fontFamily: "var(--font-inter),'Inter',sans-serif", fontSize: 12, color: "rgba(249,246,240,.35)" }}>/person</small></div>
+                    </div>
+                    <span className="syne" style={{ padding: "9px 18px", background: "var(--cu)", borderRadius: 50, color: "#fff", fontSize: 11.5, fontWeight: 700, letterSpacing: 0.5 }}>Book Now</span>
+                  </div>
+                </div>
+              </Link>
+            );
+          })}
         </div>
       </div>
 

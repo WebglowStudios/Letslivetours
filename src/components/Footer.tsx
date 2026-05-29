@@ -1,15 +1,34 @@
 "use client";
 
+import Link from "next/link";
+
 export default function Footer() {
+  const destinationLinks = [
+    { name: "Dubai", slug: "dubai" },
+    { name: "Singapore", slug: "singapore" },
+    { name: "Japan", slug: "japan" },
+    { name: "Bali", slug: "bali" },
+    { name: "Maldives", slug: "maldives" },
+    { name: "Thailand", slug: "thailand" },
+  ];
+
+  const companyLinks = [
+    { name: "About Us", href: "/about" },
+    { name: "Careers", href: "/careers" },
+    { name: "Destinations", href: "/destinations" },
+    { name: "Contact", href: "/contact" },
+    { name: "Login", href: "/login" },
+  ];
+
   return (
     <footer style={{ background: "var(--ink)", paddingTop: 72 }}>
       <div className="container">
         <div className="ft-grid" style={{ display: "grid", gridTemplateColumns: "1.8fr 1fr 1fr 1.4fr", gap: 48, paddingBottom: 52, borderBottom: "1px solid rgba(249,246,240,.07)" }}>
           {/* Brand */}
           <div>
-            <div className="syne" style={{ fontSize: 20, fontWeight: 800, letterSpacing: 2, textTransform: "uppercase", color: "var(--iv)" }}>
+            <Link href="/" className="syne" style={{ fontSize: 20, fontWeight: 800, letterSpacing: 2, textTransform: "uppercase", color: "var(--iv)", textDecoration: "none" }}>
               LetsLive<span style={{ color: "var(--cu)" }}> Tours</span>
-            </div>
+            </Link>
             <div style={{ fontSize: 13.5, color: "rgba(249,246,240,.35)", lineHeight: 1.72, maxWidth: 280, marginTop: 14 }}>
               Premium-curated journeys to the world&apos;s most extraordinary destinations — crafted for those who seek more than the ordinary.
             </div>
@@ -26,10 +45,10 @@ export default function Footer() {
           <div>
             <h4 className="syne" style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "rgba(249,246,240,.3)", marginBottom: 18 }}>Destinations</h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {["Dubai", "Singapore", "Japan", "Bali", "Maldives", "Thailand"].map((d, i) => (
-                <a key={i} href="#" className="ft-link" style={{ fontSize: 13.5, color: "rgba(249,246,240,.5)", transition: "color .2s", display: "flex", alignItems: "center", gap: 6 }}>
-                  <span className="material-symbols-rounded" style={{ fontSize: 13, opacity: 0.3, transition: "opacity .2s, color .2s" }}>chevron_right</span>{d}
-                </a>
+              {destinationLinks.map((d, i) => (
+                <Link key={i} href={`/destinations/${d.slug}`} className="ft-link" style={{ fontSize: 13.5, color: "rgba(249,246,240,.5)", transition: "color .2s", display: "flex", alignItems: "center", gap: 6, textDecoration: "none" }}>
+                  <span className="material-symbols-rounded" style={{ fontSize: 13, opacity: 0.3, transition: "opacity .2s, color .2s" }}>chevron_right</span>{d.name}
+                </Link>
               ))}
             </div>
           </div>
@@ -38,10 +57,10 @@ export default function Footer() {
           <div>
             <h4 className="syne" style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "rgba(249,246,240,.3)", marginBottom: 18 }}>Company</h4>
             <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-              {["About Us", "Careers", "Blog", "Press", "Partners"].map((l, i) => (
-                <a key={i} href="#" className="ft-link" style={{ fontSize: 13.5, color: "rgba(249,246,240,.5)", transition: "color .2s", display: "flex", alignItems: "center", gap: 6 }}>
-                  <span className="material-symbols-rounded" style={{ fontSize: 13, opacity: 0.3, transition: "opacity .2s, color .2s" }}>chevron_right</span>{l}
-                </a>
+              {companyLinks.map((l, i) => (
+                <Link key={i} href={l.href} className="ft-link" style={{ fontSize: 13.5, color: "rgba(249,246,240,.5)", transition: "color .2s", display: "flex", alignItems: "center", gap: 6, textDecoration: "none" }}>
+                  <span className="material-symbols-rounded" style={{ fontSize: 13, opacity: 0.3, transition: "opacity .2s, color .2s" }}>chevron_right</span>{l.name}
+                </Link>
               ))}
             </div>
           </div>
@@ -68,7 +87,7 @@ export default function Footer() {
           <div style={{ fontSize: 12, color: "rgba(249,246,240,.25)" }}>© 2026 LetsLive Tours. All rights reserved.</div>
           <div style={{ display: "flex", gap: 22 }}>
             {["Privacy Policy", "Terms of Use", "Cookie Policy"].map((l, i) => (
-              <a key={i} href="#" className="ft-bl-link" style={{ fontSize: 12, color: "rgba(249,246,240,.25)", transition: "color .2s" }}>{l}</a>
+              <span key={i} className="ft-bl-link" style={{ fontSize: 12, color: "rgba(249,246,240,.25)", transition: "color .2s", cursor: "pointer" }}>{l}</span>
             ))}
           </div>
         </div>
