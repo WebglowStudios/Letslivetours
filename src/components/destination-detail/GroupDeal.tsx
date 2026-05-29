@@ -1,6 +1,6 @@
 export default function GroupDeal() {
   return (
-    <section id="group-deal" style={{ padding: "80px 48px", background: "linear-gradient(135deg, var(--cu-d) 0%, var(--cu) 50%, var(--cu-l) 100%)", position: "relative", overflow: "hidden", textAlign: "center" }}>
+    <section id="group-deal" className="group-deal-section" style={{ padding: "80px 48px", background: "linear-gradient(135deg, var(--cu-d) 0%, var(--cu) 50%, var(--cu-l) 100%)", position: "relative", overflow: "hidden", textAlign: "center" }}>
       <div style={{ position: "absolute", inset: 0, backgroundImage: "radial-gradient(circle at 20% 50%, rgba(255,255,255,.08) 0%, transparent 50%), radial-gradient(circle at 80% 50%, rgba(255,255,255,.06) 0%, transparent 50%)" }} />
       <div className="rv" style={{ position: "relative", zIndex: 1, maxWidth: 700, margin: "0 auto" }}>
         <div className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "rgba(255,255,255,.2)", color: "#fff", fontSize: 11, fontWeight: 800, letterSpacing: 2, textTransform: "uppercase", padding: "6px 18px", borderRadius: 50, marginBottom: 20 }}>
@@ -14,6 +14,11 @@ export default function GroupDeal() {
         </p>
         <a href="/contact" className="syne" style={{ fontSize: 14, fontWeight: 800, color: "var(--cu-d)", background: "#fff", padding: "15px 38px", borderRadius: 50, display: "inline-block", boxShadow: "0 8px 28px rgba(0,0,0,.15)", transition: "var(--tr)" }}>Get a Group Quote</a>
       </div>
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .group-deal-section { padding: 48px 20px !important; }
+        }
+      `}</style>
     </section>
   );
 }

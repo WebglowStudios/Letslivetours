@@ -43,7 +43,7 @@ export default function PackageRow({ eyebrow, title, titleEm, subtitle, cards, a
 
   return (
     <section style={{ padding: "80px 0", background: alt ? "var(--iv2)" : "var(--iv)" }}>
-      <div style={{ maxWidth: 1400, margin: "0 auto", padding: "0 48px" }}>
+      <div className="pkg-section-inner" style={{ maxWidth: 1400, margin: "0 auto", padding: "0 48px" }}>
         {/* Head */}
         <div className="rv" style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-end", marginBottom: 36 }}>
           <div>
@@ -62,7 +62,7 @@ export default function PackageRow({ eyebrow, title, titleEm, subtitle, cards, a
 
         {/* Scroll */}
         <div style={{ position: "relative" }}>
-          <button onClick={() => scroll(-1)} style={{ position: "absolute", top: "50%", left: -22, transform: "translateY(-50%)", width: 44, height: 44, borderRadius: "50%", background: "#fff", boxShadow: "0 4px 18px rgba(0,77,94,.15)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10, border: "none", cursor: "pointer" }}>
+          <button className="pkg-scroll-arrow" onClick={() => scroll(-1)} style={{ position: "absolute", top: "50%", left: -22, transform: "translateY(-50%)", width: 44, height: 44, borderRadius: "50%", background: "#fff", boxShadow: "0 4px 18px rgba(0,77,94,.15)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10, border: "none", cursor: "pointer" }}>
             <span className="material-symbols-rounded" style={{ color: "var(--gn)", fontSize: 22 }}>chevron_left</span>
           </button>
           <div ref={scrollRef} style={{ display: "flex", gap: 24, overflowX: "auto", scrollSnapType: "x mandatory", scrollbarWidth: "none", paddingBottom: 8 }}>
@@ -95,7 +95,7 @@ export default function PackageRow({ eyebrow, title, titleEm, subtitle, cards, a
               </div>
             ))}
           </div>
-          <button onClick={() => scroll(1)} style={{ position: "absolute", top: "50%", right: -22, transform: "translateY(-50%)", width: 44, height: 44, borderRadius: "50%", background: "#fff", boxShadow: "0 4px 18px rgba(0,77,94,.15)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10, border: "none", cursor: "pointer" }}>
+          <button className="pkg-scroll-arrow" onClick={() => scroll(1)} style={{ position: "absolute", top: "50%", right: -22, transform: "translateY(-50%)", width: 44, height: 44, borderRadius: "50%", background: "#fff", boxShadow: "0 4px 18px rgba(0,77,94,.15)", display: "flex", alignItems: "center", justifyContent: "center", zIndex: 10, border: "none", cursor: "pointer" }}>
             <span className="material-symbols-rounded" style={{ color: "var(--gn)", fontSize: 22 }}>chevron_right</span>
           </button>
         </div>
@@ -104,6 +104,11 @@ export default function PackageRow({ eyebrow, title, titleEm, subtitle, cards, a
       <style jsx>{`
         .pkg-card-item:hover { transform: translateY(-6px); box-shadow: var(--sh-lg); }
         .pkg-card-item:hover img { transform: scale(1.06); }
+        @media (max-width: 768px) {
+          .pkg-section-inner { padding: 0 20px !important; }
+          .pkg-card-item { flex: 0 0 260px !important; }
+          .pkg-scroll-arrow { display: none !important; }
+        }
       `}</style>
     </section>
   );

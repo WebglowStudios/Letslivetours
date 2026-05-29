@@ -17,7 +17,7 @@ export default function CareersHero() {
       <div style={{ position: "absolute", inset: 0, zIndex: 2, opacity: 0.035, backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")` }} />
 
       <div className="container" style={{ position: "relative", zIndex: 5, width: "100%" }}>
-        <div style={{ padding: "0 0 80px 0", maxWidth: 860 }}>
+        <div className="hero-content" style={{ padding: "0 0 80px 0", maxWidth: 860 }}>
           <div className="syne" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: "uppercase", color: "var(--cu)", marginBottom: 20, display: "flex", alignItems: "center", gap: 10 }}>
             <span style={{ display: "block", width: 28, height: 1.5, background: "var(--cu)" }} />
             We&apos;re Hiring
@@ -36,9 +36,9 @@ export default function CareersHero() {
               <span className="material-symbols-rounded">info</span>Why LetsLive?
             </a>
           </div>
-          <div style={{ display: "flex", gap: 40, marginTop: 52, paddingTop: 40, borderTop: "1px solid rgba(255,255,255,.1)" }}>
+          <div className="hero-stats" style={{ display: "flex", gap: 40, flexWrap: "wrap", marginTop: 52, paddingTop: 40, borderTop: "1px solid rgba(255,255,255,.1)" }}>
             {stats.map((s, i) => (
-              <div key={i}>
+              <div key={i} className="hero-stat">
                 <div className="serif" style={{ fontSize: 32, fontWeight: 700, color: "var(--cu-l)", lineHeight: 1 }}>{s.val}</div>
                 <div className="syne" style={{ fontSize: 11, fontWeight: 600, letterSpacing: 1.5, textTransform: "uppercase", color: "rgba(255,255,255,.45)", marginTop: 5 }}>{s.lbl}</div>
               </div>
@@ -46,6 +46,19 @@ export default function CareersHero() {
           </div>
         </div>
       </div>
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .hero-stats {
+            gap: 20px !important;
+          }
+          .hero-stat {
+            min-width: 45%;
+          }
+          .hero-content {
+            padding-bottom: 60px !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

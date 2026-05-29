@@ -53,8 +53,11 @@ export default function Numbers() {
         .ng-card:hover .ng-desc {
           color: rgba(249,246,240,.4) !important;
         }
-        @media (max-width: 768px) {
+        @media (max-width: 1100px) {
           .num-grid { grid-template-columns: repeat(2, 1fr) !important; }
+        }
+        @media (max-width: 768px) {
+          .num-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </section>

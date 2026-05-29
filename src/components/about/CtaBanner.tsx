@@ -30,6 +30,12 @@ export default function CtaBanner() {
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        @media (max-width: 768px) {
+          #cta-banner { padding: 64px 0 !important; }
+        }
+      `}</style>
     </section>
   );
 }

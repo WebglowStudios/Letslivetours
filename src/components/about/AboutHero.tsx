@@ -40,9 +40,9 @@ export default function AboutHero() {
       </div>
 
       {/* Bottom stats */}
-      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 6, borderTop: "1px solid rgba(249,246,240,.1)", display: "flex", alignItems: "stretch" }}>
+      <div className="hero-stats" style={{ position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 6, borderTop: "1px solid rgba(249,246,240,.1)", display: "flex", flexWrap: "wrap", alignItems: "stretch" }}>
         {stats.map((s, i) => (
-          <div key={i} style={{ flex: 1, padding: "18px 28px", borderRight: "1px solid rgba(249,246,240,.1)", display: "flex", alignItems: "center", gap: 14 }}>
+          <div key={i} className="hero-stat-item" style={{ flex: 1, padding: "18px 28px", borderRight: "1px solid rgba(249,246,240,.1)", display: "flex", alignItems: "center", gap: 14 }}>
             <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--cu)" }}>{s.icon}</span>
             <div>
               <div className="serif" style={{ fontSize: 28, fontWeight: 700, color: "#fff", lineHeight: 1 }}>{s.val}<span style={{ color: "var(--cu)" }}>{s.suf}</span></div>
@@ -51,6 +51,13 @@ export default function AboutHero() {
           </div>
         ))}
       </div>
+
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .hero-stats { display: flex !important; flex-wrap: wrap !important; }
+          .hero-stat-item { min-width: 50% !important; padding: 12px 16px !important; }
+        }
+      `}</style>
     </section>
   );
 }

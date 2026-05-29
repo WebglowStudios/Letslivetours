@@ -123,7 +123,7 @@ export default function ContactMain() {
 
           {/* Right form */}
           <div className="rv-r">
-            <div style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: "var(--r-xl)", padding: 48, boxShadow: "var(--sh)" }}>
+            <div className="contact-form-card" style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: "var(--r-xl)", padding: 48, boxShadow: "var(--sh)" }}>
               {!submitted ? (
                 <form onSubmit={handleSubmit}>
                   <div className="serif" style={{ fontSize: 28, fontWeight: 600, color: "var(--ink)", marginBottom: 6 }}>Send Us a Message</div>
@@ -167,7 +167,7 @@ export default function ContactMain() {
                   </div>
 
                   {/* Form fields */}
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
+                  <div className="form-name-row" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginBottom: 20 }}>
                     <div style={{ display: "flex", flexDirection: "column", gap: 7 }}>
                       <label className="syne" style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--ink3)" }}>First Name</label>
                       <input type="text" placeholder="Rahul" value={firstName} onChange={(e) => setFirstName(e.target.value)} required style={{ padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, color: "var(--ink)", fontSize: 14, outline: "none", transition: "border-color .2s, box-shadow .2s", width: "100%" }} />
@@ -271,6 +271,13 @@ export default function ContactMain() {
         @media (max-width: 768px) {
           .contact-grid {
             grid-template-columns: 1fr;
+            gap: 40px !important;
+          }
+          .form-name-row {
+            grid-template-columns: 1fr !important;
+          }
+          .contact-form-card {
+            padding: 24px !important;
           }
         }
       `}</style>

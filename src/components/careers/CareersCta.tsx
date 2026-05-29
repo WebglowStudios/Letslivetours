@@ -52,6 +52,11 @@ export default function CareersCta() {
           background: rgba(255,255,255,.1);
           border-color: rgba(255,255,255,.7);
         }
+        @media (max-width: 768px) {
+          #cta-banner {
+            padding: 64px 24px !important;
+          }
+        }
       `}</style>
     </section>
   );

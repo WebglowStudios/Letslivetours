@@ -24,7 +24,7 @@ export default function WhyJoin() {
             We&apos;re not just selling holidays. We&apos;re building a company that believes travel changes lives — and we want people who believe that too.
           </p>
         </div>
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 28, marginTop: 56 }}>
+        <div className="wj-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 28, marginTop: 56 }}>
           {cards.map((card, i) => (
             <div key={i} className="wj-card rv">
               <div className="wj-icon">
@@ -93,10 +93,13 @@ export default function WhyJoin() {
           .wj-card {
             padding: 32px 24px;
           }
+          .wj-grid {
+            grid-template-columns: repeat(2, 1fr) !important;
+          }
         }
         @media (max-width: 768px) {
-          div[style*="grid-template-columns: repeat(3"] {
-            grid-template-columns: 1fr;
+          .wj-grid {
+            grid-template-columns: 1fr !important;
           }
         }
       `}</style>

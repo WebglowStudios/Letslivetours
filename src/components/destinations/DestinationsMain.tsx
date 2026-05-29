@@ -178,6 +178,7 @@ export default function DestinationsMain() {
           .dest-results-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
+
     </>
   );
 }

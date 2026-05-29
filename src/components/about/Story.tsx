@@ -13,7 +13,7 @@ export default function Story() {
               <span className="syne" style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", opacity: 0.85, marginTop: 3, display: "block" }}>Founded</span>
             </div>
             {/* Main image */}
-            <div style={{ borderRadius: "var(--r-xl)", overflow: "hidden", height: 560 }}>
+            <div className="story-main-img" style={{ borderRadius: "var(--r-xl)", overflow: "hidden", height: 560 }}>
               <img src="https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=800&q=80" alt="Story" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
             </div>
             {/* Float image */}
@@ -65,7 +65,9 @@ export default function Story() {
           .story-grid { grid-template-columns: 1fr !important; }
         }
         @media (max-width: 768px) {
+          .story-grid { gap: 40px !important; }
           .story-float { display: none !important; }
+          .story-main-img { height: 350px !important; }
         }
       `}</style>
     </section>

@@ -117,6 +117,12 @@ export default function ContactFaq() {
             grid-template-columns: 1fr;
           }
         }
+        @media (max-width: 768px) {
+          .faq-grid {
+            gap: 32px !important;
+            margin-top: 32px !important;
+          }
+        }
       `}</style>
     </section>
   );

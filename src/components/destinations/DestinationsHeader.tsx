@@ -85,9 +85,9 @@ export default function DestinationsHeader({ activeCat, setActiveCat, search, se
 
       {/* Stats bar */}
       <div style={{ background: "rgba(0,0,0,.25)", backdropFilter: "blur(12px)", borderTop: "1px solid rgba(249,246,240,.08)" }}>
-        <div style={{ display: "flex", alignItems: "stretch", maxWidth: 1360, margin: "0 auto", padding: "0 48px" }}>
+        <div className="dest-stats-bar" style={{ display: "flex", alignItems: "stretch", maxWidth: 1360, margin: "0 auto", padding: "0 48px", flexWrap: "wrap" }}>
           {stats.map((s, i) => (
-            <div key={i} style={{ flex: 1, padding: "16px 24px", borderRight: "1px solid rgba(249,246,240,.08)", display: "flex", alignItems: "center", gap: 12 }}>
+            <div key={i} style={{ flex: 1, padding: "16px 24px", borderRight: "1px solid rgba(249,246,240,.08)", display: "flex", alignItems: "center", gap: 12, minWidth: "50%" }}>
               <span className="material-symbols-rounded" style={{ fontSize: 18, color: "var(--cu)" }}>{s.icon}</span>
               <div>
                 <div className="serif" style={{ fontSize: 22, fontWeight: 700, color: "#fff", lineHeight: 1 }}>{s.val}<span style={{ color: "var(--cu)" }}>{s.suf}</span></div>
@@ -97,6 +97,18 @@ export default function DestinationsHeader({ activeCat, setActiveCat, search, se
           ))}
         </div>
       </div>
+
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .dest-stats-bar {
+            padding: 0 20px !important;
+          }
+          .dest-stats-bar > div {
+            min-width: 50% !important;
+            padding: 12px 16px !important;
+          }
+        }
+      `}</style>
     </section>
   );
 }

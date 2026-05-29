@@ -62,6 +62,11 @@ export default function MapSection() {
             min-height: 320px !important;
           }
         }
+        @media (max-width: 768px) {
+          .map-info {
+            padding: 40px 20px !important;
+          }
+        }
       `}</style>
     </section>
   );

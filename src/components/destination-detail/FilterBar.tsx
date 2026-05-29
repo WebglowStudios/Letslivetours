@@ -11,7 +11,7 @@ interface Props {
 
 export default function FilterBar({ activeFilter, setActiveFilter }: Props) {
   return (
-    <div style={{ position: "sticky", top: 72, zIndex: 800, background: "rgba(240,250,250,.97)", backdropFilter: "blur(12px)", borderBottom: "1px solid var(--line2)", padding: "0 48px" }}>
+    <div className="filter-bar-wrap" style={{ position: "sticky", top: 72, zIndex: 800, background: "rgba(240,250,250,.97)", backdropFilter: "blur(12px)", borderBottom: "1px solid var(--line2)", padding: "0 48px" }}>
       <div style={{ display: "flex", gap: 4, overflowX: "auto" }}>
         {tabs.map((t) => {
           const val = t === "All Packages" ? "all" : t.toLowerCase();
@@ -27,6 +27,11 @@ export default function FilterBar({ activeFilter, setActiveFilter }: Props) {
           );
         })}
       </div>
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .filter-bar-wrap { padding: 0 20px !important; }
+        }
+      `}</style>
     </div>
   );
 }

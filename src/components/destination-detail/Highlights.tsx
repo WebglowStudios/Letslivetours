@@ -14,7 +14,7 @@ export default function Highlights() {
           <p style={{ fontSize: 15, color: "rgba(255,255,255,.6)", lineHeight: 1.7, maxWidth: 560, margin: "10px auto 0" }}>From golden deserts to glittering skylines \u2014 every frame tells a story.</p>
         </div>
 
-        <div className="rv" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 40 }}>
+        <div className="rv hl-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16, marginTop: 40 }}>
           {/* Main */}
           <div style={{ gridRow: "span 2", position: "relative", borderRadius: "var(--r-xl)", overflow: "hidden", height: 520 }}>
             <img src="https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=900&q=80" alt="Burj Khalifa" style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .6s ease" }} />
@@ -42,6 +42,14 @@ export default function Highlights() {
           </div>
         </div>
       </div>
+
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .hl-grid { grid-template-columns: 1fr !important; }
+          .hl-grid > :global(div:first-child) { grid-row: span 1 !important; height: 280px !important; }
+          .hl-grid > :global(div:last-child) { grid-template-columns: 1fr !important; }
+        }
+      `}</style>
     </section>
   );
 }

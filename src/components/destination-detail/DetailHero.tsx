@@ -36,7 +36,7 @@ export default function DetailHero() {
       <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to right, rgba(0,20,28,.72) 0%, rgba(0,20,28,.35) 60%, transparent 100%)" }} />
 
       {/* Content */}
-      <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 80px", paddingTop: 72 }}>
+      <div className="detail-hero-content" style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 80px", paddingTop: 72 }}>
         <div className="syne" style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,.6)", display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
           <a href="/" style={{ color: "rgba(255,255,255,.6)" }}>Home</a>
           <span style={{ color: "rgba(255,255,255,.3)" }}>\u203A</span>
@@ -68,22 +68,22 @@ export default function DetailHero() {
       </div>
 
       {/* Arrows */}
-      <button onClick={() => setIdx((p) => (p - 1 + slides.length) % slides.length)} style={{ position: "absolute", top: "50%", left: 28, transform: "translateY(-50%)", width: 52, height: 52, borderRadius: "50%", background: "rgba(255,255,255,.12)", backdropFilter: "blur(8px)", border: "1.5px solid rgba(255,255,255,.2)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 10 }}>
+      <button className="detail-hero-arrow" onClick={() => setIdx((p) => (p - 1 + slides.length) % slides.length)} style={{ position: "absolute", top: "50%", left: 28, transform: "translateY(-50%)", width: 52, height: 52, borderRadius: "50%", background: "rgba(255,255,255,.12)", backdropFilter: "blur(8px)", border: "1.5px solid rgba(255,255,255,.2)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 10 }}>
         <span className="material-symbols-rounded" style={{ color: "#fff", fontSize: 24 }}>chevron_left</span>
       </button>
-      <button onClick={() => setIdx((p) => (p + 1) % slides.length)} style={{ position: "absolute", top: "50%", right: 28, transform: "translateY(-50%)", width: 52, height: 52, borderRadius: "50%", background: "rgba(255,255,255,.12)", backdropFilter: "blur(8px)", border: "1.5px solid rgba(255,255,255,.2)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 10 }}>
+      <button className="detail-hero-arrow" onClick={() => setIdx((p) => (p + 1) % slides.length)} style={{ position: "absolute", top: "50%", right: 28, transform: "translateY(-50%)", width: 52, height: 52, borderRadius: "50%", background: "rgba(255,255,255,.12)", backdropFilter: "blur(8px)", border: "1.5px solid rgba(255,255,255,.2)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 10 }}>
         <span className="material-symbols-rounded" style={{ color: "#fff", fontSize: 24 }}>chevron_right</span>
       </button>
 
       {/* Dots */}
-      <div style={{ position: "absolute", bottom: 100, left: 80, display: "flex", gap: 8, zIndex: 10 }}>
+      <div className="detail-hero-dots" style={{ position: "absolute", bottom: 100, left: 80, display: "flex", gap: 8, zIndex: 10 }}>
         {slides.map((_, i) => (
           <div key={i} onClick={() => setIdx(i)} style={{ width: i === idx ? 24 : 8, height: 8, borderRadius: i === idx ? 4 : "50%", background: i === idx ? "var(--cu)" : "rgba(255,255,255,.35)", transition: "var(--tr)", cursor: "pointer" }} />
         ))}
       </div>
 
       {/* Stats bar */}
-      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "rgba(0,20,28,.75)", backdropFilter: "blur(12px)", borderTop: "1px solid rgba(255,255,255,.08)", display: "flex", justifyContent: "center" }}>
+      <div className="detail-hero-stats" style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "rgba(0,20,28,.75)", backdropFilter: "blur(12px)", borderTop: "1px solid rgba(255,255,255,.08)", display: "flex", justifyContent: "center" }}>
         {stats.map((s, i) => (
           <div key={i} style={{ flex: 1, maxWidth: 220, padding: "20px 24px", textAlign: "center", borderRight: "1px solid rgba(255,255,255,.08)" }}>
             <div className="serif" style={{ fontSize: 26, fontWeight: 700, color: "var(--cu-l)", lineHeight: 1 }}>{s.val}</div>
@@ -91,6 +91,15 @@ export default function DetailHero() {
           </div>
         ))}
       </div>
+      <style jsx>{`
+        @media (max-width: 768px) {
+          .detail-hero-content { padding: 0 20px 120px 20px !important; padding-top: 72px !important; }
+          .detail-hero-arrow { display: none !important; }
+          .detail-hero-dots { bottom: 90px !important; left: 20px !important; }
+          .detail-hero-stats { flex-wrap: wrap !important; }
+          .detail-hero-stats > :global(div) { min-width: 33% !important; padding: 12px 16px !important; }
+        }
+      `}</style>
     </section>
   );
 }

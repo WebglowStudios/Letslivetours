@@ -56,6 +56,10 @@ export default function Mission() {
         @media (max-width: 1100px) {
           .mission-grid { grid-template-columns: 1fr !important; }
         }
+        @media (max-width: 768px) {
+          .mission-grid { gap: 40px !important; }
+          .mp-card { padding: 20px !important; }
+        }
       `}</style>
     </section>
   );

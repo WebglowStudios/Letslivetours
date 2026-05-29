@@ -37,6 +37,31 @@ img{display:block;width:100%;height:100%;object-fit:cover}
 .container{max-width:1360px;margin:0 auto;padding:0 48px}
 @media(max-width:768px){
   .container{padding:0 20px}
+  .dc-card {
+    flex-direction: column !important;
+    height: auto !important;
+  }
+  .dc-card > div:first-child {
+    width: 100% !important;
+    height: 200px !important;
+  }
+  .content-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .content-grid > div:last-child {
+    position: static !important;
+  }
+}
+@media(max-width:900px){
+  .content-grid {
+    grid-template-columns: 1fr !important;
+  }
+  .content-grid > div:last-child {
+    position: static !important;
+  }
+  .booking-layout {
+    grid-template-columns: 1fr !important;
+  }
 }
 .serif{font-family:var(--font-playfair),'Playfair Display',serif}
 .syne{font-family:var(--font-jakarta),'Plus Jakarta Sans',sans-serif}
