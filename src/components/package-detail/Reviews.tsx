@@ -1,49 +1,153 @@
 "use client";
 
-const ratingBars = [
-  { label: "5★", width: "88%", pct: "88%" },
-  { label: "4★", width: "9%", pct: "9%" },
-  { label: "3★", width: "2%", pct: "2%" },
-  { label: "2★", width: "1%", pct: "1%" },
-  { label: "1★", width: "0%", pct: "0%" },
-];
+import { useState, useEffect } from "react";
+import { api } from "@/lib/api";
 
-const reviews = [
-  {
-    name: "Priya Mehta",
-    date: "March 2025 · Honeymoon Trip",
-    avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=80&q=80",
-    initials: null,
-    stars: "★★★★★",
-    text: "Absolutely magical experience! The desert safari was the highlight — dune bashing at sunset followed by a BBQ under the stars was something we'll never forget. LetsLive handled everything perfectly, from the airport pickup to the hotel check-in. The Atlantis stay was beyond our expectations. Highly recommend!",
-  },
-  {
-    name: "Arjun Kapoor",
-    date: "February 2025 · Family Trip",
-    avatar: null,
-    initials: "AK",
-    stars: "★★★★★",
-    text: "Travelled with my family of 4 including two kids. The team at LetsLive was incredibly helpful in customising the itinerary for us. The Burj Khalifa experience was breathtaking — my kids were speechless! The guide on the heritage tour was knowledgeable and engaging. Will definitely book again.",
-  },
-  {
-    name: "Sneha Reddy",
-    date: "January 2025 · Solo Trip",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=80&q=80",
-    initials: null,
-    stars: "★★★★★",
-    text: "As a solo female traveller, I was a bit nervous about Dubai but LetsLive made me feel completely safe and taken care of. The itinerary was perfectly paced — not too rushed, not too slow. The dhow cruise dinner was romantic even solo! The Old Dubai heritage walk was my favourite part.",
-  },
-  {
-    name: "Rohit Sharma",
-    date: "December 2024 · Group Trip",
-    avatar: null,
-    initials: "RS",
-    stars: "★★★★☆",
-    text: "Great package overall! Organised a trip for 8 friends and LetsLive handled the logistics seamlessly. The hotels were excellent and the desert safari was epic. Only minor feedback — the Day 6 Miracle Garden was closed (off-season) and we weren't informed in advance. The team quickly arranged an alternative, so kudos for that.",
-  },
-];
+interface ReviewsProps {
+  packageId: string;
+}
 
-export default function Reviews() {
+interface Review {
+  _id: string;
+  userName: string;
+  rating: number;
+  comment: string;
+  travelType?: string;
+  createdAt: string;
+  avatar?: string;
+}
+
+export default function Reviews({ packageId }: ReviewsProps) {
+  const [reviews, setReviews] = useState<Review[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [avgRating, setAvgRating] = useState(0);
+  const [totalReviews, setTotalReviews] = useState(0);
+
+  useEffect(() => {
+    if (!packageId) {
+      setLoading(false);
+      return;
+    }
+
+    const fetchReviews = async () => {
+      try {
+        const res = await api.get(`/reviews/package/${packageId}`);
+        if (res.status === "success") {
+          const data = res.data?.reviews || res.data || [];
+          setReviews(data);
+          setTotalReviews(res.data?.total || data.length);
+          // Calculate average rating
+          if (data.length > 0) {
+            const avg = data.reduce((sum: number, r: Review) => sum + r.rating, 0) / data.length;
+            setAvgRating(Math.round(avg * 10) / 10);
+          }
+        }
+      } catch {
+        // Silently fail — show empty state
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchReviews();
+  }, [packageId]);
+
+  // Generate star string from rating
+  const getStarStr = (rating: number) => {
+    const full = Math.floor(rating);
+    const half = rating - full >= 0.5;
+    return "★".repeat(full) + (half ? "½" : "") + "☆".repeat(5 - full - (half ? 1 : 0));
+  };
+
+  // Get initials from name
+  const getInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase()
+      .slice(0, 2);
+  };
+
+  // Format date
+  const formatDate = (dateStr: string) => {
+    const date = new Date(dateStr);
+    return date.toLocaleDateString("en-US", { month: "long", year: "numeric" });
+  };
+
+  // Calculate rating distribution
+  const getRatingBars = () => {
+    if (reviews.length === 0) return [];
+    const counts = [0, 0, 0, 0, 0]; // 1-5 stars
+    reviews.forEach((r) => {
+      const idx = Math.min(Math.max(Math.round(r.rating) - 1, 0), 4);
+      counts[idx]++;
+    });
+    return [5, 4, 3, 2, 1].map((star) => {
+      const count = counts[star - 1];
+      const pct = reviews.length > 0 ? Math.round((count / reviews.length) * 100) : 0;
+      return { label: `${star}★`, width: `${pct}%`, pct: `${pct}%` };
+    });
+  };
+
+  if (loading) {
+    return (
+      <div
+        id="reviews"
+        style={{
+          marginTop: 48,
+          paddingTop: 40,
+          borderTop: "2px solid var(--line)",
+          textAlign: "center",
+          padding: "60px 20px",
+        }}
+      >
+        <span className="material-symbols-rounded" style={{ fontSize: 32, color: "var(--ink4)", animation: "spin 1s linear infinite" }}>
+          progress_activity
+        </span>
+        <p style={{ fontFamily: "var(--font-inter), 'Inter', sans-serif", fontSize: 13, color: "var(--ink4)", marginTop: 8 }}>
+          Loading reviews...
+        </p>
+      </div>
+    );
+  }
+
+  if (reviews.length === 0) {
+    return (
+      <div
+        id="reviews"
+        style={{
+          marginTop: 48,
+          paddingTop: 40,
+          borderTop: "2px solid var(--line)",
+        }}
+      >
+        <div style={{ textAlign: "center", padding: "40px 20px" }}>
+          <span className="material-symbols-rounded" style={{ fontSize: 40, color: "var(--ink4)", display: "block", marginBottom: 10 }}>
+            rate_review
+          </span>
+          <p
+            className="syne"
+            style={{ fontSize: 15, fontWeight: 600, color: "var(--ink3)", marginBottom: 4 }}
+          >
+            No reviews yet
+          </p>
+          <p
+            style={{
+              fontFamily: "var(--font-inter), 'Inter', sans-serif",
+              fontSize: 13,
+              color: "var(--ink4)",
+            }}
+          >
+            Be the first to share your experience!
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  const ratingBars = getRatingBars();
+
   return (
     <div
       id="reviews"
@@ -70,10 +174,10 @@ export default function Reviews() {
             className="serif"
             style={{ fontSize: 56, fontWeight: 700, color: "var(--gn)", lineHeight: 1 }}
           >
-            4.9
+            {avgRating}
           </div>
           <div>
-            <div style={{ color: "var(--cu)", fontSize: 22, letterSpacing: 2 }}>★★★★★</div>
+            <div style={{ color: "var(--cu)", fontSize: 22, letterSpacing: 2 }}>{getStarStr(avgRating)}</div>
             <div
               style={{
                 fontFamily: "var(--font-inter), 'Inter', sans-serif",
@@ -82,7 +186,7 @@ export default function Reviews() {
                 marginTop: 4,
               }}
             >
-              Based on 312 verified reviews
+              Based on {totalReviews} verified review{totalReviews !== 1 ? "s" : ""}
             </div>
           </div>
         </div>
@@ -141,9 +245,9 @@ export default function Reviews() {
 
       {/* Review Cards */}
       <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-        {reviews.map((review, i) => (
+        {reviews.map((review) => (
           <div
-            key={i}
+            key={review._id}
             className="review-card"
             style={{
               background: "#fff",
@@ -180,7 +284,7 @@ export default function Reviews() {
                   {review.avatar ? (
                     <img
                       src={review.avatar}
-                      alt={review.name}
+                      alt={review.userName}
                       style={{ width: "100%", height: "100%", objectFit: "cover" }}
                     />
                   ) : (
@@ -188,7 +292,7 @@ export default function Reviews() {
                       className="syne"
                       style={{ fontSize: 16, fontWeight: 700, color: "var(--gn)" }}
                     >
-                      {review.initials}
+                      {getInitials(review.userName)}
                     </span>
                   )}
                 </div>
@@ -197,7 +301,7 @@ export default function Reviews() {
                     className="syne"
                     style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}
                   >
-                    {review.name}
+                    {review.userName}
                   </div>
                   <div
                     style={{
@@ -207,11 +311,13 @@ export default function Reviews() {
                       marginTop: 2,
                     }}
                   >
-                    {review.date}
+                    {formatDate(review.createdAt)}{review.travelType ? ` · ${review.travelType}` : ""}
                   </div>
                 </div>
               </div>
-              <div style={{ color: "var(--cu)", fontSize: 14, letterSpacing: 1 }}>{review.stars}</div>
+              <div style={{ color: "var(--cu)", fontSize: 14, letterSpacing: 1 }}>
+                {"★".repeat(Math.round(review.rating))}{"☆".repeat(5 - Math.round(review.rating))}
+              </div>
             </div>
 
             <p
@@ -222,7 +328,7 @@ export default function Reviews() {
                 lineHeight: 1.75,
               }}
             >
-              {review.text}
+              {review.comment}
             </p>
 
             <div

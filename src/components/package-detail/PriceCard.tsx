@@ -1,15 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useParams } from "next/navigation";
 
-const metaRows = [
-  { icon: "calendar_today", label: "Duration:", value: "7 Nights / 8 Days" },
-  { icon: "hotel", label: "Stay:", value: "5-Star Hotels" },
-  { icon: "flight_takeoff", label: "Flights:", value: "Not included" },
-  { icon: "groups", label: "Group size:", value: "2–15 people" },
-  { icon: "wb_sunny", label: "Best season:", value: "Oct – Apr" },
-];
+interface PriceCardProps {
+  pkg: any;
+  slug: string;
+}
 
 const trustBadges = [
   { icon: "verified", text: "Verified Package" },
@@ -17,9 +13,35 @@ const trustBadges = [
   { icon: "support_agent", text: "24/7 Support" },
 ];
 
-export default function PriceCard() {
-  const params = useParams();
-  const slug = params?.slug as string || "dubai-luxury-escape";
+export default function PriceCard({ pkg, slug }: PriceCardProps) {
+  const price = pkg?.price || 0;
+  const originalPrice = pkg?.originalPrice || 0;
+  const discount = pkg?.discount || 0;
+  const duration = pkg?.duration;
+  const hotelRating = pkg?.hotelRating || "";
+  const rating = pkg?.rating || 0;
+  const reviewCount = pkg?.reviewCount || 0;
+
+  const hasDiscount = originalPrice > 0 && originalPrice > price;
+  const savings = hasDiscount ? originalPrice - price : 0;
+
+  // Format price in INR
+  const formatPrice = (val: number) => {
+    return "₹" + val.toLocaleString("en-IN");
+  };
+
+  // Generate star string
+  const fullStars = Math.floor(rating);
+  const hasHalf = rating - fullStars >= 0.5;
+  const starStr = "★".repeat(fullStars) + (hasHalf ? "½" : "");
+
+  // Build meta rows from pkg data
+  const metaRows = [
+    duration ? { icon: "calendar_today", label: "Duration:", value: `${duration.nights} Nights / ${duration.days} Days` } : null,
+    hotelRating ? { icon: "hotel", label: "Stay:", value: hotelRating } : null,
+    { icon: "flight_takeoff", label: "Flights:", value: "Not included" },
+    { icon: "groups", label: "Group size:", value: "2–15 people" },
+  ].filter(Boolean) as { icon: string; label: string; value: string }[];
 
   return (
     <div
@@ -57,22 +79,24 @@ export default function PriceCard() {
           >
             Per Adult
           </div>
-          <div
-            style={{
-              fontFamily: "var(--font-inter), 'Inter', sans-serif",
-              fontSize: 13,
-              color: "var(--ink4)",
-              textDecoration: "line-through",
-              marginBottom: 2,
-            }}
-          >
-            ₹1,74,999
-          </div>
+          {hasDiscount && (
+            <div
+              style={{
+                fontFamily: "var(--font-inter), 'Inter', sans-serif",
+                fontSize: 13,
+                color: "var(--ink4)",
+                textDecoration: "line-through",
+                marginBottom: 2,
+              }}
+            >
+              {formatPrice(originalPrice)}
+            </div>
+          )}
           <div
             className="serif"
             style={{ fontSize: 32, fontWeight: 700, color: "var(--gn)", lineHeight: 1 }}
           >
-            ₹1,24,999
+            {formatPrice(price)}
           </div>
           <div
             style={{
@@ -84,39 +108,45 @@ export default function PriceCard() {
           >
             per person (twin sharing)
           </div>
-          <div
-            className="syne"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 5,
-              fontSize: 11,
-              fontWeight: 700,
-              background: "rgba(41,196,216,.12)",
-              color: "var(--gn2)",
-              padding: "4px 12px",
-              borderRadius: 50,
-              marginTop: 8,
-            }}
-          >
-            <span className="material-symbols-rounded" style={{ fontSize: 14 }}>local_offer</span>
-            You save ₹50,000 (29% off)
-          </div>
+          {hasDiscount && (
+            <div
+              className="syne"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 5,
+                fontSize: 11,
+                fontWeight: 700,
+                background: "rgba(41,196,216,.12)",
+                color: "var(--gn2)",
+                padding: "4px 12px",
+                borderRadius: 50,
+                marginTop: 8,
+              }}
+            >
+              <span className="material-symbols-rounded" style={{ fontSize: 14 }}>local_offer</span>
+              You save {formatPrice(savings)} ({discount}% off)
+            </div>
+          )}
         </div>
 
-        <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2 }}>
-          <div style={{ color: "var(--cu)", fontSize: 16, letterSpacing: 1 }}>★★★★★</div>
-          <div className="serif" style={{ fontSize: 22, fontWeight: 700, color: "var(--ink)" }}>4.9</div>
-          <div
-            style={{
-              fontFamily: "var(--font-inter), 'Inter', sans-serif",
-              fontSize: 11,
-              color: "var(--ink4)",
-            }}
-          >
-            312 reviews
+        {rating > 0 && (
+          <div style={{ display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 2 }}>
+            <div style={{ color: "var(--cu)", fontSize: 16, letterSpacing: 1 }}>{starStr}</div>
+            <div className="serif" style={{ fontSize: 22, fontWeight: 700, color: "var(--ink)" }}>{rating}</div>
+            {reviewCount > 0 && (
+              <div
+                style={{
+                  fontFamily: "var(--font-inter), 'Inter', sans-serif",
+                  fontSize: 11,
+                  color: "var(--ink4)",
+                }}
+              >
+                {reviewCount} reviews
+              </div>
+            )}
           </div>
-        </div>
+        )}
       </div>
 
       {/* Meta rows */}

@@ -2,14 +2,13 @@
 
 import { useState, useEffect, useCallback } from "react";
 
-const galleryImages = [
-  "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1200&q=80",
-  "https://images.unsplash.com/photo-1518684079-3c830dcef090?w=1200&q=80",
-  "https://images.unsplash.com/photo-1582672060674-bc2bd808a8b5?w=1200&q=80",
-  "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1200&q=80",
-  "https://images.unsplash.com/photo-1546412414-e1885259563a?w=1200&q=80",
-  "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1200&q=80",
-];
+interface PackageGalleryProps {
+  images: string[];
+  heroImage?: string;
+  destinationImages?: string[];
+  stayImages?: string[];
+  activityImages?: string[];
+}
 
 const cellLabels = [
   { icon: "location_on", text: "Destination" },
@@ -17,12 +16,43 @@ const cellLabels = [
   { icon: "paragliding", text: "Activities" },
 ];
 
-export default function PackageGallery() {
+export default function PackageGallery({ images, heroImage, destinationImages, stayImages, activityImages }: PackageGalleryProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalIdx, setModalIdx] = useState(0);
+  const [modalFilter, setModalFilter] = useState("all");
+
+  // Build gallery: heroImage first, then category images, then general
+  const allImages = [
+    ...(heroImage ? [heroImage] : []),
+    ...(destinationImages || []),
+    ...(stayImages || []),
+    ...(activityImages || []),
+    ...images,
+  ].filter((img, i, arr) => arr.indexOf(img) === i); // deduplicate
+
+  // Grid cell images: destination[0], stay[0], activity[0], or fallback to general
+  const gridCellImages = [
+    destinationImages?.[0] || allImages[1] || allImages[0] || "",
+    stayImages?.[0] || allImages[2] || allImages[0] || "",
+    activityImages?.[0] || allImages[3] || allImages[0] || "",
+  ];
+
+  const galleryImages = allImages.length > 0 ? allImages : (heroImage ? [heroImage] : []);
+
+  // Filtered images for lightbox
+  const getFilteredImages = () => {
+    switch (modalFilter) {
+      case "destination": return destinationImages || [];
+      case "stay": return stayImages || [];
+      case "activities": return activityImages || [];
+      default: return galleryImages;
+    }
+  };
+  const filteredImages = getFilteredImages();
 
   const openModal = (idx: number) => {
     setModalIdx(idx);
+    setModalFilter("all");
     setModalOpen(true);
     document.body.style.overflow = "hidden";
   };
@@ -34,9 +64,9 @@ export default function PackageGallery() {
 
   const modalNav = useCallback(
     (dir: number) => {
-      setModalIdx((prev) => (prev + dir + galleryImages.length) % galleryImages.length);
+      setModalIdx((prev) => (prev + dir + filteredImages.length) % filteredImages.length);
     },
-    []
+    [filteredImages.length]
   );
 
   useEffect(() => {
@@ -49,6 +79,31 @@ export default function PackageGallery() {
     document.addEventListener("keydown", handleKey);
     return () => document.removeEventListener("keydown", handleKey);
   }, [modalOpen, modalNav]);
+
+  // Placeholder if no images
+  if (!galleryImages.length) {
+    return (
+      <div
+        style={{
+          height: 460,
+          borderRadius: "var(--r-xl)",
+          background: "var(--iv)",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          marginBottom: 32,
+          border: "1.5px solid var(--line)",
+        }}
+      >
+        <div style={{ textAlign: "center", color: "var(--ink4)" }}>
+          <span className="material-symbols-rounded" style={{ fontSize: 48, display: "block", marginBottom: 8 }}>
+            photo_library
+          </span>
+          <span className="syne" style={{ fontSize: 14, fontWeight: 600 }}>No photos available</span>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <>
@@ -69,14 +124,14 @@ export default function PackageGallery() {
         >
           <img
             src={galleryImages[0]}
-            alt="Dubai Luxury Escape Main"
+            alt="Package Main"
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
         </div>
 
         {/* 2x2 grid */}
         <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          {[1, 2, 3, 4].map((i) => (
+          {[0, 1, 2, 3].map((i) => (
             <div
               key={i}
               className="gallery-cell"
@@ -87,11 +142,11 @@ export default function PackageGallery() {
                 borderRadius: "var(--r)",
                 cursor: "pointer",
               }}
-              onClick={() => (i < 4 ? openModal(i) : openModal(0))}
+              onClick={() => (i < 3 ? openModal(i + 1) : openModal(0))}
             >
               <img
-                src={galleryImages[i] || galleryImages[0]}
-                alt={cellLabels[i - 1]?.text || "View All"}
+                src={i < 3 ? (gridCellImages[i] || galleryImages[0]) : (galleryImages[4] || galleryImages[0])}
+                alt={cellLabels[i]?.text || "View All"}
                 style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s ease" }}
               />
               <div
@@ -101,7 +156,7 @@ export default function PackageGallery() {
                   background: "linear-gradient(to top, rgba(0,20,28,.5) 0%, transparent 55%)",
                 }}
               />
-              {i < 4 ? (
+              {i < 3 ? (
                 <div
                   style={{
                     position: "absolute",
@@ -118,9 +173,9 @@ export default function PackageGallery() {
                   }}
                 >
                   <span className="material-symbols-rounded" style={{ fontSize: 15 }}>
-                    {cellLabels[i - 1]?.icon}
+                    {cellLabels[i]?.icon}
                   </span>
-                  {cellLabels[i - 1]?.text}
+                  {cellLabels[i]?.text}
                 </div>
               ) : (
                 <button
@@ -197,7 +252,7 @@ export default function PackageGallery() {
             </button>
 
             <img
-              src={galleryImages[modalIdx]}
+              src={filteredImages[modalIdx] || galleryImages[0]}
               alt=""
               style={{
                 width: "100%",
@@ -261,7 +316,35 @@ export default function PackageGallery() {
                 color: "rgba(255,255,255,.5)",
               }}
             >
-              {modalIdx + 1} / {galleryImages.length}
+              {modalIdx + 1} / {filteredImages.length}
+            </div>
+
+            {/* Filter buttons */}
+            <div style={{ display: "flex", gap: 8, justifyContent: "center", marginTop: 14 }}>
+              {[
+                { id: "all", label: "All", count: galleryImages.length },
+                { id: "destination", label: "Destination", count: (destinationImages || []).length },
+                { id: "stay", label: "Stay", count: (stayImages || []).length },
+                { id: "activities", label: "Activities", count: (activityImages || []).length },
+              ].filter(f => f.count > 0 || f.id === "all").map((f) => (
+                <button
+                  key={f.id}
+                  onClick={() => { setModalFilter(f.id); setModalIdx(0); }}
+                  style={{
+                    padding: "6px 14px",
+                    borderRadius: 50,
+                    fontSize: 11,
+                    fontWeight: 700,
+                    border: "none",
+                    cursor: "pointer",
+                    transition: "all .2s",
+                    background: modalFilter === f.id ? "var(--cu)" : "rgba(255,255,255,.12)",
+                    color: modalFilter === f.id ? "#fff" : "rgba(255,255,255,.6)",
+                  }}
+                >
+                  {f.label} ({f.count})
+                </button>
+              ))}
             </div>
 
             <div
@@ -274,7 +357,7 @@ export default function PackageGallery() {
                 paddingBottom: 4,
               }}
             >
-              {galleryImages.map((src, i) => (
+              {filteredImages.map((src, i) => (
                 <div
                   key={i}
                   onClick={() => setModalIdx(i)}
@@ -290,7 +373,7 @@ export default function PackageGallery() {
                   }}
                 >
                   <img
-                    src={src.replace("w=1200", "w=120")}
+                    src={src}
                     alt=""
                     style={{ width: "100%", height: "100%", objectFit: "cover" }}
                   />

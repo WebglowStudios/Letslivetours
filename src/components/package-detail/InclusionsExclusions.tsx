@@ -1,35 +1,16 @@
 "use client";
 
-const inclusions = [
-  "7 nights accommodation (4N Jumeirah Emirates Towers + 3N Atlantis The Palm)",
-  "Daily breakfast at hotel",
-  "Return airport transfers in private AC vehicle",
-  "All sightseeing transfers throughout the trip",
-  "Burj Khalifa At the Top (124th floor) tickets",
-  "Desert safari with BBQ dinner and live entertainment",
-  "Dubai Marina Dhow Cruise with dinner",
-  "Palm Jumeirah Monorail tickets",
-  "Dubai Frame entry tickets",
-  "Old Dubai heritage tour with English-speaking guide",
-  "Traditional Emirati lunch on Day 4",
-  "Welcome dinner on Day 1",
-  "Aquaventure Waterpark access (Atlantis stay)",
-  "All applicable taxes and service charges",
-];
+interface InclusionsExclusionsProps {
+  inclusions: string[];
+  exclusions: string[];
+}
 
-const exclusions = [
-  "International airfare to/from Dubai",
-  "UAE Tourist Visa fees (we assist with application)",
-  "Travel insurance (strongly recommended)",
-  "Lunches and dinners not mentioned in itinerary",
-  "Personal expenses, tips, and gratuities",
-  "Optional activities (helicopter tour, hot air balloon)",
-  "Alcoholic beverages",
-  "Porterage at hotels",
-  "Any services not mentioned in inclusions",
-];
+export default function InclusionsExclusions({ inclusions, exclusions }: InclusionsExclusionsProps) {
+  // Don't render if both are empty
+  if ((!inclusions || inclusions.length === 0) && (!exclusions || exclusions.length === 0)) {
+    return null;
+  }
 
-export default function InclusionsExclusions() {
   return (
     <div style={{ marginBottom: 28 }}>
       <h2
@@ -96,23 +77,27 @@ export default function InclusionsExclusions() {
                   borderRight: "1px solid var(--line)",
                 }}
               >
-                <ul style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {inclusions.map((item, i) => (
-                    <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-                      <span
-                        style={{
-                          width: 6,
-                          height: 6,
-                          borderRadius: "50%",
-                          background: "var(--gn3)",
-                          flexShrink: 0,
-                          marginTop: 7,
-                        }}
-                      />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+                {inclusions && inclusions.length > 0 ? (
+                  <ul style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {inclusions.map((item, i) => (
+                      <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                        <span
+                          style={{
+                            width: 6,
+                            height: 6,
+                            borderRadius: "50%",
+                            background: "var(--gn3)",
+                            flexShrink: 0,
+                            marginTop: 7,
+                          }}
+                        />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <span style={{ color: "var(--ink4)", fontSize: 13 }}>None listed</span>
+                )}
               </td>
               <td
                 style={{
@@ -124,23 +109,27 @@ export default function InclusionsExclusions() {
                   lineHeight: 1.7,
                 }}
               >
-                <ul style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-                  {exclusions.map((item, i) => (
-                    <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-                      <span
-                        style={{
-                          width: 6,
-                          height: 6,
-                          borderRadius: "50%",
-                          background: "var(--cu)",
-                          flexShrink: 0,
-                          marginTop: 7,
-                        }}
-                      />
-                      {item}
-                    </li>
-                  ))}
-                </ul>
+                {exclusions && exclusions.length > 0 ? (
+                  <ul style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                    {exclusions.map((item, i) => (
+                      <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
+                        <span
+                          style={{
+                            width: 6,
+                            height: 6,
+                            borderRadius: "50%",
+                            background: "var(--cu)",
+                            flexShrink: 0,
+                            marginTop: 7,
+                          }}
+                        />
+                        {item}
+                      </li>
+                    ))}
+                  </ul>
+                ) : (
+                  <span style={{ color: "var(--ink4)", fontSize: 13 }}>None listed</span>
+                )}
               </td>
             </tr>
           </tbody>

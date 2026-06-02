@@ -3,7 +3,11 @@
 import { useState, FormEvent } from "react";
 import { api } from "@/lib/api";
 
-export default function EnquiryForm() {
+interface EnquiryFormProps {
+  packageName: string;
+}
+
+export default function EnquiryForm({ packageName }: EnquiryFormProps) {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -28,6 +32,7 @@ export default function EnquiryForm() {
         phone,
         travelDate: travelDate || undefined,
         message: message || undefined,
+        packageName: packageName || undefined,
         source: "website",
       });
 
@@ -63,10 +68,22 @@ export default function EnquiryForm() {
     >
       <h3
         className="serif"
-        style={{ fontSize: 19, fontWeight: 600, color: "var(--ink)", marginBottom: 18 }}
+        style={{ fontSize: 19, fontWeight: 600, color: "var(--ink)", marginBottom: 4 }}
       >
         Send an Enquiry
       </h3>
+      {packageName && (
+        <p
+          style={{
+            fontFamily: "var(--font-inter), 'Inter', sans-serif",
+            fontSize: 12,
+            color: "var(--ink4)",
+            marginBottom: 18,
+          }}
+        >
+          About: {packageName}
+        </p>
+      )}
 
       {error && (
         <div style={{ padding: "10px 14px", background: "rgba(229,57,53,.08)", border: "1px solid rgba(229,57,53,.2)", borderRadius: 8, marginBottom: 14, fontSize: 12.5, color: "#e53935", display: "flex", alignItems: "center", gap: 8 }}>

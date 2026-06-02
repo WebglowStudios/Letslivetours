@@ -12,13 +12,13 @@ interface BookingDetail {
     _id: string;
     name: string;
     destination?: { name: string };
-    duration?: number;
+    duration?: number | { nights?: number; days?: number };
     images?: string[];
   };
   travelDate: string;
   status: string;
   totalAmount: number;
-  travellers: number;
+  travellers: number | { adults?: number; children?: number; infants?: number };
   paymentStatus?: string;
   createdAt: string;
 }
@@ -206,7 +206,9 @@ export default function BookingDetailPage() {
             <div>
               <p style={{ fontSize: 12, color: "var(--ink3)" }}>Duration</p>
               <p className="syne" style={{ fontSize: 15, fontWeight: 600, color: "var(--ink)", marginTop: 4 }}>
-                {booking.package?.duration ? `${booking.package.duration} days` : "—"}
+                {typeof booking.package?.duration === "object" && booking.package.duration !== null
+                  ? `${(booking.package.duration as { nights?: number; days?: number }).nights || 0}N / ${(booking.package.duration as { nights?: number; days?: number }).days || 0}D`
+                  : booking.package?.duration ? `${booking.package.duration} days` : "—"}
               </p>
             </div>
           </div>
@@ -239,7 +241,9 @@ export default function BookingDetailPage() {
             <div>
               <p style={{ fontSize: 12, color: "var(--ink3)" }}>Travellers</p>
               <p className="syne" style={{ fontSize: 15, fontWeight: 600, color: "var(--ink)", marginTop: 4 }}>
-                {booking.travellers || 1} {(booking.travellers || 1) === 1 ? "person" : "people"}
+                {typeof booking.travellers === "object" && booking.travellers !== null
+                  ? `${(booking.travellers as { adults?: number; children?: number; infants?: number }).adults || 0} Adults, ${(booking.travellers as { adults?: number; children?: number; infants?: number }).children || 0} Children, ${(booking.travellers as { adults?: number; children?: number; infants?: number }).infants || 0} Infants`
+                  : `${booking.travellers || 1} ${(booking.travellers || 1) === 1 ? "person" : "people"}`}
               </p>
             </div>
             <div>

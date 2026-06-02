@@ -2,94 +2,9 @@
 
 import { useState } from "react";
 
-/* ── DATA ── */
-const itineraryDays = [
-  {
-    badge: "Day 1", badgeType: "day",
-    title: "Arrival in Dubai — Check-in & Welcome Dinner",
-    content: `<p>Arrive at Dubai International Airport where our representative will greet you with a warm welcome. Transfer to your 5-star hotel in a private air-conditioned vehicle.</p><p>After check-in and freshening up, enjoy a welcome dinner at a rooftop restaurant with stunning views of the Dubai skyline. Rest and prepare for the adventures ahead.</p><ul><li>Private airport pickup included</li><li>Hotel check-in from 3:00 PM</li><li>Welcome dinner at rooftop restaurant</li><li>Overnight at 5-star hotel</li></ul>`,
-  },
-  {
-    badge: "Day 2", badgeType: "day",
-    title: "Burj Khalifa At the Top + Dubai Mall & Fountain Show",
-    content: `<p>Start your day with a sumptuous breakfast at the hotel. Head to the iconic <strong>Burj Khalifa</strong> for the "At the Top" experience — ascend to the 124th floor observation deck for panoramic views of the city, desert, and Arabian Gulf.</p><p>Spend the afternoon exploring the <strong>Dubai Mall</strong> — the world's largest shopping mall with over 1,200 stores, an indoor ice rink, and the Dubai Aquarium. In the evening, witness the spectacular <strong>Dubai Fountain Show</strong> — the world's largest choreographed fountain system.</p><ul><li>Burj Khalifa At the Top (124th floor) tickets included</li><li>Dubai Mall exploration</li><li>Dubai Fountain Show viewing</li><li>Dinner at Dubai Mall food court or restaurant of choice</li></ul>`,
-  },
-  {
-    badge: "Day 3", badgeType: "day",
-    title: "Desert Safari — Dune Bashing, Camel Ride & BBQ Dinner",
-    content: `<p>Morning at leisure. In the afternoon, embark on the most thrilling experience of your trip — the <strong>Desert Safari</strong>. Board a 4x4 Land Cruiser for heart-pumping dune bashing across the golden sand dunes of the Arabian Desert.</p><p>Arrive at a traditional Bedouin camp for camel riding, sandboarding, henna painting, and a stunning sunset. Enjoy a lavish BBQ dinner with live entertainment including belly dancing and Tanoura shows under a canopy of stars.</p><ul><li>Hotel pickup and drop-off included</li><li>Dune bashing in 4x4 Land Cruiser</li><li>Camel riding & sandboarding</li><li>Henna painting & traditional costumes</li><li>BBQ dinner with live entertainment</li></ul>`,
-  },
-  {
-    badge: "Day 4", badgeType: "day",
-    title: "Old Dubai — Creek, Gold Souk, Spice Souk & Abra Ride",
-    content: `<p>Discover the soul of old Dubai on a guided heritage tour. Cross the historic <strong>Dubai Creek</strong> on a traditional wooden Abra (water taxi) and explore the vibrant <strong>Gold Souk</strong> — home to over 300 jewellery shops — and the aromatic <strong>Spice Souk</strong>.</p><p>Visit the <strong>Al Fahidi Historical Neighbourhood</strong> with its wind-tower architecture and the Dubai Museum. Lunch at a traditional Emirati restaurant before returning to the hotel.</p><ul><li>Guided heritage tour with English-speaking guide</li><li>Abra (water taxi) ride across Dubai Creek</li><li>Gold Souk & Spice Souk visit</li><li>Al Fahidi Historical Neighbourhood</li><li>Traditional Emirati lunch included</li></ul>`,
-  },
-  {
-    badge: "Day 5", badgeType: "day",
-    title: "Palm Jumeirah & Atlantis + Dubai Marina Dhow Cruise",
-    content: `<p>Visit the iconic <strong>Palm Jumeirah</strong> — the world's largest man-made island — via the Palm Monorail. Explore the legendary <strong>Atlantis The Palm</strong> resort and enjoy optional access to the Aquaventure Waterpark.</p><p>In the evening, board a traditional <strong>Dhow Cruise</strong> along the glittering Dubai Marina. Enjoy a live dinner buffet with international cuisine, live music, and entertainment as the city's skyline reflects on the water.</p><ul><li>Palm Monorail tickets included</li><li>Atlantis The Palm visit</li><li>Optional Aquaventure Waterpark (at extra cost)</li><li>Dubai Marina Dhow Cruise with dinner</li></ul>`,
-  },
-  {
-    badge: "Day 6", badgeType: "day",
-    title: "Dubai Frame, Miracle Garden & Global Village",
-    content: `<p>Visit the <strong>Dubai Frame</strong> — a 150-metre tall picture frame structure offering views of both old and new Dubai simultaneously. Then head to the stunning <strong>Miracle Garden</strong> (seasonal, Oct–Apr) — the world's largest natural flower garden with over 150 million blooms.</p><p>In the evening, explore the <strong>Global Village</strong> — a multicultural festival park featuring pavilions from 90+ countries with food, shopping, and entertainment.</p><ul><li>Dubai Frame tickets included</li><li>Miracle Garden visit (seasonal)</li><li>Global Village evening visit</li><li>Dinner at Global Village food court</li></ul>`,
-  },
-  {
-    badge: "Day 7", badgeType: "day",
-    title: "Leisure Day — Shopping, Spa or Optional Add-ons",
-    content: `<p>Enjoy a free day to explore Dubai at your own pace. Options include a visit to <strong>Ibn Battuta Mall</strong>, a relaxing spa session at the hotel, or optional add-ons like a helicopter tour over the Palm Jumeirah or a hot air balloon ride over the desert.</p><p>In the evening, enjoy a farewell dinner at a restaurant of your choice — we recommend the stunning <strong>At.mosphere</strong> restaurant on the 122nd floor of Burj Khalifa.</p><ul><li>Day at leisure</li><li>Optional helicopter tour (at extra cost)</li><li>Optional hot air balloon ride (at extra cost)</li><li>Farewell dinner (own expense or upgrade available)</li></ul>`,
-  },
-  {
-    badge: "Day 8", badgeType: "day",
-    title: "Departure — Airport Transfer & Fond Farewell",
-    content: `<p>Enjoy a final breakfast at the hotel. Check out and transfer to Dubai International Airport in a private vehicle for your onward journey. Our representative will assist with check-in formalities.</p><p>Carry home memories of golden deserts, glittering skylines, and the warmth of Arabian hospitality. Until next time!</p><ul><li>Breakfast at hotel included</li><li>Hotel checkout by 12:00 PM</li><li>Private airport transfer included</li><li>Assistance with airport check-in</li></ul>`,
-  },
-];
-
-const summaryDays = [
-  { badge: "Day 1", title: "Arrival & Welcome Dinner", content: "<p>Airport pickup → Hotel check-in → Welcome rooftop dinner → Overnight stay.</p>" },
-  { badge: "Day 2", title: "Burj Khalifa + Dubai Mall", content: "<p>Breakfast → Burj Khalifa 124F observation deck → Dubai Mall → Dubai Fountain Show → Dinner.</p>" },
-  { badge: "Day 3", title: "Desert Safari & BBQ", content: "<p>Morning leisure → Afternoon desert safari → Dune bashing → Camel ride → BBQ dinner with live shows.</p>" },
-  { badge: "Day 4", title: "Old Dubai Heritage Tour", content: "<p>Breakfast → Dubai Creek Abra ride → Gold Souk → Spice Souk → Al Fahidi → Emirati lunch → Hotel.</p>" },
-  { badge: "Day 5", title: "Palm Jumeirah + Marina Cruise", content: "<p>Breakfast → Palm Monorail → Atlantis visit → Evening Dubai Marina Dhow Cruise with dinner.</p>" },
-  { badge: "Day 6", title: "Dubai Frame + Global Village", content: "<p>Breakfast → Dubai Frame → Miracle Garden → Evening Global Village → Dinner.</p>" },
-  { badge: "Day 7", title: "Leisure + Farewell Dinner", content: "<p>Free day → Optional helicopter/balloon tour → Farewell dinner at restaurant of choice.</p>" },
-  { badge: "Day 8", title: "Departure", content: "<p>Breakfast → Hotel checkout → Private airport transfer → Departure.</p>" },
-];
-
-const activities = [
-  { badge: "Activity 1", badgeType: "activity", title: "Burj Khalifa — At the Top (124th Floor)", content: `<p>Ascend to the 124th floor of the world's tallest building in a high-speed elevator. The observation deck offers 360° panoramic views of Dubai's skyline, the Arabian Gulf, and the surrounding desert. Best experienced at sunset.</p><ul><li>Duration: ~2 hours</li><li>Tickets included in package</li><li>Best time: Sunset (5:30–7:00 PM)</li><li>Dress code: Smart casual</li></ul>` },
-  { badge: "Activity 2", badgeType: "activity", title: "Desert Safari — Dune Bashing & Bedouin Camp", content: `<p>The quintessential Dubai experience. Board a 4x4 Land Cruiser for exhilarating dune bashing across the red sand dunes. Arrive at a traditional Bedouin camp for camel riding, sandboarding, henna painting, and a BBQ dinner with belly dancing and Tanoura shows.</p><ul><li>Duration: ~6 hours (3 PM – 9 PM)</li><li>Pickup and drop-off from hotel included</li><li>BBQ dinner included</li><li>Suitable for all ages (not recommended for pregnant women)</li></ul>` },
-  { badge: "Activity 3", badgeType: "activity", title: "Dubai Marina Dhow Cruise with Dinner", content: `<p>Sail along the stunning Dubai Marina on a traditional wooden dhow. Enjoy a live dinner buffet with international and Emirati cuisine, live music, and entertainment as the city's glittering skyline reflects on the calm waters.</p><ul><li>Duration: ~2.5 hours</li><li>Dinner buffet included</li><li>Live entertainment on board</li><li>Departure: 8:30 PM</li></ul>` },
-  { badge: "Activity 4", badgeType: "activity", title: "Dubai Creek Abra Ride & Heritage Walk", content: `<p>Cross the historic Dubai Creek on a traditional wooden Abra (water taxi) — one of the most authentic experiences in Dubai. Explore the Gold Souk, Spice Souk, and the Al Fahidi Historical Neighbourhood with a knowledgeable guide.</p><ul><li>Duration: ~4 hours</li><li>English-speaking guide included</li><li>Abra ride included</li><li>Traditional Emirati lunch included</li></ul>` },
-];
-
-const stays = [
-  { badge: "Stay 1", badgeType: "stay", title: "Jumeirah Emirates Towers — 5-Star Luxury (Nights 1–4)", content: `<p>Stay at the iconic <strong>Jumeirah Emirates Towers</strong> — one of Dubai's most recognisable landmarks. Located in the heart of the city on Sheikh Zayed Road, this 5-star hotel offers stunning views of the Dubai skyline and easy access to all major attractions.</p><ul><li>Room type: Deluxe King Room</li><li>Breakfast included daily</li><li>Swimming pool, spa & fitness centre access</li><li>Check-in: Day 1 | Check-out: Day 5</li><li>4 nights</li></ul>` },
-  { badge: "Stay 2", badgeType: "stay", title: "Atlantis The Palm — 5-Star Resort (Nights 5–7)", content: `<p>Upgrade your stay to the legendary <strong>Atlantis The Palm</strong> on the iconic Palm Jumeirah. This world-famous resort offers direct beach access, multiple pools, and the Aquaventure Waterpark right at your doorstep.</p><ul><li>Room type: Ocean Premier Room</li><li>Breakfast included daily</li><li>Aquaventure Waterpark access included</li><li>Private beach access</li><li>Check-in: Day 5 | Check-out: Day 8</li><li>3 nights</li></ul>` },
-];
-
-const transfers = [
-  { badge: "Transfer 1", badgeType: "transfer", title: "Dubai International Airport → Hotel (Day 1)", content: `<p>Private air-conditioned vehicle transfer from Dubai International Airport (DXB) to your hotel. Our representative will meet you at the arrivals hall with a name board.</p><ul><li>Vehicle: Toyota Camry or equivalent</li><li>Duration: ~30–45 minutes</li><li>Meet & greet service included</li><li>Available 24/7</li></ul>` },
-  { badge: "Transfer 2", badgeType: "transfer", title: "All Sightseeing Transfers (Days 2–7)", content: `<p>All transfers between hotel and sightseeing locations are included in the package. Private air-conditioned vehicles are used for all transfers throughout the trip.</p><ul><li>All transfers in private AC vehicles</li><li>Includes desert safari pickup/drop-off</li><li>Includes dhow cruise pickup/drop-off</li><li>Includes all guided tour transfers</li></ul>` },
-  { badge: "Transfer 3", badgeType: "transfer", title: "Hotel → Dubai International Airport (Day 8)", content: `<p>Private air-conditioned vehicle transfer from your hotel to Dubai International Airport for your departure flight. Please ensure you are ready at least 3 hours before your flight.</p><ul><li>Vehicle: Toyota Camry or equivalent</li><li>Duration: ~30–45 minutes</li><li>Luggage assistance included</li><li>Departure assistance at airport</li></ul>` },
-];
-
-const itinImages = [
-  "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1000&q=80",
-  "https://images.unsplash.com/photo-1518684079-3c830dcef090?w=1000&q=80",
-  "https://images.unsplash.com/photo-1582672060674-bc2bd808a8b5?w=1000&q=80",
-  "https://images.unsplash.com/photo-1509316785289-025f5b846b35?w=1000&q=80",
-  "https://images.unsplash.com/photo-1546412414-e1885259563a?w=1000&q=80",
-];
-
-const tabs = [
-  { id: "itinerary", label: "Itinerary" },
-  { id: "summary", label: "Summarised View" },
-  { id: "activities", label: "Activities" },
-  { id: "stay", label: "Stay" },
-  { id: "transfers", label: "Transfers" },
-];
+interface PackageTabsProps {
+  pkg: any;
+}
 
 /* ── BADGE STYLES ── */
 const badgeStyles: Record<string, React.CSSProperties> = {
@@ -104,11 +19,24 @@ function AccordionItem({
   item,
   isOpen,
   onToggle,
+  onImageClick,
 }: {
   item: { badge: string; badgeType?: string; title: string; content: string };
   isOpen: boolean;
   onToggle: () => void;
+  onImageClick?: (images: string[], idx: number) => void;
 }) {
+  const handleBodyClick = (e: React.MouseEvent) => {
+    const target = e.target as HTMLElement;
+    if (target.tagName === "IMG" && target.hasAttribute("data-lightbox")) {
+      const container = target.closest(".acc-images");
+      if (container && onImageClick) {
+        const imgs = Array.from(container.querySelectorAll("img")).map((img) => img.getAttribute("src") || "");
+        const idx = imgs.indexOf(target.getAttribute("src") || "");
+        onImageClick(imgs, idx >= 0 ? idx : 0);
+      }
+    }
+  };
   return (
     <div
       style={{
@@ -203,6 +131,7 @@ function AccordionItem({
             color: "var(--ink3)",
             lineHeight: 1.75,
           }}
+          onClick={handleBodyClick}
           dangerouslySetInnerHTML={{ __html: item.content }}
         />
       </div>
@@ -210,16 +139,92 @@ function AccordionItem({
   );
 }
 
-export default function PackageTabs() {
+/* ── Helper: build HTML content for an itinerary day ── */
+function buildItineraryContent(day: any): string {
+  let html = "";
+  if (day.description) {
+    html += `<p>${day.description}</p>`;
+  }
+  if (day.activities && day.activities.length > 0) {
+    html += `<ul>${day.activities.map((a: string) => `<li>${a}</li>`).join("")}</ul>`;
+  }
+  if (day.meals && day.meals.length > 0) {
+    html += `<p><strong>Meals:</strong> ${day.meals.join(", ")}</p>`;
+  }
+  if (day.accommodation) {
+    html += `<p><strong>Accommodation:</strong> ${day.accommodation}</p>`;
+  }
+  if (day.images && day.images.length > 0) {
+    html += `<div class="acc-images">${day.images.map((img: string) => `<img src="${img}" alt="" class="acc-thumb" data-lightbox />`).join("")}</div>`;
+  }
+  return html;
+}
+
+/* ── Helper: build HTML content for activities ── */
+function buildActivityContent(activity: any): string {
+  let html = "";
+  if (activity.description) {
+    html += `<p>${activity.description}</p>`;
+  }
+  if (activity.duration) {
+    html += `<p><strong>Duration:</strong> ${activity.duration}</p>`;
+  }
+  if (activity.details && activity.details.length > 0) {
+    html += `<ul>${activity.details.map((d: string) => `<li>${d}</li>`).join("")}</ul>`;
+  }
+  if (activity.images && activity.images.length > 0) {
+    html += `<div class="acc-images">${activity.images.map((img: string) => `<img src="${img}" alt="" class="acc-thumb" data-lightbox />`).join("")}</div>`;
+  }
+  return html;
+}
+
+/* ── Helper: build HTML content for stays ── */
+function buildStayContent(stay: any): string {
+  let html = "";
+  html += `<p><strong>${stay.name}</strong></p>`;
+  if (stay.rating) html += `<p>Rating: ${stay.rating}</p>`;
+  if (stay.nights) html += `<p>${stay.nights} Night${stay.nights > 1 ? "s" : ""}</p>`;
+  if (stay.roomType) html += `<p>Room Type: ${stay.roomType}</p>`;
+  if (stay.amenities && stay.amenities.length > 0) {
+    html += `<ul>${stay.amenities.map((a: string) => `<li>${a}</li>`).join("")}</ul>`;
+  }
+  return html;
+}
+
+/* ── Helper: build HTML content for transfers ── */
+function buildTransferContent(transfer: any): string {
+  let html = "";
+  if (transfer.description) {
+    html += `<p>${transfer.description}</p>`;
+  }
+  if (transfer.details && transfer.details.length > 0) {
+    html += `<ul>${transfer.details.map((d: string) => `<li>${d}</li>`).join("")}</ul>`;
+  }
+  if (transfer.images && transfer.images.length > 0) {
+    html += `<div class="acc-images">${transfer.images.map((img: string) => `<img src="${img}" alt="" class="acc-thumb" data-lightbox />`).join("")}</div>`;
+  }
+  return html;
+}
+
+const tabs = [
+  { id: "itinerary", label: "Itinerary" },
+  { id: "activities", label: "Activities" },
+  { id: "stay", label: "Stay" },
+  { id: "transfers", label: "Transfers" },
+];
+
+export default function PackageTabs({ pkg }: PackageTabsProps) {
   const [activeTab, setActiveTab] = useState("itinerary");
   const [openItems, setOpenItems] = useState<Record<string, number | null>>({
     itinerary: null,
-    summary: null,
     activities: null,
     stay: null,
     transfers: null,
   });
   const [itinIdx, setItinIdx] = useState(0);
+  const [lightboxOpen, setLightboxOpen] = useState(false);
+  const [lightboxImages, setLightboxImages] = useState<string[]>([]);
+  const [lightboxIdx, setLightboxIdx] = useState(0);
 
   const toggleItem = (tab: string, idx: number) => {
     setOpenItems((prev) => ({
@@ -228,20 +233,57 @@ export default function PackageTabs() {
     }));
   };
 
+  const itinerary = pkg?.itinerary || [];
+  const activities = pkg?.activities || [];
+  const stays = pkg?.stays || [];
+  const transfers = pkg?.transfers || [];
+  const images = pkg?.images || [];
+  const duration = pkg?.duration;
+  const destination = pkg?.destination;
+
+  const itinImages = images.slice(0, 5);
+
   const itinNav = (dir: number) => {
+    if (itinImages.length === 0) return;
     setItinIdx((prev) => (prev + dir + itinImages.length) % itinImages.length);
   };
 
   const getTabData = (tabId: string) => {
     switch (tabId) {
-      case "itinerary": return itineraryDays;
-      case "summary": return summaryDays.map((d) => ({ ...d, badgeType: "day" }));
-      case "activities": return activities;
-      case "stay": return stays;
-      case "transfers": return transfers;
-      default: return [];
+      case "itinerary":
+        return itinerary.map((day: any) => ({
+          badge: `Day ${day.day}`,
+          badgeType: "day",
+          title: day.title,
+          content: buildItineraryContent(day),
+        }));
+      case "activities":
+        return activities.map((act: any, i: number) => ({
+          badge: `Activity ${i + 1}`,
+          badgeType: "activity",
+          title: act.title,
+          content: buildActivityContent(act),
+        }));
+      case "stay":
+        return stays.map((s: any, i: number) => ({
+          badge: `Stay ${i + 1}`,
+          badgeType: "stay",
+          title: s.name,
+          content: buildStayContent(s),
+        }));
+      case "transfers":
+        return transfers.map((t: any, i: number) => ({
+          badge: `Transfer ${i + 1}`,
+          badgeType: "transfer",
+          title: t.title,
+          content: buildTransferContent(t),
+        }));
+      default:
+        return [];
     }
   };
+
+  const tabData = getTabData(activeTab);
 
   return (
     <div style={{ marginBottom: 28 }}>
@@ -284,7 +326,7 @@ export default function PackageTabs() {
       {/* Tab Panels */}
       <div style={{ paddingTop: 20 }}>
         {/* Itinerary Hero (only for itinerary tab) */}
-        {activeTab === "itinerary" && (
+        {activeTab === "itinerary" && itinImages.length > 0 && (
           <div
             style={{
               position: "relative",
@@ -296,7 +338,7 @@ export default function PackageTabs() {
           >
             <img
               src={itinImages[itinIdx]}
-              alt="Dubai Itinerary"
+              alt="Itinerary"
               style={{
                 width: "100%",
                 height: "100%",
@@ -312,83 +354,152 @@ export default function PackageTabs() {
               }}
             />
             <div style={{ position: "absolute", bottom: 20, left: 22, color: "#fff" }}>
-              <div className="serif" style={{ fontSize: 42, fontWeight: 700, lineHeight: 1 }}>8</div>
+              <div className="serif" style={{ fontSize: 42, fontWeight: 700, lineHeight: 1 }}>
+                {duration?.days || itinerary.length}
+              </div>
               <div
                 className="syne"
                 style={{ fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,.8)", marginTop: 4 }}
               >
-                Days in Dubai, UAE
+                Days in {destination?.name || "your destination"}
               </div>
             </div>
-            <button
-              onClick={() => itinNav(-1)}
-              style={{
-                position: "absolute",
-                top: "50%",
-                transform: "translateY(-50%)",
-                left: 14,
-                width: 40,
-                height: 40,
-                borderRadius: "50%",
-                background: "rgba(255,255,255,.9)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                border: "none",
-                cursor: "pointer",
-                transition: "var(--tr)",
-                boxShadow: "var(--sh)",
-              }}
-            >
-              <span className="material-symbols-rounded" style={{ fontSize: 22, color: "var(--gn)" }}>
-                chevron_left
-              </span>
-            </button>
-            <button
-              onClick={() => itinNav(1)}
-              style={{
-                position: "absolute",
-                top: "50%",
-                transform: "translateY(-50%)",
-                right: 14,
-                width: 40,
-                height: 40,
-                borderRadius: "50%",
-                background: "rgba(255,255,255,.9)",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                border: "none",
-                cursor: "pointer",
-                transition: "var(--tr)",
-                boxShadow: "var(--sh)",
-              }}
-            >
-              <span className="material-symbols-rounded" style={{ fontSize: 22, color: "var(--gn)" }}>
-                chevron_right
-              </span>
-            </button>
+            {itinImages.length > 1 && (
+              <>
+                <button
+                  onClick={() => itinNav(-1)}
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    left: 14,
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    background: "rgba(255,255,255,.9)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "none",
+                    cursor: "pointer",
+                    transition: "var(--tr)",
+                    boxShadow: "var(--sh)",
+                  }}
+                >
+                  <span className="material-symbols-rounded" style={{ fontSize: 22, color: "var(--gn)" }}>
+                    chevron_left
+                  </span>
+                </button>
+                <button
+                  onClick={() => itinNav(1)}
+                  style={{
+                    position: "absolute",
+                    top: "50%",
+                    transform: "translateY(-50%)",
+                    right: 14,
+                    width: 40,
+                    height: 40,
+                    borderRadius: "50%",
+                    background: "rgba(255,255,255,.9)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    border: "none",
+                    cursor: "pointer",
+                    transition: "var(--tr)",
+                    boxShadow: "var(--sh)",
+                  }}
+                >
+                  <span className="material-symbols-rounded" style={{ fontSize: 22, color: "var(--gn)" }}>
+                    chevron_right
+                  </span>
+                </button>
+              </>
+            )}
           </div>
         )}
 
-        {/* Accordion List */}
-        <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-          {getTabData(activeTab).map((item, idx) => (
-            <AccordionItem
-              key={`${activeTab}-${idx}`}
-              item={item}
-              isOpen={activeTab === "summary" ? true : openItems[activeTab] === idx}
-              onToggle={() => toggleItem(activeTab, idx)}
-            />
-          ))}
-        </div>
+        {/* Accordion List or Empty State */}
+        {tabData.length > 0 ? (
+          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+            {tabData.map((item: any, idx: number) => (
+              <AccordionItem
+                key={`${activeTab}-${idx}`}
+                item={item}
+                isOpen={openItems[activeTab] === idx}
+                onToggle={() => toggleItem(activeTab, idx)}
+                onImageClick={(imgs, i) => { setLightboxImages(imgs); setLightboxIdx(i); setLightboxOpen(true); }}
+              />
+            ))}
+          </div>
+        ) : (
+          <div
+            style={{
+              padding: "40px 20px",
+              textAlign: "center",
+              color: "var(--ink4)",
+              fontFamily: "var(--font-inter), 'Inter', sans-serif",
+              fontSize: 14,
+            }}
+          >
+            <span className="material-symbols-rounded" style={{ fontSize: 36, display: "block", marginBottom: 8, color: "var(--ink4)" }}>
+              info
+            </span>
+            No information available
+          </div>
+        )}
       </div>
 
       <style jsx>{`
         button:hover {
           color: var(--gn);
         }
+        :global(.acc-images) {
+          display: flex;
+          gap: 8px;
+          flex-wrap: wrap;
+          margin-top: 12px;
+        }
+        :global(.acc-thumb) {
+          width: 72px;
+          height: 52px;
+          object-fit: cover;
+          border-radius: 8px;
+          border: 1.5px solid var(--line);
+          cursor: pointer;
+          transition: var(--tr);
+        }
+        :global(.acc-thumb:hover) {
+          border-color: var(--cu);
+          transform: scale(1.05);
+        }
       `}</style>
+
+      {/* Lightbox */}
+      {lightboxOpen && lightboxImages.length > 0 && (
+        <div
+          style={{ position: "fixed", inset: 0, zIndex: 9000, background: "rgba(0,10,14,.92)", display: "flex", alignItems: "center", justifyContent: "center", padding: 20 }}
+          onClick={() => setLightboxOpen(false)}
+        >
+          <div style={{ position: "relative", maxWidth: 900, width: "100%" }} onClick={(e) => e.stopPropagation()}>
+            <button onClick={() => setLightboxOpen(false)} style={{ position: "absolute", top: -44, right: 0, width: 36, height: 36, borderRadius: "50%", background: "rgba(255,255,255,.12)", display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer" }}>
+              <span className="material-symbols-rounded" style={{ color: "#fff", fontSize: 20 }}>close</span>
+            </button>
+            <img src={lightboxImages[lightboxIdx]} alt="" style={{ width: "100%", maxHeight: "80vh", objectFit: "contain", borderRadius: "var(--r)" }} />
+            {lightboxImages.length > 1 && (
+              <>
+                <button onClick={() => setLightboxIdx((lightboxIdx - 1 + lightboxImages.length) % lightboxImages.length)} style={{ position: "absolute", top: "50%", transform: "translateY(-50%)", left: -50, width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,.12)", display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer" }}>
+                  <span className="material-symbols-rounded" style={{ color: "#fff", fontSize: 24 }}>chevron_left</span>
+                </button>
+                <button onClick={() => setLightboxIdx((lightboxIdx + 1) % lightboxImages.length)} style={{ position: "absolute", top: "50%", transform: "translateY(-50%)", right: -50, width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,.12)", display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer" }}>
+                  <span className="material-symbols-rounded" style={{ color: "#fff", fontSize: 24 }}>chevron_right</span>
+                </button>
+              </>
+            )}
+            <div style={{ textAlign: "center", marginTop: 12, fontSize: 12, color: "rgba(255,255,255,.5)" }}>{lightboxIdx + 1} / {lightboxImages.length}</div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -125,7 +125,13 @@ export default function PackageDetailPage() {
         </div>
 
         {/* Gallery */}
-        <PackageGallery />
+        <PackageGallery
+          images={pkg?.images || []}
+          heroImage={pkg?.heroImage}
+          destinationImages={pkg?.destinationImages || []}
+          stayImages={pkg?.stayImages || []}
+          activityImages={pkg?.activityImages || []}
+        />
 
         {/* Content Grid */}
         <div
@@ -139,21 +145,21 @@ export default function PackageDetailPage() {
         >
           {/* Left Column */}
           <div>
-            <PackageInfo />
-            <PackageTabs />
-            <InclusionsExclusions />
-            <KnowBeforeYouGo />
+            <PackageInfo pkg={pkg} />
+            <PackageTabs pkg={pkg} />
+            <InclusionsExclusions inclusions={pkg?.inclusions || []} exclusions={pkg?.exclusions || []} />
+            <KnowBeforeYouGo items={pkg?.knowBeforeYouGo || []} />
           </div>
 
           {/* Right Column (Sticky) */}
           <div style={{ position: "sticky", top: 84 }}>
-            <PriceCard />
-            <EnquiryForm />
+            <PriceCard pkg={pkg} slug={slug} />
+            <EnquiryForm packageName={packageName} />
           </div>
         </div>
 
         {/* Reviews */}
-        <Reviews />
+        <Reviews packageId={pkg?._id} />
       </div>
 
       <Footer />
