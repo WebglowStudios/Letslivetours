@@ -119,7 +119,7 @@ export default function Hero() {
       {/* Content */}
       <div className="hero-content-wrap" style={{
         position: "relative", zIndex: 5,
-        padding: "0 0 72px 72px",
+        padding: "0 0 140px 72px",
         width: "calc(100% - 88px)",
       }}>
         <div className="syne" style={{
@@ -131,36 +131,36 @@ export default function Hero() {
         </div>
 
         <h1 className="serif" style={{
-          fontSize: "clamp(64px, 9vw, 130px)", fontWeight: 700, lineHeight: 0.95,
-          letterSpacing: -3, color: "#fff", maxWidth: 750,
+          fontSize: "clamp(52px, 7vw, 100px)", fontWeight: 700, lineHeight: 0.95,
+          letterSpacing: -2, color: "#fff", maxWidth: 800,
         }}>
           The World Is<br />Your <em style={{ fontStyle: "italic", color: "var(--gd)" }}>Canvas</em>.
         </h1>
 
         {/* Search */}
         <div style={{
-          marginTop: 40, background: "rgba(249,246,240,.07)", backdropFilter: "blur(24px)",
+          marginTop: 48, background: "rgba(249,246,240,.07)", backdropFilter: "blur(24px)",
           border: "1px solid rgba(249,246,240,.15)", borderRadius: "var(--r-xl)",
-          padding: "20px 26px", display: "flex", gap: 2, alignItems: "stretch", maxWidth: 820,
+          padding: "12px 12px 12px 24px", display: "flex", alignItems: "center", maxWidth: 700,
         }} className="hero-search-bar">
           <div style={{
-            flex: 1, display: "flex", flexDirection: "column", gap: 4, padding: "6px 20px",
+            flex: 1, display: "flex", flexDirection: "column", gap: 3, paddingRight: 20,
             borderRight: "1px solid rgba(249,246,240,.12)",
           }} className="hs-field">
             <div className="syne" style={{
-              fontSize: 9.5, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase",
+              fontSize: 9, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase",
               color: "rgba(249,246,240,.5)",
             }}>Where to?</div>
             <input
               type="text"
-              placeholder="Dubai, Bali, Japan…"
+              placeholder="Dubai, Bali, Japan..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               onKeyDown={(e) => e.key === "Enter" && handleSearch()}
               style={{
                 background: "transparent", border: "none", outline: "none",
-                fontFamily: "var(--font-inter),'Inter',sans-serif", fontSize: 15,
-                color: "#fff", fontWeight: 500,
+                fontFamily: "var(--font-inter),'Inter',sans-serif", fontSize: 14,
+                color: "#fff", fontWeight: 500, width: "100%",
               }}
             />
           </div>
@@ -169,11 +169,11 @@ export default function Hero() {
             { label: "Travellers", type: "text", placeholder: "2 Adults" },
           ].map((f, i) => (
             <div key={i} style={{
-              flex: 1, display: "flex", flexDirection: "column", gap: 4, padding: "6px 20px",
+              flex: 1, display: "flex", flexDirection: "column", gap: 3, padding: "0 20px",
               borderRight: i < 1 ? "1px solid rgba(249,246,240,.12)" : "none",
             }} className="hs-field">
               <div className="syne" style={{
-                fontSize: 9.5, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase",
+                fontSize: 9, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase",
                 color: "rgba(249,246,240,.5)",
               }}>{f.label}</div>
               <input
@@ -181,17 +181,17 @@ export default function Hero() {
                 placeholder={f.placeholder}
                 style={{
                   background: "transparent", border: "none", outline: "none",
-                  fontFamily: "var(--font-inter),'Inter',sans-serif", fontSize: 15,
-                  color: "#fff", fontWeight: 500,
+                  fontFamily: "var(--font-inter),'Inter',sans-serif", fontSize: 14,
+                  color: "#fff", fontWeight: 500, width: "100%",
                 }}
               />
             </div>
           ))}
           <button onClick={handleSearch} className="syne" style={{
-            flexShrink: 0, padding: "14px 26px", background: "var(--cu)", border: "none",
-            borderRadius: 16, color: "#fff", fontSize: 13, fontWeight: 700, letterSpacing: 0.5,
+            flexShrink: 0, padding: "14px 24px", background: "var(--cu)", border: "none",
+            borderRadius: 14, color: "#fff", fontSize: 13, fontWeight: 700, letterSpacing: 0.5,
             cursor: "pointer", display: "flex", alignItems: "center", gap: 7,
-            transition: "var(--tr)", alignSelf: "center", marginLeft: 10,
+            transition: "var(--tr)", marginLeft: 12,
           }}>
             <span className="material-symbols-rounded" style={{ fontSize: 18 }}>search</span>Search
           </button>
@@ -200,7 +200,7 @@ export default function Hero() {
 
       {/* Bottom stats */}
       <div className="hero-bottom-bar" style={{
-        position: "absolute", bottom: 0, left: 0, right: 88, zIndex: 6,
+        position: "absolute", bottom: 0, left: 0, right: 0, zIndex: 6,
         borderTop: "1px solid rgba(249,246,240,.1)", display: "flex", alignItems: "stretch",
       }}>
         {[
@@ -240,12 +240,11 @@ export default function Hero() {
       <style jsx>{`
         @media (max-width: 1100px) {
           .filmstrip-wrap { display: none !important; }
-          .hero-content-wrap { width: 100% !important; padding: 0 0 72px 52px !important; }
-          .hero-bottom-bar { right: 0 !important; }
+          .hero-content-wrap { width: 100% !important; padding: 0 0 140px 52px !important; }
         }
         @media (max-width: 768px) {
-          .hero-content-wrap { padding: 0 0 120px 20px !important; }
-          .hero-content-wrap h1 { font-size: clamp(48px, 10vw, 80px) !important; }
+          .hero-content-wrap { padding: 0 0 160px 20px !important; }
+          .hero-content-wrap h1 { font-size: clamp(36px, 9vw, 60px) !important; white-space: normal !important; }
           .hero-search-bar { flex-direction: column !important; padding: 16px 18px !important; }
           .hs-field { border-right: none !important; border-bottom: 1px solid rgba(249,246,240,.12) !important; }
           .hero-bottom-bar {

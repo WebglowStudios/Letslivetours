@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import Link from "next/link";
+import { generateBookingPdf } from "@/lib/generateBookingPdf";
 
 interface BookingDetail {
   _id: string;
@@ -160,19 +161,42 @@ export default function BookingDetailPage() {
               {displayId}
             </p>
           </div>
-          <span
-            className="syne"
-            style={{
-              ...getStatusStyle(booking.status),
-              padding: "8px 20px",
-              borderRadius: 24,
-              fontSize: 13,
-              fontWeight: 700,
-              textTransform: "capitalize",
-            }}
-          >
-            {booking.status}
-          </span>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <button
+              onClick={() => generateBookingPdf(booking as Parameters<typeof generateBookingPdf>[0])}
+              className="syne"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+                padding: "8px 16px",
+                background: "var(--gn-gl)",
+                color: "var(--gn)",
+                border: "1px solid var(--line2)",
+                borderRadius: 20,
+                fontSize: 12,
+                fontWeight: 600,
+                cursor: "pointer",
+                transition: "var(--tr)",
+              }}
+            >
+              <span className="material-symbols-rounded" style={{ fontSize: 16 }}>download</span>
+              Download PDF
+            </button>
+            <span
+              className="syne"
+              style={{
+                ...getStatusStyle(booking.status),
+                padding: "8px 20px",
+                borderRadius: 24,
+                fontSize: 13,
+                fontWeight: 700,
+                textTransform: "capitalize",
+              }}
+            >
+              {booking.status}
+            </span>
+          </div>
         </div>
       </div>
 

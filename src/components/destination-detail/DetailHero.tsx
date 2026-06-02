@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 
-const slides = [
+const fallbackSlides = [
   "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1600&q=80",
   "https://images.unsplash.com/photo-1518684079-3c830dcef090?w=1600&q=80",
   "https://images.unsplash.com/photo-1582672060674-bc2bd808a8b5?w=1600&q=80",
@@ -11,23 +11,28 @@ const slides = [
 
 const stats = [
   { val: "48+", lbl: "Packages" },
-  { val: "4.9\u2605", lbl: "Avg Rating" },
+  { val: "4.9★", lbl: "Avg Rating" },
   { val: "12K+", lbl: "Happy Travellers" },
-  { val: "3\u201314", lbl: "Night Options" },
-  { val: "Oct\u2013Apr", lbl: "Best Season" },
+  { val: "3–14", lbl: "Night Options" },
+  { val: "Oct–Apr", lbl: "Best Season" },
 ];
 
 interface DetailHeroProps {
   destinationName?: string;
+  images?: string[];
+  heroImage?: string;
 }
 
-export default function DetailHero({ destinationName = "Dubai" }: DetailHeroProps) {
+export default function DetailHero({ destinationName = "Dubai", images, heroImage }: DetailHeroProps) {
   const [idx, setIdx] = useState(0);
+
+  // Use provided images for slideshow, fallback to defaults
+  const slides = images && images.length > 0 ? images : (heroImage ? [heroImage, ...fallbackSlides.slice(1)] : fallbackSlides);
 
   useEffect(() => {
     const iv = setInterval(() => setIdx((p) => (p + 1) % slides.length), 5000);
     return () => clearInterval(iv);
-  }, []);
+  }, [slides.length]);
 
   return (
     <section id="hero" style={{ position: "relative", height: "100vh", minHeight: 600, overflow: "hidden" }}>
@@ -43,24 +48,24 @@ export default function DetailHero({ destinationName = "Dubai" }: DetailHeroProp
       <div className="detail-hero-content" style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 80px", paddingTop: 72 }}>
         <div className="syne" style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,.6)", display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
           <a href="/" style={{ color: "rgba(255,255,255,.6)" }}>Home</a>
-          <span style={{ color: "rgba(255,255,255,.3)" }}>\u203A</span>
+          <span style={{ color: "rgba(255,255,255,.3)" }}>›</span>
           <a href="/destinations" style={{ color: "rgba(255,255,255,.6)" }}>Destinations</a>
-          <span style={{ color: "rgba(255,255,255,.3)" }}>\u203A</span>
+          <span style={{ color: "rgba(255,255,255,.3)" }}>›</span>
           <span style={{ color: "rgba(255,255,255,.9)" }}>{destinationName}</span>
         </div>
         <div className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--cu)", color: "#fff", fontSize: 11, fontWeight: 800, letterSpacing: 2, textTransform: "uppercase", padding: "6px 16px", borderRadius: 50, marginBottom: 18, width: "fit-content", boxShadow: "0 4px 18px rgba(245,166,35,.45)" }}>
-          <span className="material-symbols-rounded" style={{ fontSize: 16 }}>local_offer</span>Up to 30% Off \u2014 Limited Time
+          <span className="material-symbols-rounded" style={{ fontSize: 16 }}>local_offer</span>Up to 30% Off — Limited Time
         </div>
         <h1 className="serif" style={{ fontSize: "clamp(48px, 7vw, 88px)", fontWeight: 700, color: "#fff", lineHeight: 1.05, marginBottom: 12 }}>
           Discover<br /><em style={{ fontStyle: "italic", color: "var(--cu-l)" }}>{destinationName}</em>
         </h1>
         <p style={{ fontSize: 17, color: "rgba(255,255,255,.75)", marginBottom: 32, maxWidth: 480, lineHeight: 1.6 }}>
-          Where golden deserts meet futuristic skylines \u2014 an experience unlike any other.
+          Where golden deserts meet futuristic skylines — an experience unlike any other.
         </p>
         <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 32 }}>
           <span className="syne" style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.6)" }}>Starting from</span>
-          <span className="serif" style={{ fontSize: 18, color: "rgba(255,255,255,.4)", textDecoration: "line-through" }}>\u20B91,74,999</span>
-          <span className="serif" style={{ fontSize: 36, fontWeight: 700, color: "var(--cu-l)" }}>\u20B91,24,999</span>
+          <span className="serif" style={{ fontSize: 18, color: "rgba(255,255,255,.4)", textDecoration: "line-through" }}>₹1,74,999</span>
+          <span className="serif" style={{ fontSize: 36, fontWeight: 700, color: "var(--cu-l)" }}>₹1,24,999</span>
           <span style={{ fontSize: 13, color: "rgba(255,255,255,.55)" }}>/ person</span>
         </div>
         <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>

@@ -380,140 +380,163 @@ export default function Navbar() {
             border: "none",
             cursor: "pointer",
             zIndex: 1100,
+            position: "relative",
           }}
         >
           <span className="material-symbols-rounded" style={{ fontSize: 28, color: scrolled ? "var(--ink)" : "var(--iv)" }}>
-            {mobileMenuOpen ? "close" : "menu"}
+            menu
           </span>
         </button>
       </div>
 
-      {/* Mobile menu overlay */}
-      {mobileMenuOpen && (
-        <div className="nav-mobile-overlay" style={{
+      {/* Mobile sidebar drawer */}
+      <div
+        className="nav-mobile-backdrop"
+        onClick={() => setMobileMenuOpen(false)}
+        style={{
+          position: "fixed",
+          inset: 0,
+          background: "rgba(0,20,28,.5)",
+          zIndex: 1050,
+          opacity: mobileMenuOpen ? 1 : 0,
+          pointerEvents: mobileMenuOpen ? "auto" : "none",
+          transition: "opacity .3s ease",
+        }}
+      />
+      <div
+        className="nav-mobile-drawer"
+        style={{
           position: "fixed",
           top: 0,
-          left: 0,
           right: 0,
           bottom: 0,
+          width: "min(300px, 82vw)",
           background: "#fff",
-          zIndex: 1050,
+          zIndex: 1060,
+          transform: mobileMenuOpen ? "translateX(0)" : "translateX(100%)",
+          transition: "transform .35s cubic-bezier(.4,0,.2,1)",
           display: "flex",
           flexDirection: "column",
-          alignItems: "center",
-          justifyContent: "center",
-          padding: "72px 20px 40px",
-        }}>
-          <div style={{ display: "flex", flexDirection: "column", alignItems: "center", gap: 0, width: "100%" }}>
-            {links.map((link, i) => (
-              <Link
-                key={i}
-                href={link.href}
-                className="syne"
-                onClick={() => setMobileMenuOpen(false)}
-                style={{
-                  padding: 16,
-                  fontSize: 16,
-                  fontWeight: 600,
-                  color: "var(--ink2)",
-                  textDecoration: "none",
-                  letterSpacing: 0.5,
-                  width: "100%",
-                  textAlign: "center",
-                  borderBottom: "1px solid var(--line)",
-                }}
-              >
-                {link.label}
-              </Link>
-            ))}
+          boxShadow: mobileMenuOpen ? "-8px 0 40px rgba(0,20,28,.15)" : "none",
+        }}
+      >
+        {/* Drawer header */}
+        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px", borderBottom: "1px solid var(--line)" }}>
+          <span className="syne" style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1, color: "var(--gn)", textTransform: "uppercase" }}>
+            LetsLive<span style={{ color: "var(--cu)" }}> Tours</span>
+          </span>
+          <button
+            onClick={() => setMobileMenuOpen(false)}
+            style={{ width: 36, height: 36, borderRadius: "50%", background: "var(--iv)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+          >
+            <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink2)" }}>close</span>
+          </button>
+        </div>
+
+        {/* User greeting */}
+        {user && (
+          <div style={{ padding: "20px 24px", background: "var(--iv)", borderBottom: "1px solid var(--line)" }}>
+            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+              <div style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--gn)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 15, fontWeight: 700 }}>
+                {getInitials()}
+              </div>
+              <div>
+                <div className="syne" style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)" }}>{user.firstName} {user.lastName}</div>
+                <div style={{ fontSize: 11, color: "var(--ink3)" }}>{user.email}</div>
+              </div>
+            </div>
           </div>
-          <div style={{ display: "flex", flexDirection: "column", gap: 12, marginTop: 32, width: "100%", maxWidth: 280 }}>
-            {user ? (
-              <>
-                <div className="syne" style={{ textAlign: "center", fontSize: 14, fontWeight: 600, color: "var(--ink2)", marginBottom: 4 }}>
-                  Hi, {user.firstName}
-                </div>
-                <Link
-                  href="/dashboard"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="syne"
-                  style={{
-                    padding: "12px 24px",
-                    background: "transparent",
-                    border: "1.5px solid var(--line2)",
-                    borderRadius: 50,
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: "var(--ink2)",
-                    textAlign: "center",
-                    textDecoration: "none",
-                  }}
-                >
-                  Dashboard
-                </Link>
-                <button
-                  onClick={handleLogout}
-                  className="syne"
-                  style={{
-                    padding: "12px 24px",
-                    background: "transparent",
-                    border: "1.5px solid #e53935",
-                    borderRadius: 50,
-                    fontSize: 13,
-                    fontWeight: 600,
-                    color: "#e53935",
-                    cursor: "pointer",
-                  }}
-                >
-                  Logout
-                </button>
-              </>
-            ) : (
-              <Link
-                href="/login"
-                onClick={() => setMobileMenuOpen(false)}
-                className="syne"
-                style={{
-                  padding: "12px 24px",
-                  background: "transparent",
-                  border: "1.5px solid var(--line2)",
-                  borderRadius: 50,
-                  fontSize: 13,
-                  fontWeight: 600,
-                  color: "var(--ink2)",
-                  textAlign: "center",
-                  textDecoration: "none",
-                }}
-              >
-                Sign In
-              </Link>
-            )}
+        )}
+
+        {/* Navigation links */}
+        <div style={{ flex: 1, padding: "12px 0", overflowY: "auto", minHeight: 0 }}>
+          {links.map((link, i) => (
             <Link
-              href="/destinations"
-              onClick={() => setMobileMenuOpen(false)}
+              key={i}
+              href={link.href}
               className="syne"
+              onClick={() => setMobileMenuOpen(false)}
               style={{
-                padding: "12px 24px",
-                background: "var(--cu)",
-                border: "none",
-                borderRadius: 50,
-                fontSize: 13,
-                fontWeight: 700,
-                color: "#fff",
-                cursor: "pointer",
+                display: "flex",
+                alignItems: "center",
+                gap: 12,
+                padding: "14px 24px",
+                fontSize: 14,
+                fontWeight: 600,
+                color: "var(--ink2)",
                 textDecoration: "none",
-                textAlign: "center",
+                transition: "background .2s",
               }}
             >
-              Book Now
+              <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink3)" }}>
+                {link.label === "Destinations" ? "explore" : link.label === "Packages" ? "inventory_2" : link.label === "About" ? "info" : link.label === "Careers" ? "work" : "mail"}
+              </span>
+              {link.label}
             </Link>
-          </div>
+          ))}
+
+          {user && (
+            <>
+              <div style={{ height: 1, background: "var(--line)", margin: "8px 24px" }} />
+              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="syne" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 24px", fontSize: 14, fontWeight: 600, color: "var(--ink2)", textDecoration: "none" }}>
+                <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink3)" }}>dashboard</span>
+                Dashboard
+              </Link>
+              <Link href="/dashboard/bookings" onClick={() => setMobileMenuOpen(false)} className="syne" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 24px", fontSize: 14, fontWeight: 600, color: "var(--ink2)", textDecoration: "none" }}>
+                <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink3)" }}>confirmation_number</span>
+                My Bookings
+              </Link>
+              <Link href="/dashboard/profile" onClick={() => setMobileMenuOpen(false)} className="syne" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 24px", fontSize: 14, fontWeight: 600, color: "var(--ink2)", textDecoration: "none" }}>
+                <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink3)" }}>person</span>
+                Profile
+              </Link>
+            </>
+          )}
         </div>
-      )}
+
+        {/* Bottom actions */}
+        <div style={{ padding: "14px 20px 20px", borderTop: "1px solid var(--line)", display: "flex", flexDirection: "column", gap: 8, flexShrink: 0 }}>
+          {user ? (
+            <button
+              onClick={handleLogout}
+              className="syne"
+              style={{ width: "100%", padding: "12px", background: "rgba(229,57,53,.06)", border: "1px solid rgba(229,57,53,.15)", borderRadius: 12, fontSize: 13, fontWeight: 600, color: "#e53935", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+            >
+              <span className="material-symbols-rounded" style={{ fontSize: 18 }}>logout</span>
+              Logout
+            </button>
+          ) : (
+            <Link
+              href="/login"
+              onClick={() => setMobileMenuOpen(false)}
+              className="syne"
+              style={{ width: "100%", padding: "12px", background: "transparent", border: "1.5px solid var(--line2)", borderRadius: 12, fontSize: 13, fontWeight: 600, color: "var(--ink2)", textDecoration: "none", textAlign: "center", display: "block" }}
+            >
+              Sign In
+            </Link>
+          )}
+          <Link
+            href="/destinations"
+            onClick={() => setMobileMenuOpen(false)}
+            className="syne"
+            style={{ width: "100%", padding: "12px", background: "var(--cu)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center", display: "block" }}
+          >
+            Book Now
+          </Link>
+        </div>
+      </div>
 
       <style jsx>{`
         .nav-links-list {
           display: flex;
+        }
+        @media (max-width: 1024px) {
+          #nav {
+            padding: 0 28px !important;
+          }
+          .nav-links-list {
+            gap: 20px !important;
+          }
         }
         @media (max-width: 768px) {
           .nav-links-list,
@@ -526,7 +549,7 @@ export default function Navbar() {
             display: flex !important;
           }
           #nav {
-            padding: 0 20px !important;
+            padding: 0 16px !important;
           }
         }
         .nav-link-item::after {

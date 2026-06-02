@@ -180,7 +180,7 @@ export default function DestinationDetailPage() {
     <>
       <ProgressBar />
       <Navbar />
-      <DetailHero destinationName={destinationName} />
+      <DetailHero destinationName={destinationName} images={destination?.images} heroImage={destination?.heroImage} />
 
       {/* Marquee */}
       <div style={{ background: "var(--gn)", overflow: "hidden", padding: "14px 0" }}>
@@ -206,7 +206,7 @@ export default function DestinationDetailPage() {
         cards={filterCards(handpickedCards)}
       />
 
-      <Highlights />
+      <Highlights destinationName={destinationName} photoGallery={destination?.photoGallery || []} />
 
       <PackageRow
         eyebrow="Romance Awaits"
@@ -217,7 +217,7 @@ export default function DestinationDetailPage() {
         alt
       />
 
-      <GroupDeal />
+      <GroupDeal groupDeal={destination?.groupDeal || null} />
 
       <PackageRow
         eyebrow="For the Whole Family"
@@ -227,9 +227,9 @@ export default function DestinationDetailPage() {
         cards={filterCards(familyCards.length > 0 ? familyCards : fallbackFamilyCards)}
       />
 
-      <WhyDubai />
-      <TravelTips />
-      <DetailPartners />
+      <WhyDubai destinationName={destinationName} whyVisit={destination?.whyVisit || []} />
+      <TravelTips tips={destination?.travelTips || []} />
+      <DetailPartners partners={destination?.partners || []} />
       <Footer />
       <ScrollToTop />
       <ScrollReveal />
