@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useRef } from "react";
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Navbar() {
@@ -10,12 +11,28 @@ export default function Navbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const pathname = usePathname();
+
+  // Pages that should always show the "scrolled" (solid) navbar style
+  const solidNavPages = [
+    "/packages/",    // package detail pages
+    "/book",         // booking page
+    "/articles",     // articles listing + article detail
+    "/itinerary/",   // custom itinerary detail
+    "/dashboard",    // user dashboard pages
+  ];
+  const alwaysSolid = solidNavPages.some((p) => pathname.startsWith(p));
 
   useEffect(() => {
+    if (alwaysSolid) {
+      setScrolled(true);
+      return;
+    }
     const handleScroll = () => setScrolled(window.scrollY > 60);
+    handleScroll(); // set initial state
     window.addEventListener("scroll", handleScroll);
     return () => window.removeEventListener("scroll", handleScroll);
-  }, []);
+  }, [alwaysSolid, pathname]);
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -42,7 +59,6 @@ export default function Navbar() {
 
   const links = [
     { label: "Destinations", href: "/destinations" },
-    { label: "Packages", href: "/destinations" },
     { label: "About", href: "/about" },
     { label: "Careers", href: "/careers" },
     { label: "Contact", href: "/contact" },
