@@ -41,7 +41,7 @@ export default function Timeline() {
                     </div>
                   </div>
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <div style={{ width: 16, height: 16, borderRadius: "50%", background: "var(--cu)", border: "3px solid var(--gn)", boxShadow: "0 0 0 4px rgba(245,166,35,.3)" }} />
+                    <div className="tl-dot" style={{ width: 16, height: 16, borderRadius: "50%", background: "var(--cu)", border: "3px solid var(--gn)", boxShadow: "0 0 0 4px rgba(245,166,35,.3)" }} />
                   </div>
                   <div />
                 </>
@@ -49,7 +49,7 @@ export default function Timeline() {
                 <>
                   <div />
                   <div style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
-                    <div style={{ width: 16, height: 16, borderRadius: "50%", background: "var(--cu)", border: "3px solid var(--gn)", boxShadow: "0 0 0 4px rgba(245,166,35,.3)" }} />
+                    <div className="tl-dot" style={{ width: 16, height: 16, borderRadius: "50%", background: "var(--cu)", border: "3px solid var(--gn)", boxShadow: "0 0 0 4px rgba(245,166,35,.3)" }} />
                   </div>
                   <div style={{ paddingLeft: 40, textAlign: "left" }}>
                     <div className="tl-content" style={{ background: "rgba(249,246,240,.05)", border: "1px solid rgba(249,246,240,.1)", borderRadius: "var(--r)", padding: "28px 32px", transition: "var(--tr)" }}>
@@ -72,11 +72,39 @@ export default function Timeline() {
           transform: scale(1.02);
         }
         @media (max-width: 1100px) {
-          .tl-line { left: 28px !important; transform: none !important; }
-          .tl-item { grid-template-columns: 1fr !important; padding-left: 52px !important; position: relative !important; }
-          .tl-item > div:first-child { padding-right: 0 !important; text-align: left !important; }
-          .tl-item > div:nth-child(2) { position: absolute !important; left: 20px !important; top: 50% !important; transform: translateY(-50%) !important; }
-          .tl-item > div:last-child:empty { display: none !important; }
+          .tl-line { display: none !important; }
+          .tl-items {
+            border-left: 2px solid rgba(249,246,240,.12) !important;
+            margin-left: 8px !important;
+            padding-left: 0 !important;
+          }
+          .tl-item {
+            display: flex !important;
+            padding: 16px 0 16px 32px !important;
+            position: relative !important;
+          }
+          .tl-item > div:empty {
+            display: none !important;
+          }
+          .tl-item > div:has(.tl-content) {
+            flex: 1 !important;
+            padding: 0 !important;
+            text-align: left !important;
+          }
+          .tl-content {
+            width: 100% !important;
+          }
+          .tl-item .tl-dot {
+            position: absolute !important;
+            left: -9px !important;
+            top: 28px !important;
+            transform: none !important;
+          }
+        }
+        @media (max-width: 768px) {
+          .tl-content {
+            padding: 20px !important;
+          }
         }
       `}</style>
     </section>

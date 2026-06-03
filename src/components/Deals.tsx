@@ -24,7 +24,7 @@ export default function Deals() {
   }, []);
 
   return (
-    <section id="deals" className="deals-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: 560 }}>
+    <section id="deals" className="deals-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: 560, overflow: "hidden" }}>
       {/* Left */}
       <div className="rv-l deals-left" style={{ background: "var(--iv2)", padding: "84px 72px", display: "flex", flexDirection: "column", justifyContent: "center", position: "relative", overflow: "hidden" }}>
         <div className="syne" style={{ position: "absolute", bottom: -30, right: -10, fontSize: 200, fontWeight: 800, color: "rgba(0,77,94,.04)", lineHeight: 1, pointerEvents: "none", letterSpacing: -8 }}>40</div>
@@ -86,11 +86,11 @@ export default function Deals() {
           .deals-grid { grid-template-columns: 1fr !important; }
         }
         @media (max-width: 768px) {
-          .deals-left { padding: 48px 24px !important; }
-          .deals-right { padding: 48px 24px !important; }
-          .deals-timer-num { font-size: 36px !important; }
-          .deals-timer-box { min-width: 60px !important; padding: 14px 16px !important; }
-          .deals-colon { font-size: 28px !important; }
+          .deals-left { padding: 48px 20px !important; }
+          .deals-right { padding: 48px 16px !important; }
+          .deals-timer-num { font-size: 28px !important; }
+          .deals-timer-box { min-width: 52px !important; padding: 12px 10px !important; border-radius: 10px !important; }
+          .deals-colon { font-size: 22px !important; padding-bottom: 12px !important; }
         }
       `}</style>
     </section>

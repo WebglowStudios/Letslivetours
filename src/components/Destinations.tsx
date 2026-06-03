@@ -28,6 +28,15 @@ const fallbackDestinations = [
 export default function Destinations() {
   const [hovered, setHovered] = useState<number | null>(null);
   const [destinations, setDestinations] = useState<DestinationData[]>(fallbackDestinations);
+  const [mobileSlide, setMobileSlide] = useState(0);
+
+  // Auto-advance mobile carousel
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setMobileSlide((p) => (p + 1) % destinations.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [destinations.length]);
 
   useEffect(() => {
     const fetchDestinations = async () => {
@@ -69,8 +78,8 @@ export default function Destinations() {
           <div className="syne dest-watermark" style={{ position: "absolute", top: -30, right: 0, fontSize: 140, fontWeight: 800, color: "rgba(0,77,94,.04)", lineHeight: 1, pointerEvents: "none", letterSpacing: -5 }}>01</div>
         </div>
 
-        {/* Cards */}
-        <div className="rv dest-row" style={{ display: "flex", gap: 14, height: 580, overflow: "hidden" }}>
+        {/* Desktop Cards */}
+        <div className="rv dest-row dest-desktop" style={{ display: "flex", gap: 14, height: 580, overflow: "hidden" }}>
           {destinations.map((d, i) => {
             const isExpanded = hovered === null ? i === 0 : hovered === i;
             const img = d.heroImage || d.images?.[0] || "";
@@ -131,6 +140,99 @@ export default function Destinations() {
             );
           })}
         </div>
+
+        {/* Mobile Carousel - Full-width infinite slider */}
+        <div className="dest-mobile-carousel" style={{ display: "none", flexDirection: "column", gap: 16 }}>
+          {/* Slider container */}
+          <div style={{ position: "relative", width: "100%", height: 400, borderRadius: 20, overflow: "hidden" }}>
+            {destinations.map((d, i) => {
+              const img = d.heroImage || d.images?.[0] || "";
+              return (
+                <Link
+                  key={i}
+                  href={`/destinations/${d.slug}`}
+                  style={{
+                    position: "absolute",
+                    inset: 0,
+                    opacity: i === mobileSlide ? 1 : 0,
+                    transform: i === mobileSlide ? "translateX(0)" : i > mobileSlide ? "translateX(60px)" : "translateX(-60px)",
+                    transition: "opacity .5s ease, transform .5s ease",
+                    textDecoration: "none",
+                    pointerEvents: i === mobileSlide ? "auto" : "none",
+                  }}
+                >
+                  <img src={img} alt={d.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,20,28,.9) 0%, rgba(0,20,28,.2) 50%, transparent 70%)" }} />
+                  {/* Badge */}
+                  <div className="syne" style={{ position: "absolute", top: 14, left: 14, background: "rgba(255,255,255,.12)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,.15)", borderRadius: 50, padding: "5px 14px", fontSize: 9, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "rgba(255,255,255,.8)" }}>
+                    {d.packageCount} packages
+                  </div>
+                  {/* Content */}
+                  <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "24px 20px" }}>
+                    <div className="syne" style={{ fontSize: 9, fontWeight: 700, letterSpacing: 2.5, textTransform: "uppercase", color: "var(--cu)", marginBottom: 6 }}>
+                      {d.country || d.region}
+                    </div>
+                    <div className="serif" style={{ fontSize: 28, fontWeight: 700, color: "#fff", lineHeight: 1.1, marginBottom: 8 }}>
+                      {d.name}
+                    </div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12, color: "rgba(255,255,255,.55)" }}>
+                      <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                        <span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--cu)" }}>star</span>
+                        {d.rating}
+                      </span>
+                      {d.bestSeason && (
+                        <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                          <span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--cu)" }}>calendar_today</span>
+                          {d.bestSeason}
+                        </span>
+                      )}
+                    </div>
+                    <div className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 14, fontSize: 11, fontWeight: 700, color: "var(--cu)", letterSpacing: 0.5 }}>
+                      Explore
+                      <span className="material-symbols-rounded" style={{ fontSize: 14 }}>arrow_forward</span>
+                    </div>
+                  </div>
+                </Link>
+              );
+            })}
+          </div>
+
+          {/* Navigation: dots + arrows */}
+          <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 16 }}>
+            <button
+              onClick={() => setMobileSlide((p) => (p - 1 + destinations.length) % destinations.length)}
+              style={{ width: 40, height: 40, borderRadius: "50%", border: "1.5px solid var(--line2)", background: "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+            >
+              <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink2)" }}>chevron_left</span>
+            </button>
+
+            <div style={{ display: "flex", gap: 6, alignItems: "center" }}>
+              {destinations.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => setMobileSlide(i)}
+                  style={{
+                    width: i === mobileSlide ? 20 : 6,
+                    height: 6,
+                    borderRadius: 3,
+                    background: i === mobileSlide ? "var(--cu)" : "var(--line2)",
+                    border: "none",
+                    cursor: "pointer",
+                    transition: "all .3s ease",
+                    padding: 0,
+                  }}
+                />
+              ))}
+            </div>
+
+            <button
+              onClick={() => setMobileSlide((p) => (p + 1) % destinations.length)}
+              style={{ width: 40, height: 40, borderRadius: "50%", border: "1.5px solid var(--line2)", background: "transparent", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+            >
+              <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink2)" }}>chevron_right</span>
+            </button>
+          </div>
+        </div>
       </div>
 
       <style jsx>{`
@@ -138,22 +240,20 @@ export default function Destinations() {
           .dest-head {
             flex-direction: column !important;
             align-items: flex-start !important;
-            gap: 16px !important;
+            gap: 12px !important;
+            margin-bottom: 28px !important;
           }
           .dest-watermark {
             display: none !important;
           }
           .dest-all-link {
-            margin-top: 8px !important;
+            margin-top: 4px !important;
           }
-          .dest-row {
-            flex-direction: column !important;
-            height: auto !important;
+          .dest-desktop {
+            display: none !important;
           }
-          .dest-row > a {
-            min-width: unset !important;
-            height: 280px !important;
-            flex: unset !important;
+          .dest-mobile-carousel {
+            display: flex !important;
           }
         }
       `}</style>

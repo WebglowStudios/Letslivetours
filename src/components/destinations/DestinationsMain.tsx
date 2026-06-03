@@ -34,6 +34,7 @@ export default function DestinationsMain() {
   const [listView, setListView] = useState(true);
   const [destinations, setDestinations] = useState<Destination[]>(staticDestinations);
   const [apiLoading, setApiLoading] = useState(true);
+  const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
 
   useEffect(() => {
     async function fetchDestinations() {
@@ -111,17 +112,111 @@ export default function DestinationsMain() {
       {/* Main layout */}
       <section id="main" style={{ padding: "52px 0 96px", background: "var(--iv)" }}>
         <div className="container">
+          {/* Mobile filter toggle button */}
+          <button
+            className="mobile-filter-btn"
+            onClick={() => setMobileFilterOpen(true)}
+            style={{
+              display: "none",
+              alignItems: "center",
+              gap: 8,
+              padding: "12px 20px",
+              background: "#fff",
+              border: "1.5px solid var(--line2)",
+              borderRadius: 12,
+              fontSize: 13,
+              fontWeight: 600,
+              color: "var(--ink2)",
+              cursor: "pointer",
+              marginBottom: 20,
+              width: "100%",
+              justifyContent: "center",
+            }}
+          >
+            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>tune</span>
+            Filters & Sort
+            {(checkedCats.length > 0 || maxPrice < 300000) && (
+              <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--cu)", marginLeft: 4 }} />
+            )}
+          </button>
+
+          {/* Mobile filter drawer */}
+          <div
+            onClick={() => setMobileFilterOpen(false)}
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,20,28,.5)",
+              zIndex: 1050,
+              opacity: mobileFilterOpen ? 1 : 0,
+              pointerEvents: mobileFilterOpen ? "auto" : "none",
+              transition: "opacity .3s ease",
+            }}
+          />
+          <div
+            className="mobile-filter-drawer"
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              bottom: 0,
+              width: "min(300px, 85vw)",
+              background: "#fff",
+              zIndex: 1060,
+              transform: mobileFilterOpen ? "translateX(0)" : "translateX(-100%)",
+              transition: "transform .35s cubic-bezier(.4,0,.2,1)",
+              display: "none",
+              flexDirection: "column",
+              boxShadow: mobileFilterOpen ? "8px 0 40px rgba(0,20,28,.15)" : "none",
+              overflowY: "auto",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "16px 20px", borderBottom: "1px solid var(--line)" }}>
+              <span className="syne" style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>Filters</span>
+              <button
+                onClick={() => setMobileFilterOpen(false)}
+                style={{ width: 34, height: 34, borderRadius: "50%", background: "var(--iv)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+              >
+                <span className="material-symbols-rounded" style={{ fontSize: 18, color: "var(--ink2)" }}>close</span>
+              </button>
+            </div>
+            <div style={{ padding: "16px 20px", flex: 1 }}>
+              <Sidebar
+                checkedCats={checkedCats}
+                setCheckedCats={setCheckedCats}
+                maxPrice={maxPrice}
+                setMaxPrice={setMaxPrice}
+                sort={sort}
+                setSort={setSort}
+                resultCount={filtered.length}
+                onClear={clearFilters}
+              />
+            </div>
+            <div style={{ padding: "12px 20px", borderTop: "1px solid var(--line)" }}>
+              <button
+                onClick={() => setMobileFilterOpen(false)}
+                className="syne"
+                style={{ width: "100%", padding: "12px", background: "var(--cu)", border: "none", borderRadius: 10, color: "#fff", fontSize: 13, fontWeight: 700, cursor: "pointer" }}
+              >
+                Show {filtered.length} Results
+              </button>
+            </div>
+          </div>
+
           <div className="main-layout" style={{ display: "grid", gridTemplateColumns: "280px 1fr", gap: 32, alignItems: "start" }}>
-            <Sidebar
-              checkedCats={checkedCats}
-              setCheckedCats={setCheckedCats}
-              maxPrice={maxPrice}
-              setMaxPrice={setMaxPrice}
-              sort={sort}
-              setSort={setSort}
-              resultCount={filtered.length}
-              onClear={clearFilters}
-            />
+            {/* Desktop sidebar */}
+            <div className="desktop-sidebar">
+              <Sidebar
+                checkedCats={checkedCats}
+                setCheckedCats={setCheckedCats}
+                maxPrice={maxPrice}
+                setMaxPrice={setMaxPrice}
+                sort={sort}
+                setSort={setSort}
+                resultCount={filtered.length}
+                onClear={clearFilters}
+              />
+            </div>
 
             <div>
               {/* Results head */}
@@ -172,6 +267,9 @@ export default function DestinationsMain() {
       <style jsx>{`
         @media (max-width: 1100px) {
           .main-layout { grid-template-columns: 1fr !important; }
+          .desktop-sidebar { display: none !important; }
+          .mobile-filter-btn { display: flex !important; }
+          .mobile-filter-drawer { display: flex !important; }
           .dest-results-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
         @media (max-width: 768px) {

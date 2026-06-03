@@ -122,11 +122,11 @@ export default function Hero() {
         padding: "0 0 140px 72px",
         width: "calc(100% - 88px)",
       }}>
-        <div className="syne" style={{
+        <div className="syne hero-eyebrow" style={{
           fontSize: 11, fontWeight: 700, letterSpacing: 4, textTransform: "uppercase",
           color: "var(--cu)", marginBottom: 20, display: "flex", alignItems: "center", gap: 10,
         }}>
-          <span style={{ display: "block", width: 28, height: 1.5, background: "var(--cu)" }} />
+          <span className="eyebrow-line" style={{ display: "block", width: 28, height: 1.5, background: "var(--cu)" }} />
           Journeys Beyond the Ordinary
         </div>
 
@@ -187,11 +187,11 @@ export default function Hero() {
               />
             </div>
           ))}
-          <button onClick={handleSearch} className="syne" style={{
+          <button onClick={handleSearch} className="syne hero-search-btn" style={{
             flexShrink: 0, padding: "14px 24px", background: "var(--cu)", border: "none",
             borderRadius: 14, color: "#fff", fontSize: 13, fontWeight: 700, letterSpacing: 0.5,
-            cursor: "pointer", display: "flex", alignItems: "center", gap: 7,
-            transition: "var(--tr)", marginLeft: 12,
+            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
+            transition: "var(--tr)", marginLeft: 12, width: "auto",
           }}>
             <span className="material-symbols-rounded" style={{ fontSize: 18 }}>search</span>Search
           </button>
@@ -243,22 +243,66 @@ export default function Hero() {
           .hero-content-wrap { width: 100% !important; padding: 0 0 140px 52px !important; }
         }
         @media (max-width: 768px) {
-          .hero-content-wrap { padding: 0 0 160px 20px !important; }
-          .hero-content-wrap h1 { font-size: clamp(36px, 9vw, 60px) !important; white-space: normal !important; }
-          .hero-search-bar { flex-direction: column !important; padding: 16px 18px !important; }
-          .hs-field { border-right: none !important; border-bottom: 1px solid rgba(249,246,240,.12) !important; }
+          .hero-content-wrap {
+            padding: 0 20px 180px !important;
+            display: flex !important;
+            flex-direction: column !important;
+            align-items: center !important;
+            text-align: center !important;
+          }
+          .hero-content-wrap .hero-eyebrow {
+            font-size: 9px !important;
+          }
+          .hero-content-wrap .hero-eyebrow .eyebrow-line {
+            display: none !important;
+          }
+          .hero-content-wrap h1 {
+            font-size: clamp(44px, 12vw, 56px) !important;
+            text-align: center !important;
+          }
+          .hero-search-bar {
+            flex-direction: column !important;
+            padding: 16px !important;
+            gap: 0 !important;
+            width: 100% !important;
+            max-width: 100% !important;
+            border-radius: 20px !important;
+          }
+          .hs-field {
+            border-right: none !important;
+            border-bottom: 1px solid rgba(249,246,240,.1) !important;
+            padding: 12px 4px !important;
+            text-align: center !important;
+          }
+          .hs-field:last-of-type {
+            border-bottom: none !important;
+          }
+          .hs-field input {
+            text-align: center !important;
+          }
+          .hs-field input::placeholder {
+            text-align: center !important;
+          }
+          .hs-field > div {
+            text-align: center !important;
+          }
+          .hero-search-btn {
+            width: 100% !important;
+            margin-left: 0 !important;
+            margin-top: 12px !important;
+            border-radius: 12px !important;
+            padding: 14px !important;
+          }
           .hero-bottom-bar {
             display: grid !important;
             grid-template-columns: 1fr 1fr !important;
           }
           .hero-bottom-bar > div {
-            display: flex !important;
-            padding: 12px 16px !important;
-            border-right: 1px solid rgba(249,246,240,.1) !important;
+            padding: 14px 16px !important;
             border-bottom: 1px solid rgba(249,246,240,.1) !important;
           }
           .hero-bottom-bar > div .serif {
-            font-size: 20px !important;
+            font-size: 22px !important;
           }
           .hero-bottom-bar .hero-scroll-text {
             display: none !important;

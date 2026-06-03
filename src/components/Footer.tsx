@@ -111,7 +111,9 @@ export default function Footer() {
           .ft-grid { grid-template-columns: 1fr 1fr !important; }
         }
         @media (max-width: 768px) {
-          .ft-grid { grid-template-columns: 1fr !important; }
+          .ft-grid { grid-template-columns: 1fr 1fr !important; gap: 32px 20px !important; }
+          .ft-grid > div:first-child { grid-column: 1 / -1 !important; }
+          .ft-grid > div:last-child { grid-column: 1 / -1 !important; }
           .ft-bottom-bar {
             flex-direction: column !important;
             align-items: center !important;

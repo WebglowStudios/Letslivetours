@@ -21,7 +21,8 @@ interface BookingData {
   };
   travelDate: string;
   returnDate?: string;
-  status: string;
+  status?: string;
+  bookingStatus?: string;
   totalAmount: number;
   paidAmount?: number;
   paymentStatus?: string;
@@ -95,11 +96,12 @@ function formatShortDate(dateStr: string): string {
 }
 
 function getStatusLabel(status: string): string {
+  if (!status) return "Pending";
   return status.charAt(0).toUpperCase() + status.slice(1);
 }
 
 function getStatusColor(status: string): [number, number, number] {
-  switch (status) {
+  switch (status || "pending") {
     case "confirmed": return C.tealLight;
     case "completed": return C.green;
     case "cancelled": return C.red;
@@ -137,14 +139,15 @@ export function generateBookingPdf(booking: BookingData): void {
 
   // Booking ID on right
   const displayId = booking.bookingId || `LLT-${booking._id.slice(0, 8).toUpperCase()}`;
+  const bookingStatus = booking.status || booking.bookingStatus || "pending";
   doc.setFont("helvetica", "bold");
   doc.setFontSize(10);
   doc.setTextColor(...C.white);
   doc.text(displayId, W - M, 12, { align: "right" });
 
   // Status badge on right
-  const statusColor = getStatusColor(booking.status);
-  const statusText = getStatusLabel(booking.status);
+  const statusColor = getStatusColor(bookingStatus);
+  const statusText = getStatusLabel(bookingStatus);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(8);
   doc.setTextColor(...statusColor);
@@ -233,7 +236,7 @@ export function generateBookingPdf(booking: BookingData): void {
     travText = `${booking.travellers} Traveller${booking.travellers > 1 ? "s" : ""}`;
   }
   yL = field("Travellers", travText, M, yL);
-  yL = field("Booking Status", getStatusLabel(booking.status), M, yL);
+  yL = field("Booking Status", getStatusLabel(bookingStatus), M, yL);
   yL = field("Booked On", formatShortDate(booking.createdAt), M, yL);
 
   // Right column
