@@ -234,7 +234,7 @@ export default function MyBookingsPage() {
                     {booking.status}
                   </span>
                   <span style={{ fontSize: 13, color: "var(--ink3)" }}>
-                    ${booking.totalAmount?.toLocaleString()}
+                    ₹{booking.totalAmount?.toLocaleString("en-IN")}
                   </span>
                 </div>
               </div>

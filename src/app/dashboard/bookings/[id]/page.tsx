@@ -273,7 +273,7 @@ export default function BookingDetailPage() {
             <div>
               <p style={{ fontSize: 12, color: "var(--ink3)" }}>Total Amount</p>
               <p className="serif" style={{ fontSize: 22, fontWeight: 700, color: "var(--gn)", marginTop: 4 }}>
-                ${booking.totalAmount?.toLocaleString()}
+                ₹{booking.totalAmount?.toLocaleString("en-IN")}
               </p>
             </div>
             <div>

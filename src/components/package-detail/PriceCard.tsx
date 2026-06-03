@@ -1,6 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
+import { api } from "@/lib/api";
 
 interface PriceCardProps {
   pkg: any;
@@ -14,6 +16,34 @@ const trustBadges = [
 ];
 
 export default function PriceCard({ pkg, slug }: PriceCardProps) {
+  const [showCallback, setShowCallback] = useState(false);
+  const [cbName, setCbName] = useState("");
+  const [cbPhone, setCbPhone] = useState("");
+  const [cbEmail, setCbEmail] = useState("");
+  const [cbLoading, setCbLoading] = useState(false);
+  const [cbSent, setCbSent] = useState(false);
+
+  const handleCallbackSubmit = async () => {
+    if (!cbName.trim() || !cbPhone.trim()) return;
+    setCbLoading(true);
+    try {
+      await api.post("/enquiries", {
+        type: "callback",
+        firstName: cbName.trim(),
+        email: cbEmail.trim() || "not-provided@callback.local",
+        phone: cbPhone.trim(),
+        packageName: pkg?.name || "",
+        message: `Callback requested for package: ${pkg?.name || slug}`,
+        source: "website",
+      });
+      setCbSent(true);
+      setTimeout(() => { setShowCallback(false); setCbSent(false); setCbName(""); setCbPhone(""); setCbEmail(""); }, 2500);
+    } catch {
+      alert("Failed to submit. Please try again.");
+    } finally {
+      setCbLoading(false);
+    }
+  };
   const price = pkg?.price || 0;
   const originalPrice = pkg?.originalPrice || 0;
   const discount = pkg?.discount || 0;
@@ -200,6 +230,7 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
 
       {/* Callback button */}
       <button
+        onClick={() => setShowCallback(!showCallback)}
         className="syne price-callback-btn"
         style={{
           width: "100%",
@@ -221,6 +252,26 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
         <span className="material-symbols-rounded" style={{ fontSize: 17 }}>call</span>
         Request a Callback
       </button>
+
+      {/* Callback mini form */}
+      {showCallback && (
+        <div style={{ marginTop: 12, padding: 14, background: "var(--iv)", borderRadius: 12, border: "1px solid var(--line)" }}>
+          {cbSent ? (
+            <p className="syne" style={{ textAlign: "center", fontSize: 13, fontWeight: 600, color: "var(--gn3)", padding: "10px 0" }}>
+              ✓ Callback requested! We&apos;ll call you soon.
+            </p>
+          ) : (
+            <>
+              <input type="text" value={cbName} onChange={(e) => setCbName(e.target.value)} placeholder="Your Name *" style={{ width: "100%", padding: "9px 12px", border: "1px solid var(--line2)", borderRadius: 8, fontSize: 13, marginBottom: 8, outline: "none" }} />
+              <input type="tel" value={cbPhone} onChange={(e) => setCbPhone(e.target.value)} placeholder="Phone Number *" style={{ width: "100%", padding: "9px 12px", border: "1px solid var(--line2)", borderRadius: 8, fontSize: 13, marginBottom: 8, outline: "none" }} />
+              <input type="email" value={cbEmail} onChange={(e) => setCbEmail(e.target.value)} placeholder="Email (optional)" style={{ width: "100%", padding: "9px 12px", border: "1px solid var(--line2)", borderRadius: 8, fontSize: 13, marginBottom: 10, outline: "none" }} />
+              <button onClick={handleCallbackSubmit} disabled={cbLoading || !cbName.trim() || !cbPhone.trim()} className="syne" style={{ width: "100%", padding: 10, background: "var(--gn)", color: "#fff", border: "none", borderRadius: 50, fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: cbLoading ? 0.6 : 1 }}>
+                {cbLoading ? "Submitting..." : "Request Callback"}
+              </button>
+            </>
+          )}
+        </div>
+      )}
 
       {/* Trust badges */}
       <div

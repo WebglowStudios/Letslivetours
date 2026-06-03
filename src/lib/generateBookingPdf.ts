@@ -19,6 +19,13 @@ interface BookingData {
     email: string;
     phone?: string;
   };
+  primaryTraveller?: {
+    firstName?: string;
+    lastName?: string;
+    email?: string;
+    phone?: string;
+  };
+  travellersDetails?: { name: string; age?: number; phone?: string; type: string }[];
   travelDate: string;
   returnDate?: string;
   status?: string;
@@ -253,9 +260,16 @@ export function generateBookingPdf(booking: BookingData): void {
   y = Math.max(yL, yR) + 4;
 
   // ═══════════════════════════════════════════════════════
-  // TRAVELLER INFO (if user data available)
+  // TRAVELLER INFO
   // ═══════════════════════════════════════════════════════
-  if (booking.user) {
+  const pt = booking.primaryTraveller;
+  const usr = booking.user;
+  const travFirstName = pt?.firstName || usr?.firstName || "";
+  const travLastName = pt?.lastName || usr?.lastName || "";
+  const travEmail = pt?.email || usr?.email || booking.contactEmail || "";
+  const travPhone = pt?.phone || usr?.phone || booking.contactPhone || "";
+
+  if (travFirstName || travEmail) {
     doc.setFillColor(...C.amber);
     doc.rect(M, y, 20, 1.5, "F");
     y += 8;
@@ -265,14 +279,57 @@ export function generateBookingPdf(booking: BookingData): void {
     doc.text("Primary Traveller", M, y);
     y += 8;
 
-    const fullName = s(`${booking.user.firstName} ${booking.user.lastName}`);
-    yL = field("Name", fullName, M, y);
-    yR = field("Email", s(booking.user.email), M + colW, y);
+    const fullName = s(`${travFirstName} ${travLastName}`.trim());
+    if (fullName) yL = field("Name", fullName, M, y);
+    else yL = y;
+    if (travEmail) yR = field("Email", s(travEmail), M + colW, y);
+    else yR = y;
     y = Math.max(yL, yR);
 
-    if (booking.user.phone) {
-      y = field("Phone", s(booking.user.phone), M, y);
+    if (travPhone) {
+      y = field("Phone", s(travPhone), M, y);
     }
+  }
+
+  // ═══════════════════════════════════════════════════════
+  // ADDITIONAL TRAVELLERS
+  // ═══════════════════════════════════════════════════════
+  if (booking.travellersDetails && booking.travellersDetails.length > 0) {
+    doc.setFillColor(...C.amber);
+    doc.rect(M, y, 20, 1.5, "F");
+    y += 8;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(11);
+    doc.setTextColor(...C.teal);
+    doc.text("Co-Travellers", M, y);
+    y += 8;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8.5);
+
+    for (let i = 0; i < booking.travellersDetails.length; i++) {
+      const t = booking.travellersDetails[i];
+      const typeLabel = t.type ? t.type.charAt(0).toUpperCase() + t.type.slice(1) : "Adult";
+      const ageStr = t.age ? `, Age: ${t.age}` : "";
+      const phoneStr = t.phone ? ` | Ph: ${s(t.phone)}` : "";
+
+      doc.setTextColor(...C.teal);
+      doc.setFont("helvetica", "bold");
+      doc.text(`${i + 1}.`, M, y);
+      doc.setTextColor(...C.ink);
+      doc.setFont("helvetica", "normal");
+      doc.text(`${s(t.name || "—")}${ageStr}${phoneStr}`, M + 8, y);
+
+      // Type badge
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(7);
+      doc.setTextColor(...C.gray);
+      doc.text(`[${typeLabel}]`, M + 8 + doc.getTextWidth(`${s(t.name || "—")}${ageStr}${phoneStr}`) + 4, y);
+      doc.setFontSize(8.5);
+
+      y += 6;
+    }
+    y += 6;
   }
 
   // ═══════════════════════════════════════════════════════
