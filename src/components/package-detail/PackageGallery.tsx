@@ -10,12 +10,6 @@ interface PackageGalleryProps {
   activityImages?: string[];
 }
 
-const cellLabels = [
-  { icon: "location_on", text: "Destination" },
-  { icon: "hotel", text: "Stay" },
-  { icon: "paragliding", text: "Activities" },
-];
-
 export default function PackageGallery({ images, heroImage, destinationImages, stayImages, activityImages }: PackageGalleryProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalIdx, setModalIdx] = useState(0);
@@ -30,12 +24,30 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
     ...images,
   ].filter((img, i, arr) => arr.indexOf(img) === i); // deduplicate
 
-  // Grid cell images: destination[0], stay[0], activity[0], or fallback to general
-  const gridCellImages = [
-    destinationImages?.[0] || allImages[1] || allImages[0] || "",
-    stayImages?.[0] || allImages[2] || allImages[0] || "",
-    activityImages?.[0] || allImages[3] || allImages[0] || "",
-  ];
+  // Build labeled sections — only include categories that actually have images
+  const sections: { img: string; icon: string; label: string }[] = [];
+  if (destinationImages && destinationImages.length > 0) {
+    sections.push({ img: destinationImages[0], icon: "location_on", label: "Destination" });
+  }
+  if (stayImages && stayImages.length > 0) {
+    sections.push({ img: stayImages[0], icon: "hotel", label: "Stay" });
+  }
+  if (activityImages && activityImages.length > 0) {
+    sections.push({ img: activityImages[0], icon: "paragliding", label: "Activities" });
+  }
+
+  // Fill 3 grid cells: labeled sections first, then general images (no label), then fallback to hero
+  const gridCells: { img: string; icon?: string; label?: string }[] = [];
+  for (let i = 0; i < 3; i++) {
+    if (i < sections.length) {
+      gridCells.push(sections[i]);
+    } else {
+      // Pick a general image not already used — skip index 0 (hero shown as main)
+      const fallbackIdx = i + 1;
+      const fallbackImg = allImages[fallbackIdx] || allImages[0] || "";
+      gridCells.push({ img: fallbackImg });
+    }
+  }
 
   const galleryImages = allImages.length > 0 ? allImages : (heroImage ? [heroImage] : []);
 
@@ -145,8 +157,8 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
               onClick={() => (i < 3 ? openModal(i + 1) : openModal(0))}
             >
               <img
-                src={i < 3 ? (gridCellImages[i] || galleryImages[0]) : (galleryImages[4] || galleryImages[0])}
-                alt={cellLabels[i]?.text || "View All"}
+                src={i < 3 ? (gridCells[i]?.img || galleryImages[0]) : (galleryImages[4] || galleryImages[0])}
+                alt={gridCells[i]?.label || "View All"}
                 style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s ease" }}
               />
               <div
@@ -156,7 +168,7 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
                   background: "linear-gradient(to top, rgba(0,20,28,.5) 0%, transparent 55%)",
                 }}
               />
-              {i < 3 ? (
+              {i < 3 && gridCells[i]?.label ? (
                 <div
                   style={{
                     position: "absolute",
@@ -173,11 +185,11 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
                   }}
                 >
                   <span className="material-symbols-rounded" style={{ fontSize: 15 }}>
-                    {cellLabels[i]?.icon}
+                    {gridCells[i]?.icon}
                   </span>
-                  {cellLabels[i]?.text}
+                  {gridCells[i]?.label}
                 </div>
-              ) : (
+              ) : i === 3 ? (
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
@@ -206,7 +218,7 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
                   <span className="material-symbols-rounded" style={{ fontSize: 16 }}>photo_library</span>
                   View All Photos
                 </button>
-              )}
+              ) : null}
             </div>
           ))}
         </div>
