@@ -9,6 +9,7 @@ import PackageInfo from "@/components/package-detail/PackageInfo";
 import PackageTabs from "@/components/package-detail/PackageTabs";
 import InclusionsExclusions from "@/components/package-detail/InclusionsExclusions";
 import KnowBeforeYouGo from "@/components/package-detail/KnowBeforeYouGo";
+import ThingsToCarry from "@/components/package-detail/ThingsToCarry";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
@@ -74,6 +75,7 @@ export default function CustomItineraryPage() {
             <PackageTabs pkg={pkg} />
             <InclusionsExclusions inclusions={pkg.inclusions || []} exclusions={pkg.exclusions || []} />
             <KnowBeforeYouGo items={pkg.knowBeforeYouGo || []} />
+            <ThingsToCarry items={pkg.thingsToCarry || []} />
           </div>
           <div style={{ position: "sticky", top: 84 }}>
             {/* Simplified price card for custom itinerary */}

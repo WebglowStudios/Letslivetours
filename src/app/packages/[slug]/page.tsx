@@ -13,6 +13,7 @@ import PackageInfo from "@/components/package-detail/PackageInfo";
 import PackageTabs from "@/components/package-detail/PackageTabs";
 import InclusionsExclusions from "@/components/package-detail/InclusionsExclusions";
 import KnowBeforeYouGo from "@/components/package-detail/KnowBeforeYouGo";
+import ThingsToCarry from "@/components/package-detail/ThingsToCarry";
 import PriceCard from "@/components/package-detail/PriceCard";
 import EnquiryForm from "@/components/package-detail/EnquiryForm";
 import Reviews from "@/components/package-detail/Reviews";
@@ -149,6 +150,7 @@ export default function PackageDetailPage() {
             <PackageTabs pkg={pkg} />
             <InclusionsExclusions inclusions={pkg?.inclusions || []} exclusions={pkg?.exclusions || []} />
             <KnowBeforeYouGo items={pkg?.knowBeforeYouGo || []} />
+            <ThingsToCarry items={pkg?.thingsToCarry || []} />
           </div>
 
           {/* Right Column (Sticky) */}

@@ -66,11 +66,14 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
   const starStr = "★".repeat(fullStars) + (hasHalf ? "½" : "");
 
   // Build meta rows from pkg data
+  const flightsIncluded = pkg?.flightsIncluded || false;
+  const travellerCount = pkg?.travellerCount || "";
+
   const metaRows = [
     duration ? { icon: "calendar_today", label: "Duration:", value: `${duration.nights} Nights / ${duration.days} Days` } : null,
     hotelRating ? { icon: "hotel", label: "Stay:", value: hotelRating } : null,
-    { icon: "flight_takeoff", label: "Flights:", value: "Not included" },
-    { icon: "groups", label: "Group size:", value: "2–15 people" },
+    { icon: "flight_takeoff", label: "Flights:", value: flightsIncluded ? "Included" : "Not included" },
+    travellerCount ? { icon: "groups", label: "Traveller count:", value: travellerCount } : null,
   ].filter(Boolean) as { icon: string; label: string; value: string }[];
 
   return (
