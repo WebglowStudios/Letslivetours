@@ -180,7 +180,18 @@ export default function DestinationDetailPage() {
     <>
       <ProgressBar />
       <Navbar />
-      <DetailHero destinationName={destinationName} images={destination?.images} heroImage={destination?.heroImage} />
+      <DetailHero
+        destinationName={destinationName}
+        images={destination?.images}
+        heroImage={destination?.heroImage}
+        description={destination?.shortDescription || destination?.description}
+        startingPrice={destination?.startingPrice}
+        packageCount={destination?.packageCount || packages.length}
+        rating={destination?.rating}
+        reviewCount={destination?.reviewCount}
+        bestSeason={destination?.bestSeason}
+        country={destination?.country}
+      />
 
       {/* Marquee */}
       <div style={{ background: "var(--gn)", overflow: "hidden", padding: "14px 0" }}>
@@ -204,6 +215,8 @@ export default function DestinationDetailPage() {
         titleEm="Packages"
         subtitle={`Curated by our ${destinationName} travel experts — the best experiences at unbeatable prices.`}
         cards={filterCards(handpickedCards)}
+        destinationName={destinationName}
+        country={destination?.country}
       />
 
       <Highlights destinationName={destinationName} photoGallery={destination?.photoGallery || []} />
@@ -215,6 +228,8 @@ export default function DestinationDetailPage() {
         subtitle="Crafted for couples — intimate escapes with luxury stays and unforgettable moments."
         cards={filterCards(honeymoonCards.length > 0 ? honeymoonCards : fallbackHoneymoonCards)}
         alt
+        destinationName={destinationName}
+        country={destination?.country}
       />
 
       <GroupDeal groupDeal={destination?.groupDeal || null} />
@@ -225,6 +240,8 @@ export default function DestinationDetailPage() {
         titleEm="Tours"
         subtitle="Kid-friendly adventures and family memories that last a lifetime — all stress-free."
         cards={filterCards(familyCards.length > 0 ? familyCards : fallbackFamilyCards)}
+        destinationName={destinationName}
+        country={destination?.country}
       />
 
       <WhyDubai destinationName={destinationName} whyVisit={destination?.whyVisit || []} />

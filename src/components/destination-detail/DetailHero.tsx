@@ -2,37 +2,69 @@
 
 import { useEffect, useState } from "react";
 
-const fallbackSlides = [
-  "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=1600&q=80",
-  "https://images.unsplash.com/photo-1518684079-3c830dcef090?w=1600&q=80",
-  "https://images.unsplash.com/photo-1582672060674-bc2bd808a8b5?w=1600&q=80",
-  "https://images.unsplash.com/photo-1546412414-e1885259563a?w=1600&q=80",
-];
-
-const stats = [
-  { val: "48+", lbl: "Packages" },
-  { val: "4.9★", lbl: "Avg Rating" },
-  { val: "12K+", lbl: "Happy Travellers" },
-  { val: "3–14", lbl: "Night Options" },
-  { val: "Oct–Apr", lbl: "Best Season" },
-];
-
 interface DetailHeroProps {
   destinationName?: string;
   images?: string[];
   heroImage?: string;
+  description?: string;
+  startingPrice?: number;
+  packageCount?: number;
+  rating?: number;
+  reviewCount?: number;
+  bestSeason?: string;
+  country?: string;
 }
 
-export default function DetailHero({ destinationName = "Dubai", images, heroImage }: DetailHeroProps) {
+const formatPrice = (n: number) =>
+  "₹" + new Intl.NumberFormat("en-IN").format(n);
+
+export default function DetailHero({
+  destinationName = "Destination",
+  images,
+  heroImage,
+  description,
+  startingPrice,
+  packageCount,
+  rating,
+  reviewCount,
+  bestSeason,
+  country,
+}: DetailHeroProps) {
   const [idx, setIdx] = useState(0);
 
-  // Use provided images for slideshow, fallback to defaults
-  const slides = images && images.length > 0 ? images : (heroImage ? [heroImage, ...fallbackSlides.slice(1)] : fallbackSlides);
+  // Build slideshow: heroImage first, then images[], fallback if nothing
+  const slides = (() => {
+    const combined: string[] = [];
+    if (heroImage) combined.push(heroImage);
+    if (images && images.length > 0) {
+      images.forEach((img) => { if (!combined.includes(img)) combined.push(img); });
+    }
+    return combined.length > 0 ? combined : [
+      "https://images.unsplash.com/photo-1506929562872-bb421503ef21?w=1600&q=80",
+      "https://images.unsplash.com/photo-1507525428034-b723cf961d3e?w=1600&q=80",
+    ];
+  })();
 
   useEffect(() => {
     const iv = setInterval(() => setIdx((p) => (p + 1) % slides.length), 5000);
     return () => clearInterval(iv);
   }, [slides.length]);
+
+  // Build dynamic stats bar
+  const stats = [
+    packageCount != null ? { val: `${packageCount}+`, lbl: "Packages" } : null,
+    rating ? { val: `${rating}★`, lbl: "Avg Rating" } : null,
+    reviewCount ? { val: `${reviewCount > 1000 ? Math.round(reviewCount / 1000) + "K+" : reviewCount + "+"}`, lbl: "Reviews" } : null,
+    bestSeason ? { val: bestSeason, lbl: "Best Season" } : null,
+    country ? { val: country, lbl: "Country" } : null,
+  ].filter(Boolean) as { val: string; lbl: string }[];
+
+  // Fallback stats if destination has no data yet
+  const displayStats = stats.length > 0 ? stats : [
+    { val: "10+", lbl: "Packages" },
+    { val: "4.8★", lbl: "Avg Rating" },
+    { val: "500+", lbl: "Travellers" },
+  ];
 
   return (
     <section id="hero" style={{ position: "relative", height: "100vh", minHeight: 600, overflow: "hidden" }}>
@@ -46,6 +78,7 @@ export default function DetailHero({ destinationName = "Dubai", images, heroImag
 
       {/* Content */}
       <div className="detail-hero-content" style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 80px", paddingTop: 72 }}>
+        {/* Breadcrumb */}
         <div className="syne" style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,.6)", display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
           <a href="/" style={{ color: "rgba(255,255,255,.6)" }}>Home</a>
           <span style={{ color: "rgba(255,255,255,.3)" }}>›</span>
@@ -53,53 +86,75 @@ export default function DetailHero({ destinationName = "Dubai", images, heroImag
           <span style={{ color: "rgba(255,255,255,.3)" }}>›</span>
           <span style={{ color: "rgba(255,255,255,.9)" }}>{destinationName}</span>
         </div>
-        <div className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 8, background: "var(--cu)", color: "#fff", fontSize: 11, fontWeight: 800, letterSpacing: 2, textTransform: "uppercase", padding: "6px 16px", borderRadius: 50, marginBottom: 18, width: "fit-content", boxShadow: "0 4px 18px rgba(245,166,35,.45)" }}>
-          <span className="material-symbols-rounded" style={{ fontSize: 16 }}>local_offer</span>Up to 30% Off — Limited Time
-        </div>
-        <h1 className="serif" style={{ fontSize: "clamp(48px, 7vw, 88px)", fontWeight: 700, color: "#fff", lineHeight: 1.05, marginBottom: 12 }}>
+
+        {/* Location badge */}
+        {country && (
+          <div className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "rgba(255,255,255,.12)", backdropFilter: "blur(8px)", color: "rgba(255,255,255,.85)", fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", padding: "6px 14px", borderRadius: 50, marginBottom: 16, width: "fit-content", border: "1px solid rgba(255,255,255,.2)" }}>
+            <span className="material-symbols-rounded" style={{ fontSize: 14 }}>location_on</span>
+            {country}
+          </div>
+        )}
+
+        {/* Title */}
+        <h1 className="serif" style={{ fontSize: "clamp(42px, 6vw, 80px)", fontWeight: 700, color: "#fff", lineHeight: 1.05, marginBottom: 16 }}>
           Discover<br /><em style={{ fontStyle: "italic", color: "var(--cu-l)" }}>{destinationName}</em>
         </h1>
-        <p style={{ fontSize: 17, color: "rgba(255,255,255,.75)", marginBottom: 32, maxWidth: 480, lineHeight: 1.6 }}>
-          Where golden deserts meet futuristic skylines — an experience unlike any other.
+
+        {/* Description */}
+        <p style={{ fontSize: 16, color: "rgba(255,255,255,.75)", marginBottom: 28, maxWidth: 520, lineHeight: 1.65 }}>
+          {description || `Explore the best of ${destinationName} with our handpicked travel packages.`}
         </p>
-        <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 32 }}>
-          <span className="syne" style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.6)" }}>Starting from</span>
-          <span className="serif" style={{ fontSize: 18, color: "rgba(255,255,255,.4)", textDecoration: "line-through" }}>₹1,74,999</span>
-          <span className="serif" style={{ fontSize: 36, fontWeight: 700, color: "var(--cu-l)" }}>₹1,24,999</span>
-          <span style={{ fontSize: 13, color: "rgba(255,255,255,.55)" }}>/ person</span>
-        </div>
+
+        {/* Starting price */}
+        {startingPrice ? (
+          <div style={{ display: "flex", alignItems: "baseline", gap: 10, marginBottom: 32 }}>
+            <span className="syne" style={{ fontSize: 13, fontWeight: 600, color: "rgba(255,255,255,.6)" }}>Starting from</span>
+            <span className="serif" style={{ fontSize: 34, fontWeight: 700, color: "var(--cu-l)" }}>{formatPrice(startingPrice)}</span>
+            <span style={{ fontSize: 13, color: "rgba(255,255,255,.55)" }}>/ person</span>
+          </div>
+        ) : (
+          <div style={{ marginBottom: 32 }} />
+        )}
+
+        {/* CTA buttons */}
         <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-          <button className="syne" style={{ fontSize: 14, fontWeight: 700, color: "#fff", background: "var(--cu)", padding: "14px 32px", borderRadius: 50, border: "none", cursor: "pointer", boxShadow: "0 6px 24px rgba(245,166,35,.4)", transition: "var(--tr)" }}>Explore Packages</button>
-          <button className="syne" style={{ fontSize: 14, fontWeight: 600, color: "#fff", padding: "14px 32px", borderRadius: 50, border: "1.5px solid rgba(255,255,255,.4)", background: "none", cursor: "pointer", display: "flex", alignItems: "center", gap: 8, transition: "var(--tr)" }}>
-            <span className="material-symbols-rounded">play_circle</span>Watch Highlights
-          </button>
+          <a href="#packages" className="syne" style={{ fontSize: 14, fontWeight: 700, color: "#fff", background: "var(--cu)", padding: "14px 32px", borderRadius: 50, border: "none", cursor: "pointer", boxShadow: "0 6px 24px rgba(245,166,35,.4)", transition: "var(--tr)", textDecoration: "none" }}>
+            Explore Packages
+          </a>
         </div>
       </div>
 
       {/* Arrows */}
-      <button className="detail-hero-arrow" onClick={() => setIdx((p) => (p - 1 + slides.length) % slides.length)} style={{ position: "absolute", top: "50%", left: 28, transform: "translateY(-50%)", width: 52, height: 52, borderRadius: "50%", background: "rgba(255,255,255,.12)", backdropFilter: "blur(8px)", border: "1.5px solid rgba(255,255,255,.2)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 10 }}>
-        <span className="material-symbols-rounded" style={{ color: "#fff", fontSize: 24 }}>chevron_left</span>
-      </button>
-      <button className="detail-hero-arrow" onClick={() => setIdx((p) => (p + 1) % slides.length)} style={{ position: "absolute", top: "50%", right: 28, transform: "translateY(-50%)", width: 52, height: 52, borderRadius: "50%", background: "rgba(255,255,255,.12)", backdropFilter: "blur(8px)", border: "1.5px solid rgba(255,255,255,.2)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 10 }}>
-        <span className="material-symbols-rounded" style={{ color: "#fff", fontSize: 24 }}>chevron_right</span>
-      </button>
+      {slides.length > 1 && (
+        <>
+          <button className="detail-hero-arrow" onClick={() => setIdx((p) => (p - 1 + slides.length) % slides.length)} style={{ position: "absolute", top: "50%", left: 28, transform: "translateY(-50%)", width: 52, height: 52, borderRadius: "50%", background: "rgba(255,255,255,.12)", backdropFilter: "blur(8px)", border: "1.5px solid rgba(255,255,255,.2)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 10 }}>
+            <span className="material-symbols-rounded" style={{ color: "#fff", fontSize: 24 }}>chevron_left</span>
+          </button>
+          <button className="detail-hero-arrow" onClick={() => setIdx((p) => (p + 1) % slides.length)} style={{ position: "absolute", top: "50%", right: 28, transform: "translateY(-50%)", width: 52, height: 52, borderRadius: "50%", background: "rgba(255,255,255,.12)", backdropFilter: "blur(8px)", border: "1.5px solid rgba(255,255,255,.2)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", zIndex: 10 }}>
+            <span className="material-symbols-rounded" style={{ color: "#fff", fontSize: 24 }}>chevron_right</span>
+          </button>
+        </>
+      )}
 
       {/* Dots */}
-      <div className="detail-hero-dots" style={{ position: "absolute", bottom: 100, left: 80, display: "flex", gap: 8, zIndex: 10 }}>
-        {slides.map((_, i) => (
-          <div key={i} onClick={() => setIdx(i)} style={{ width: i === idx ? 24 : 8, height: 8, borderRadius: i === idx ? 4 : "50%", background: i === idx ? "var(--cu)" : "rgba(255,255,255,.35)", transition: "var(--tr)", cursor: "pointer" }} />
-        ))}
-      </div>
+      {slides.length > 1 && (
+        <div className="detail-hero-dots" style={{ position: "absolute", bottom: 100, left: 80, display: "flex", gap: 8, zIndex: 10 }}>
+          {slides.map((_, i) => (
+            <div key={i} onClick={() => setIdx(i)} style={{ width: i === idx ? 24 : 8, height: 8, borderRadius: i === idx ? 4 : "50%", background: i === idx ? "var(--cu)" : "rgba(255,255,255,.35)", transition: "var(--tr)", cursor: "pointer" }} />
+          ))}
+        </div>
+      )}
 
       {/* Stats bar */}
       <div className="detail-hero-stats" style={{ position: "absolute", bottom: 0, left: 0, right: 0, background: "rgba(0,20,28,.75)", backdropFilter: "blur(12px)", borderTop: "1px solid rgba(255,255,255,.08)", display: "flex", justifyContent: "center" }}>
-        {stats.map((s, i) => (
+        {displayStats.map((s, i) => (
           <div key={i} style={{ flex: 1, maxWidth: 220, padding: "20px 24px", textAlign: "center", borderRight: "1px solid rgba(255,255,255,.08)" }}>
-            <div className="serif" style={{ fontSize: 26, fontWeight: 700, color: "var(--cu-l)", lineHeight: 1 }}>{s.val}</div>
+            <div className="serif" style={{ fontSize: 22, fontWeight: 700, color: "var(--cu-l)", lineHeight: 1 }}>{s.val}</div>
             <div className="syne" style={{ fontSize: 11, fontWeight: 600, color: "rgba(255,255,255,.5)", letterSpacing: 1.5, textTransform: "uppercase", marginTop: 4 }}>{s.lbl}</div>
           </div>
         ))}
       </div>
+
       <style jsx>{`
         @media (max-width: 768px) {
           .detail-hero-content { padding: 0 20px 120px 20px !important; padding-top: 72px !important; }

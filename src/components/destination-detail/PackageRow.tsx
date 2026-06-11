@@ -26,6 +26,8 @@ interface Props {
   subtitle: string;
   cards: PkgCard[];
   alt?: boolean;
+  destinationName?: string;
+  country?: string;
 }
 
 const badgeStyles: Record<string, { background: string }> = {
@@ -36,7 +38,7 @@ const badgeStyles: Record<string, { background: string }> = {
   family: { background: "#43a047" },
 };
 
-export default function PackageRow({ eyebrow, title, titleEm, subtitle, cards, alt }: Props) {
+export default function PackageRow({ eyebrow, title, titleEm, subtitle, cards, alt, destinationName, country }: Props) {
   const scrollRef = useRef<HTMLDivElement>(null);
 
   const scroll = (dir: number) => {
@@ -79,7 +81,7 @@ export default function PackageRow({ eyebrow, title, titleEm, subtitle, cards, a
                   </button>
                 </div>
                 <div style={{ padding: 20 }}>
-                  <div className="syne" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--gn3)", marginBottom: 6 }}>Dubai \u00B7 UAE</div>
+                  <div className="syne" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--gn3)", marginBottom: 6 }}>{destinationName || ""}{country ? ` · ${country}` : ""}</div>
                   <div className="serif" style={{ fontSize: 16, fontWeight: 600, color: "var(--ink)", lineHeight: 1.35, marginBottom: 12 }}>{c.name}</div>
                   <div style={{ display: "flex", gap: 14, marginBottom: 10 }}>
                     <span className="syne" style={{ fontSize: 12, fontWeight: 500, color: "var(--ink3)", display: "flex", alignItems: "center", gap: 4 }}><span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--gn3)" }}>calendar_today</span>{c.duration}</span>
