@@ -50,21 +50,18 @@ export default function DetailHero({
     return () => clearInterval(iv);
   }, [slides.length]);
 
-  // Build dynamic stats bar
-  const stats = [
-    packageCount != null ? { val: `${packageCount}+`, lbl: "Packages" } : null,
-    rating ? { val: `${rating}★`, lbl: "Avg Rating" } : null,
-    reviewCount ? { val: `${reviewCount > 1000 ? Math.round(reviewCount / 1000) + "K+" : reviewCount + "+"}`, lbl: "Reviews" } : null,
-    bestSeason ? { val: bestSeason, lbl: "Best Season" } : null,
-    country ? { val: country, lbl: "Country" } : null,
-  ].filter(Boolean) as { val: string; lbl: string }[];
+  // Build dynamic stats bar — always show at least 4 items
+  const stats: { val: string; lbl: string }[] = [];
+  stats.push({ val: `${packageCount || 0}+`, lbl: "Packages" });
+  if (rating) stats.push({ val: `${rating}★`, lbl: "Avg Rating" });
+  if (reviewCount) stats.push({ val: `${reviewCount > 1000 ? Math.round(reviewCount / 1000) + "K+" : reviewCount + "+"}`, lbl: "Reviews" });
+  if (bestSeason) stats.push({ val: bestSeason, lbl: "Best Season" });
+  if (country) stats.push({ val: country, lbl: "Country" });
+  // Ensure at least 4 stats show
+  if (!rating && !reviewCount) stats.push({ val: "4.8★", lbl: "Avg Rating" });
+  if (!bestSeason) stats.push({ val: "Year-round", lbl: "Best Season" });
 
-  // Fallback stats if destination has no data yet
-  const displayStats = stats.length > 0 ? stats : [
-    { val: "10+", lbl: "Packages" },
-    { val: "4.8★", lbl: "Avg Rating" },
-    { val: "500+", lbl: "Travellers" },
-  ];
+  const displayStats = stats;
 
   return (
     <section id="hero" style={{ position: "relative", height: "100vh", minHeight: 600, overflow: "hidden" }}>

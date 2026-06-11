@@ -194,8 +194,61 @@ function buildStayContent(stay: any): string {
 /* ── Helper: build HTML content for transfers ── */
 function buildTransferContent(transfer: any): string {
   let html = "";
+
+  // Transfer type + vehicle
+  if (transfer.transferType || transfer.vehicleType) {
+    html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">`;
+    if (transfer.transferType) {
+      html += `<span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--ink3)"><span class="material-symbols-rounded" style="font-size:16px;color:var(--gn3)">directions_bus</span>${transfer.transferType}</span>`;
+    }
+    html += `</div>`;
+    if (transfer.vehicleType) {
+      html += `<p style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:16px">Transfer in ${transfer.vehicleType}</p>`;
+    }
+  }
+
+  // From → To route
+  if (transfer.from || transfer.to) {
+    html += `<div style="border-top:1px dashed var(--line2);padding-top:14px;margin-bottom:14px">`;
+
+    if (transfer.from) {
+      html += `<div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
+        <div style="width:14px;height:14px;border-radius:50%;border:2px solid var(--cu);flex-shrink:0"></div>
+        <div style="flex:1;background:#fffbf0;border:1px solid #fde68a;border-radius:10px;padding:12px 16px">
+          <div style="font-size:10px;font-weight:700;color:var(--cu);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">From</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--ink)">
+            <span class="material-symbols-rounded" style="font-size:18px;color:var(--ink3)">location_on</span>${transfer.from}
+          </div>
+        </div>
+      </div>`;
+    }
+
+    // Stops
+    if (transfer.stops && transfer.stops.length > 0) {
+      html += `<div style="margin:8px 0 8px 6px;border-left:2px dotted var(--line2);padding-left:20px">`;
+      transfer.stops.forEach((stop: string) => {
+        html += `<div style="font-size:13px;color:var(--ink3);padding:4px 0;display:flex;align-items:center;gap:6px"><span class="material-symbols-rounded" style="font-size:14px;color:var(--ink4)">radio_button_unchecked</span>${stop}</div>`;
+      });
+      html += `</div>`;
+    }
+
+    if (transfer.to) {
+      html += `<div style="display:flex;align-items:center;gap:12px;margin-top:6px">
+        <div style="width:14px;height:14px;border-radius:50%;border:2px solid var(--cu);background:var(--cu);flex-shrink:0"></div>
+        <div style="flex:1;background:#fffbf0;border:1px solid #fde68a;border-radius:10px;padding:12px 16px">
+          <div style="font-size:10px;font-weight:700;color:var(--cu);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">To</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--ink)">
+            <span class="material-symbols-rounded" style="font-size:18px;color:var(--ink3)">location_on</span>${transfer.to}
+          </div>
+        </div>
+      </div>`;
+    }
+
+    html += `</div>`;
+  }
+
   if (transfer.description) {
-    html += `<p>${transfer.description}</p>`;
+    html += `<p style="margin-top:12px">${transfer.description}</p>`;
   }
   if (transfer.details && transfer.details.length > 0) {
     html += `<ul>${transfer.details.map((d: string) => `<li>${d}</li>`).join("")}</ul>`;
@@ -273,7 +326,7 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
         }));
       case "transfers":
         return transfers.map((t: any, i: number) => ({
-          badge: `Transfer ${i + 1}`,
+          badge: t.day ? `Day ${t.day}` : `Transfer ${i + 1}`,
           badgeType: "transfer",
           title: t.title,
           content: buildTransferContent(t),
