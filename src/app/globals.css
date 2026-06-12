@@ -29,14 +29,17 @@
   --sh:   0 4px 28px rgba(0,77,94,.10);
   --sh-lg:0 18px 64px rgba(0,77,94,.18);
 }
-html{scroll-behavior:smooth}
-body{font-family:var(--font-inter),'Inter',sans-serif;background:var(--iv);color:var(--ink);overflow-x:hidden}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{font-family:var(--font-inter),'Inter',sans-serif;background:var(--iv);color:var(--ink);overflow-x:hidden;min-width:0}
+/* Prevent any page wrapper from punching out of the viewport */
+body > *{max-width:100vw;min-width:0}
 a{text-decoration:none;color:inherit}
 ul{list-style:none}
 img{display:block;width:100%;height:100%;object-fit:cover}
 .container{max-width:1360px;margin:0 auto;padding:0 48px}
 @media(max-width:768px){
   .container{padding:0 20px}
+  .pkg-page-wrap{padding-left:16px !important;padding-right:16px !important}
   .dc-card {
     flex-direction: column !important;
     height: auto !important;

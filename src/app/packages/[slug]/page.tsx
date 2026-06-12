@@ -96,10 +96,13 @@ export default function PackageDetailPage() {
       <ScrollReveal />
 
       <div
+        className="pkg-page-wrap"
         style={{
           maxWidth: 1240,
           margin: "0 auto",
           padding: "88px 24px 60px",
+          boxSizing: "border-box",
+          width: "100%",
         }}
       >
         {/* Breadcrumb */}
