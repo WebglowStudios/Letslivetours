@@ -6,10 +6,25 @@ interface InclusionsExclusionsProps {
 }
 
 export default function InclusionsExclusions({ inclusions, exclusions }: InclusionsExclusionsProps) {
-  // Don't render if both are empty
   if ((!inclusions || inclusions.length === 0) && (!exclusions || exclusions.length === 0)) {
     return null;
   }
+
+  const listStyle: React.CSSProperties = {
+    display: "flex",
+    flexDirection: "column",
+    gap: 8,
+  };
+
+  const itemStyle: React.CSSProperties = {
+    display: "flex",
+    alignItems: "flex-start",
+    gap: 8,
+    fontFamily: "var(--font-inter), 'Inter', sans-serif",
+    fontSize: 13.5,
+    color: "var(--ink3)",
+    lineHeight: 1.7,
+  };
 
   return (
     <div style={{ marginBottom: 28 }}>
@@ -19,8 +34,12 @@ export default function InclusionsExclusions({ inclusions, exclusions }: Inclusi
       >
         Inclusions & Exclusions
       </h2>
-      <div style={{ overflowX: "auto" }}>
+
+      {/* Desktop: side-by-side table | Mobile: stacked cards */}
+      <div className="ie-table-wrap">
+        {/* Desktop table */}
         <table
+          className="ie-table"
           style={{
             width: "100%",
             borderCollapse: "collapse",
@@ -66,31 +85,12 @@ export default function InclusionsExclusions({ inclusions, exclusions }: Inclusi
           </thead>
           <tbody>
             <tr>
-              <td
-                style={{
-                  padding: "16px 18px",
-                  verticalAlign: "top",
-                  fontFamily: "var(--font-inter), 'Inter', sans-serif",
-                  fontSize: 13.5,
-                  color: "var(--ink3)",
-                  lineHeight: 1.7,
-                  borderRight: "1px solid var(--line)",
-                }}
-              >
+              <td style={{ padding: "16px 18px", verticalAlign: "top", borderRight: "1px solid var(--line)" }}>
                 {inclusions && inclusions.length > 0 ? (
-                  <ul style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <ul style={listStyle}>
                     {inclusions.map((item, i) => (
-                      <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-                        <span
-                          style={{
-                            width: 6,
-                            height: 6,
-                            borderRadius: "50%",
-                            background: "var(--gn3)",
-                            flexShrink: 0,
-                            marginTop: 7,
-                          }}
-                        />
+                      <li key={i} style={itemStyle}>
+                        <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--gn3)", flexShrink: 0, marginTop: 7 }} />
                         {item}
                       </li>
                     ))}
@@ -99,30 +99,12 @@ export default function InclusionsExclusions({ inclusions, exclusions }: Inclusi
                   <span style={{ color: "var(--ink4)", fontSize: 13 }}>None listed</span>
                 )}
               </td>
-              <td
-                style={{
-                  padding: "16px 18px",
-                  verticalAlign: "top",
-                  fontFamily: "var(--font-inter), 'Inter', sans-serif",
-                  fontSize: 13.5,
-                  color: "var(--ink3)",
-                  lineHeight: 1.7,
-                }}
-              >
+              <td style={{ padding: "16px 18px", verticalAlign: "top" }}>
                 {exclusions && exclusions.length > 0 ? (
-                  <ul style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                  <ul style={listStyle}>
                     {exclusions.map((item, i) => (
-                      <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 8 }}>
-                        <span
-                          style={{
-                            width: 6,
-                            height: 6,
-                            borderRadius: "50%",
-                            background: "var(--cu)",
-                            flexShrink: 0,
-                            marginTop: 7,
-                          }}
-                        />
+                      <li key={i} style={itemStyle}>
+                        <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--cu)", flexShrink: 0, marginTop: 7 }} />
                         {item}
                       </li>
                     ))}
@@ -134,7 +116,60 @@ export default function InclusionsExclusions({ inclusions, exclusions }: Inclusi
             </tr>
           </tbody>
         </table>
+
+        {/* Mobile stacked cards */}
+        <div className="ie-mobile">
+          {inclusions && inclusions.length > 0 && (
+            <div style={{
+              background: "rgba(0,174,204,.05)",
+              border: "1.5px solid var(--line)",
+              borderRadius: "var(--r)",
+              padding: "14px 16px",
+              marginBottom: 10,
+            }}>
+              <div className="syne" style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--gn2)", marginBottom: 12 }}>
+                ✓ &nbsp;Inclusions
+              </div>
+              <ul style={listStyle}>
+                {inclusions.map((item, i) => (
+                  <li key={i} style={itemStyle}>
+                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--gn3)", flexShrink: 0, marginTop: 7 }} />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+          {exclusions && exclusions.length > 0 && (
+            <div style={{
+              background: "rgba(245,166,35,.05)",
+              border: "1.5px solid var(--line)",
+              borderRadius: "var(--r)",
+              padding: "14px 16px",
+            }}>
+              <div className="syne" style={{ fontSize: 11, fontWeight: 800, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--cu-d)", marginBottom: 12 }}>
+                ✗ &nbsp;Exclusions
+              </div>
+              <ul style={listStyle}>
+                {exclusions.map((item, i) => (
+                  <li key={i} style={itemStyle}>
+                    <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--cu)", flexShrink: 0, marginTop: 7 }} />
+                    {item}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+        </div>
       </div>
+
+      <style jsx>{`
+        .ie-mobile { display: none; }
+        @media (max-width: 600px) {
+          .ie-table { display: none; }
+          .ie-mobile { display: block; }
+        }
+      `}</style>
     </div>
   );
 }

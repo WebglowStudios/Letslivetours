@@ -166,6 +166,60 @@ export default function PackageDetailPage() {
 
       <Footer />
       <ScrollToTop />
+
+      {/* Mobile sticky booking bar */}
+      <div className="mobile-cta-bar">
+        <div>
+          <div style={{ fontSize: 11, color: "rgba(255,255,255,.7)", fontFamily: "var(--font-jakarta),'Plus Jakarta Sans',sans-serif", fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>Per Adult</div>
+          <div style={{ fontSize: 20, fontWeight: 700, color: "#fff", fontFamily: "var(--font-sora),'Sora',sans-serif", lineHeight: 1 }}>
+            {pkg?.price ? "₹" + pkg.price.toLocaleString("en-IN") : "Get Price"}
+          </div>
+        </div>
+        <a
+          href={`/book/${slug}`}
+          style={{
+            fontSize: 14,
+            fontWeight: 700,
+            color: "var(--gn)",
+            background: "#fff",
+            padding: "12px 28px",
+            borderRadius: 50,
+            textDecoration: "none",
+            fontFamily: "var(--font-jakarta),'Plus Jakarta Sans',sans-serif",
+            whiteSpace: "nowrap",
+          }}
+        >
+          Book Now
+        </a>
+      </div>
+
+      <style>{`
+        .mobile-cta-bar {
+          display: none;
+        }
+        @media (max-width: 900px) {
+          .mobile-cta-bar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            z-index: 200;
+            background: var(--gn);
+            padding: 14px 20px;
+            box-shadow: 0 -4px 24px rgba(0,77,94,.2);
+            padding-bottom: max(14px, env(safe-area-inset-bottom));
+          }
+        }
+        @media (max-width: 900px) {
+          /* Add bottom padding so content isn't hidden behind the sticky bar */
+          main, #__next > div {
+            padding-bottom: 80px;
+          }
+        }
+      `}</style>
     </>
   );
 }

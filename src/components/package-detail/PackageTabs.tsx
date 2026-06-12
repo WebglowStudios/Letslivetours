@@ -139,20 +139,49 @@ function AccordionItem({
   );
 }
 
+/* ── Shared: styled bullet list ── */
+function buildBulletList(items: string[], accentColor = "var(--cu)"): string {
+  return `<ul style="display:flex;flex-direction:column;gap:8px;margin:10px 0 4px">${items
+    .map(
+      (item) =>
+        `<li style="display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:var(--ink2);line-height:1.65">
+          <span style="width:7px;height:7px;border-radius:50%;background:${accentColor};flex-shrink:0;margin-top:6px"></span>
+          <span>${item}</span>
+        </li>`
+    )
+    .join("")}</ul>`;
+}
+
+/* ── Shared: section label ── */
+function sectionLabel(icon: string, text: string): string {
+  return `<div style="display:flex;align-items:center;gap:7px;margin:14px 0 6px">
+    <span class="material-symbols-rounded" style="font-size:15px;color:var(--gn3)">${icon}</span>
+    <span style="font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:1px;color:var(--ink3)">${text}</span>
+  </div>`;
+}
+
 /* ── Helper: build HTML content for an itinerary day ── */
 function buildItineraryContent(day: any): string {
   let html = "";
   if (day.description) {
-    html += `<p>${day.description}</p>`;
+    html += `<p style="margin-bottom:10px">${day.description}</p>`;
   }
   if (day.activities && day.activities.length > 0) {
-    html += `<ul>${day.activities.map((a: string) => `<li>${a}</li>`).join("")}</ul>`;
+    html += sectionLabel("directions_walk", "Activities");
+    html += buildBulletList(day.activities, "var(--cu)");
   }
   if (day.meals && day.meals.length > 0) {
-    html += `<p><strong>Meals:</strong> ${day.meals.join(", ")}</p>`;
+    html += sectionLabel("restaurant", "Meals Included");
+    html += `<div style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:4px">${day.meals
+      .map(
+        (m: string) =>
+          `<span style="display:inline-flex;align-items:center;gap:5px;font-size:12px;font-weight:600;background:rgba(41,196,216,.1);color:var(--gn2);padding:5px 12px;border-radius:6px">${m}</span>`
+      )
+      .join("")}</div>`;
   }
   if (day.accommodation) {
-    html += `<p><strong>Accommodation:</strong> ${day.accommodation}</p>`;
+    html += sectionLabel("hotel", "Accommodation");
+    html += `<p style="font-size:13.5px;color:var(--ink2);margin-bottom:4px">${day.accommodation}</p>`;
   }
   if (day.images && day.images.length > 0) {
     html += `<div class="acc-images">${day.images.map((img: string) => `<img src="${img}" alt="" class="acc-thumb" data-lightbox />`).join("")}</div>`;
@@ -164,13 +193,17 @@ function buildItineraryContent(day: any): string {
 function buildActivityContent(activity: any): string {
   let html = "";
   if (activity.description) {
-    html += `<p>${activity.description}</p>`;
+    html += `<p style="margin-bottom:10px">${activity.description}</p>`;
   }
   if (activity.duration) {
-    html += `<p><strong>Duration:</strong> ${activity.duration}</p>`;
+    html += `<div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;background:var(--gn-gl);color:var(--gn);padding:5px 14px;border-radius:6px;margin-bottom:12px">
+      <span class="material-symbols-rounded" style="font-size:14px">schedule</span>
+      ${activity.duration}
+    </div>`;
   }
   if (activity.details && activity.details.length > 0) {
-    html += `<ul>${activity.details.map((d: string) => `<li>${d}</li>`).join("")}</ul>`;
+    html += sectionLabel("checklist", "Activity Details");
+    html += buildBulletList(activity.details, "var(--cu)");
   }
   if (activity.images && activity.images.length > 0) {
     html += `<div class="acc-images">${activity.images.map((img: string) => `<img src="${img}" alt="" class="acc-thumb" data-lightbox />`).join("")}</div>`;
@@ -181,12 +214,21 @@ function buildActivityContent(activity: any): string {
 /* ── Helper: build HTML content for stays ── */
 function buildStayContent(stay: any): string {
   let html = "";
-  html += `<p><strong>${stay.name}</strong></p>`;
-  if (stay.rating) html += `<p>Rating: ${stay.rating}</p>`;
-  if (stay.nights) html += `<p>${stay.nights} Night${stay.nights > 1 ? "s" : ""}</p>`;
-  if (stay.roomType) html += `<p>Room Type: ${stay.roomType}</p>`;
+  html += `<p style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:8px">${stay.name}</p>`;
+  if (stay.rating) {
+    html += `<div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;background:rgba(41,196,216,.1);color:var(--gn2);padding:5px 14px;border-radius:6px;margin-bottom:10px">
+      <span class="material-symbols-rounded" style="font-size:14px">star</span>${stay.rating}
+    </div>`;
+  }
+  const meta: string[] = [];
+  if (stay.nights) meta.push(`${stay.nights} Night${stay.nights > 1 ? "s" : ""}`);
+  if (stay.roomType) meta.push(stay.roomType);
+  if (meta.length > 0) {
+    html += `<p style="font-size:13px;color:var(--ink3);margin-bottom:10px">${meta.join(" · ")}</p>`;
+  }
   if (stay.amenities && stay.amenities.length > 0) {
-    html += `<ul>${stay.amenities.map((a: string) => `<li>${a}</li>`).join("")}</ul>`;
+    html += sectionLabel("wifi", "Amenities");
+    html += buildBulletList(stay.amenities, "var(--gn3)");
   }
   return html;
 }
@@ -211,47 +253,63 @@ function buildTransferContent(transfer: any): string {
   if (transfer.from || transfer.to) {
     html += `<div style="border-top:1px dashed var(--line2);padding-top:14px;margin-bottom:14px">`;
 
+    // Build stops HTML for inside the route block
+    let stopsHtml = "";
+    if (transfer.stops && transfer.stops.length > 0) {
+      stopsHtml = transfer.stops.map((stop: string) =>
+        `<div style="display:flex;align-items:center;gap:6px;padding:6px 0;font-size:13px;color:var(--ink3)">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--ink4);flex-shrink:0"></span>
+          ${stop}
+        </div>`
+      ).join("");
+    }
+
+    // Single layout: left spine (dots + continuous dotted line) + right cards
+    html += `<div style="display:flex;gap:14px;align-items:stretch">`;
+
+    // Left spine — one column holding open dot, dotted line, filled dot
+    html += `<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:14px">
+      <div style="width:14px;height:14px;border-radius:50%;border:2.5px solid var(--cu);background:#fff;flex-shrink:0"></div>
+      <div style="flex:1;width:0;border-left:2px dotted var(--cu);margin:4px 0;min-height:40px"></div>
+      <div style="width:14px;height:14px;border-radius:50%;background:var(--cu);flex-shrink:0"></div>
+    </div>`;
+
+    // Right content — from card, optional stops, to card
+    html += `<div style="flex:1;display:flex;flex-direction:column;gap:8px">`;
+
     if (transfer.from) {
-      html += `<div style="display:flex;align-items:center;gap:12px;margin-bottom:6px">
-        <div style="width:14px;height:14px;border-radius:50%;border:2px solid var(--cu);flex-shrink:0"></div>
-        <div style="flex:1;background:#fffbf0;border:1px solid #fde68a;border-radius:10px;padding:12px 16px">
-          <div style="font-size:10px;font-weight:700;color:var(--cu);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">From</div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--ink)">
-            <span class="material-symbols-rounded" style="font-size:18px;color:var(--ink3)">location_on</span>${transfer.from}
-          </div>
+      html += `<div style="background:#fffbf0;border:1px solid #fde68a;border-radius:10px;padding:10px 14px">
+        <div style="font-size:10px;font-weight:700;color:var(--cu);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">From</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--ink)">
+          <span class="material-symbols-rounded" style="font-size:18px;color:var(--ink3)">location_on</span>${transfer.from}
         </div>
       </div>`;
     }
 
-    // Stops
-    if (transfer.stops && transfer.stops.length > 0) {
-      html += `<div style="margin:8px 0 8px 6px;border-left:2px dotted var(--line2);padding-left:20px">`;
-      transfer.stops.forEach((stop: string) => {
-        html += `<div style="font-size:13px;color:var(--ink3);padding:4px 0;display:flex;align-items:center;gap:6px"><span class="material-symbols-rounded" style="font-size:14px;color:var(--ink4)">radio_button_unchecked</span>${stop}</div>`;
-      });
-      html += `</div>`;
+    if (stopsHtml) {
+      html += `<div style="padding:2px 12px">${stopsHtml}</div>`;
     }
 
     if (transfer.to) {
-      html += `<div style="display:flex;align-items:center;gap:12px;margin-top:6px">
-        <div style="width:14px;height:14px;border-radius:50%;border:2px solid var(--cu);background:var(--cu);flex-shrink:0"></div>
-        <div style="flex:1;background:#fffbf0;border:1px solid #fde68a;border-radius:10px;padding:12px 16px">
-          <div style="font-size:10px;font-weight:700;color:var(--cu);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">To</div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--ink)">
-            <span class="material-symbols-rounded" style="font-size:18px;color:var(--ink3)">location_on</span>${transfer.to}
-          </div>
+      html += `<div style="background:#fffbf0;border:1px solid #fde68a;border-radius:10px;padding:10px 14px">
+        <div style="font-size:10px;font-weight:700;color:var(--cu);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">To</div>
+        <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--ink)">
+          <span class="material-symbols-rounded" style="font-size:18px;color:var(--ink3)">location_on</span>${transfer.to}
         </div>
       </div>`;
     }
 
-    html += `</div>`;
+    html += `</div>`; // close right content
+    html += `</div>`; // close flex row
+    html += `</div>`; // close border-top wrapper
   }
 
   if (transfer.description) {
     html += `<p style="margin-top:12px">${transfer.description}</p>`;
   }
   if (transfer.details && transfer.details.length > 0) {
-    html += `<ul>${transfer.details.map((d: string) => `<li>${d}</li>`).join("")}</ul>`;
+    html += sectionLabel("info", "Transfer Details");
+    html += buildBulletList(transfer.details, "var(--gn)");
   }
   if (transfer.images && transfer.images.length > 0) {
     html += `<div class="acc-images">${transfer.images.map((img: string) => `<img src="${img}" alt="" class="acc-thumb" data-lightbox />`).join("")}</div>`;
@@ -381,9 +439,9 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
         {/* Itinerary Hero (only for itinerary tab) */}
         {activeTab === "itinerary" && itinImages.length > 0 && (
           <div
+            className="itin-hero"
             style={{
               position: "relative",
-              height: 340,
               borderRadius: "var(--r-xl)",
               overflow: "hidden",
               marginBottom: 20,
@@ -507,6 +565,9 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
         button:hover {
           color: var(--gn);
         }
+        .itin-hero {
+          height: 340px;
+        }
         :global(.acc-images) {
           display: flex;
           gap: 8px;
@@ -525,6 +586,11 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
         :global(.acc-thumb:hover) {
           border-color: var(--cu);
           transform: scale(1.05);
+        }
+        @media (max-width: 600px) {
+          .itin-hero {
+            height: 200px !important;
+          }
         }
       `}</style>
 

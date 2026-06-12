@@ -120,6 +120,7 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
   return (
     <>
       <div
+        className="pkg-gallery"
         style={{
           display: "grid",
           gridTemplateColumns: "1fr 1fr",
@@ -131,7 +132,8 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
       >
         {/* Main image */}
         <div
-          style={{ gridRow: "span 2", position: "relative", height: 460, cursor: "pointer" }}
+          className="gallery-main"
+          style={{ gridRow: "span 2", position: "relative", cursor: "pointer" }}
           onClick={() => openModal(0)}
         >
           <img
@@ -149,7 +151,6 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
               className="gallery-cell"
               style={{
                 position: "relative",
-                height: 224,
                 overflow: "hidden",
                 borderRadius: "var(--r)",
                 cursor: "pointer",
@@ -276,6 +277,7 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
 
             <button
               onClick={() => modalNav(-1)}
+              className="lb-nav lb-nav-l"
               style={{
                 position: "absolute",
                 top: "50%",
@@ -298,6 +300,7 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
 
             <button
               onClick={() => modalNav(1)}
+              className="lb-nav lb-nav-r"
               style={{
                 position: "absolute",
                 top: "50%",
@@ -400,16 +403,42 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
         .gallery-cell:hover img {
           transform: scale(1.04);
         }
-        @media (max-width: 900px) {
-          div:first-child {
+        /* Desktop: main image tall, sub-cells smaller */
+        .gallery-main {
+          height: 460px;
+        }
+        .gallery-cell {
+          height: 224px;
+        }
+        /* Lightbox arrows: outside on desktop, inside on mobile */
+        .lb-nav-l { left: -60px; }
+        .lb-nav-r { right: -60px; }
+
+        @media (max-width: 768px) {
+          /* Stack gallery to single column */
+          .pkg-gallery {
             grid-template-columns: 1fr !important;
           }
-          div:first-child > div:first-child {
-            height: 280px !important;
+          /* Main image shorter on mobile */
+          .gallery-main {
+            height: 260px !important;
             grid-row: span 1 !important;
           }
+          /* Sub-cells in a 2-col row below */
           .gallery-cell {
-            height: 160px !important;
+            height: 130px !important;
+          }
+          /* Lightbox arrows inside the image on mobile */
+          .lb-nav-l { left: 8px !important; }
+          .lb-nav-r { right: 8px !important; }
+        }
+
+        @media (max-width: 480px) {
+          .gallery-main {
+            height: 220px !important;
+          }
+          .gallery-cell {
+            height: 110px !important;
           }
         }
       `}</style>
