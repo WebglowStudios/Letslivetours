@@ -87,6 +87,7 @@ export default function Navbar() {
         height: 72,
         display: "flex",
         alignItems: "center",
+        justifyContent: "space-between",
         padding: "0 52px",
         transition: "var(--tr)",
         ...(scrolled
@@ -101,26 +102,32 @@ export default function Navbar() {
     >
       <Link
         href="/"
-        className="syne"
         style={{
-          fontSize: 20,
-          fontWeight: 800,
-          letterSpacing: 2,
-          textTransform: "uppercase",
-          color: scrolled ? "var(--gn)" : "var(--iv)",
-          transition: "color .3s",
+          display: "flex",
+          alignItems: "center",
           textDecoration: "none",
+          flexShrink: 0,
         }}
       >
-        LetsLive<span style={{ color: "var(--cu)" }}> Tours</span>
+        <img
+          src="/logo.png"
+          alt="LetsLive Tours"
+          style={{
+            height: 60,
+            width: "auto",
+            transition: "opacity .3s",
+          }}
+        />
       </Link>
 
       <ul
         style={{
           display: "flex",
           gap: 34,
-          margin: "0 auto",
           listStyle: "none",
+          position: "absolute",
+          left: "50%",
+          transform: "translateX(-50%)",
         }}
         className="nav-links-list"
       >
@@ -438,9 +445,7 @@ export default function Navbar() {
       >
         {/* Drawer header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px", borderBottom: "1px solid var(--line)" }}>
-          <span className="syne" style={{ fontSize: 14, fontWeight: 800, letterSpacing: 1, color: "var(--gn)", textTransform: "uppercase" }}>
-            LetsLive<span style={{ color: "var(--cu)" }}> Tours</span>
-          </span>
+          <img src="/logo.png" alt="LetsLive Tours" style={{ height: 32, width: "auto" }} />
           <button
             onClick={() => setMobileMenuOpen(false)}
             style={{ width: 36, height: 36, borderRadius: "50%", background: "var(--iv)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}

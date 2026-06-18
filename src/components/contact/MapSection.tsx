@@ -2,9 +2,9 @@
 
 export default function MapSection() {
   const addressItems = [
-    { icon: "location_on", text: "12 Travel Square, Bandra West, Mumbai, Maharashtra 400050" },
-    { icon: "train", text: "5 min walk from Bandra Station (West Exit)" },
-    { icon: "local_parking", text: "Free parking available in the building" },
+    { icon: "location_on", text: "E/5, First Floor, Mauli Complex, Sukhsagar Nagar, Katraj, Pune, Maharashtra 411046" },
+    { icon: "schedule", text: "Mon–Sat, 10AM – 8PM IST" },
+    { icon: "phone", text: "+91 77700 88299 / +91 77700 88466" },
   ];
 
   return (
@@ -16,7 +16,7 @@ export default function MapSection() {
             Find Us
           </div>
           <h3 className="serif" style={{ fontSize: "clamp(26px, 3vw, 38px)", fontWeight: 700, lineHeight: 1.1, letterSpacing: -1, marginTop: 12, marginBottom: 16 }}>
-            Our <em style={{ fontStyle: "italic", color: "var(--cu)" }}>Mumbai</em><br />Headquarters
+            Our <em style={{ fontStyle: "italic", color: "var(--cu)" }}>Pune</em><br />Headquarters
           </h3>
           <p style={{ fontSize: 14.5, color: "var(--ink3)", lineHeight: 1.72, marginBottom: 28 }}>
             Drop by our office for a face-to-face consultation with our travel experts. We&apos;d love to meet you and plan your journey in person.
@@ -35,7 +35,7 @@ export default function MapSection() {
         </div>
         <div className="map-frame rv-r" style={{ position: "relative", overflow: "hidden", minHeight: 480, background: "var(--iv3)" }}>
           <iframe
-            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3771.4!2d72.8296!3d19.0596!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMTnCsDAzJzM0LjYiTiA3MsKwNDknNDYuNiJF!5e0!3m2!1sen!2sin!4v1620000000000!5m2!1sen!2sin"
+            src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3784.6551335519343!2d73.8733925!3d18.453961!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x3bc2eb8ad5a871f3%3A0xd0a8380199867be!2sLetslive!5e0!3m2!1sen!2sin!4v1781779102801!5m2!1sen!2sin"
             allowFullScreen
             loading="lazy"
             referrerPolicy="no-referrer-when-downgrade"

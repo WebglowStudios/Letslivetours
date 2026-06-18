@@ -3,14 +3,14 @@
 export default function Offices() {
   const offices = [
     {
-      city: "Mumbai",
+      city: "Pune",
       image: "https://images.unsplash.com/photo-1529253355930-ddbe423a2ac7?w=600&q=80",
       badge: "Headquarters",
       badgeIcon: "star",
       info: [
-        { icon: "location_on", text: "12 Travel Square, Bandra West" },
-        { icon: "phone", text: "+91 98765 43210" },
-        { icon: "schedule", text: "Mon–Sat, 9AM – 8PM" },
+        { icon: "location_on", text: "E/5, First Floor, Mauli Complex, Sukhsagar Nagar, Katraj" },
+        { icon: "phone", text: "+91 77700 88299" },
+        { icon: "schedule", text: "Mon–Sat, 10AM – 8PM" },
       ],
     },
     {

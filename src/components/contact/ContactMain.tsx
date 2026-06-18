@@ -25,10 +25,10 @@ export default function ContactMain() {
   ];
 
   const contactCards = [
-    { icon: "phone", label: "Call Us", value: "+91 98765 43210", sub: "Mon–Sat, 9AM – 8PM IST" },
-    { icon: "mail", label: "Email Us", value: "hello@letslivetours.in", sub: "We reply within 2 hours" },
-    { icon: "chat", label: "WhatsApp", value: "+91 98765 43210", sub: "Available 24/7 for urgent queries" },
-    { icon: "location_on", label: "Visit Us", value: "12 Travel Square, Bandra", sub: "Mumbai, Maharashtra 400050" },
+    { icon: "phone", label: "Call Us", value: "+91 77700 88299 / +91 77700 88466", sub: "Mon–Sat, 10AM – 8PM IST" },
+    { icon: "mail", label: "Email Us", value: "info@letslivetours.com", sub: "We reply within 2 hours" },
+    { icon: "chat", label: "WhatsApp", value: "+91 77700 88299", sub: "Available 24/7 for urgent queries" },
+    { icon: "location_on", label: "Visit Us", value: "E/5, First Floor, Mauli Complex, Sukhsagar Nagar, Katraj", sub: "Pune, Maharashtra 411046" },
   ];
 
   const hours = [
