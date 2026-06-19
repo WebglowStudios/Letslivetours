@@ -17,6 +17,7 @@ export default function Footer() {
     { name: "Careers", href: "/careers" },
     { name: "Destinations", href: "/destinations" },
     { name: "Articles", href: "/articles" },
+    { name: "FAQs", href: "/faq" },
     { name: "Contact", href: "/contact" },
   ];
 
