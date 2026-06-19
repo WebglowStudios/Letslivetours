@@ -78,11 +78,11 @@ export default function Packages() {
   };
 
   const getBadgeStyle = (badge?: string): React.CSSProperties => {
-    if (!badge) return { background: "rgba(255,255,255,.15)", borderColor: "rgba(255,255,255,.22)", color: "#fff" };
+    if (!badge) return { background: "rgba(0,20,28,.6)", borderColor: "rgba(255,255,255,.25)", color: "#fff", boxShadow: "0 2px 8px rgba(0,0,0,.3)" };
     const lower = badge.toLowerCase();
-    if (lower.includes("hot") || lower.includes("deal")) return { background: "rgba(212,168,83,.2)", borderColor: "rgba(212,168,83,.4)", color: "var(--gd)" };
-    if (lower.includes("top") || lower.includes("rated") || lower.includes("green")) return { background: "rgba(74,194,138,.15)", borderColor: "rgba(74,194,138,.3)", color: "#4AC28A" };
-    return { background: "rgba(255,255,255,.15)", borderColor: "rgba(255,255,255,.22)", color: "#fff" };
+    if (lower.includes("hot") || lower.includes("deal")) return { background: "rgba(245,166,35,.92)", borderColor: "rgba(245,166,35,1)", color: "#fff", boxShadow: "0 2px 8px rgba(245,166,35,.4)" };
+    if (lower.includes("top") || lower.includes("rated") || lower.includes("green")) return { background: "rgba(34,170,100,.92)", borderColor: "rgba(34,170,100,1)", color: "#fff", boxShadow: "0 2px 8px rgba(34,170,100,.4)" };
+    return { background: "rgba(0,20,28,.6)", borderColor: "rgba(255,255,255,.25)", color: "#fff", boxShadow: "0 2px 8px rgba(0,0,0,.3)" };
   };
 
   return (

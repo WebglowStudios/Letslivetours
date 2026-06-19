@@ -19,13 +19,13 @@ export interface Destination {
 }
 
 const badgeColors: Record<string, { bg: string; border: string; color: string }> = {
-  beach: { bg: "rgba(41,196,216,.2)", border: "rgba(41,196,216,.4)", color: "var(--gd)" },
-  city: { bg: "rgba(245,166,35,.2)", border: "rgba(245,166,35,.4)", color: "var(--cu-l)" },
-  mountain: { bg: "rgba(74,194,138,.2)", border: "rgba(74,194,138,.4)", color: "#4AC28A" },
-  adventure: { bg: "rgba(220,80,80,.2)", border: "rgba(220,80,80,.4)", color: "#f87171" },
-  cultural: { bg: "rgba(167,139,250,.2)", border: "rgba(167,139,250,.4)", color: "#c4b5fd" },
-  wildlife: { bg: "rgba(52,211,153,.2)", border: "rgba(52,211,153,.4)", color: "#6ee7b7" },
-  tropical: { bg: "rgba(251,191,36,.2)", border: "rgba(251,191,36,.4)", color: "#fde68a" },
+  beach: { bg: "rgba(0,140,170,.88)", border: "rgba(0,140,170,1)", color: "#fff" },
+  city: { bg: "rgba(210,130,20,.88)", border: "rgba(210,130,20,1)", color: "#fff" },
+  mountain: { bg: "rgba(34,160,90,.88)", border: "rgba(34,160,90,1)", color: "#fff" },
+  adventure: { bg: "rgba(200,60,60,.88)", border: "rgba(200,60,60,1)", color: "#fff" },
+  cultural: { bg: "rgba(120,90,220,.88)", border: "rgba(120,90,220,1)", color: "#fff" },
+  wildlife: { bg: "rgba(16,160,100,.88)", border: "rgba(16,160,100,1)", color: "#fff" },
+  tropical: { bg: "rgba(200,140,10,.88)", border: "rgba(200,140,10,1)", color: "#fff" },
 };
 
 interface Props {
@@ -74,7 +74,7 @@ export default function DestinationCard({ dest, listView }: Props) {
           <span className="material-symbols-rounded" style={{ fontSize: 12, color: "var(--cu)" }}>location_on</span>{dest.region}
         </div>
         <div className="serif" style={{ fontSize: 20, fontWeight: 700, color: "var(--ink)", lineHeight: 1.2, marginBottom: 8 }}>{dest.name}</div>
-        <div style={{ fontSize: 13, color: "var(--ink3)", lineHeight: 1.65, marginBottom: 14, flex: 1, ...(listView ? { overflow: "hidden", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical" as const } : {}) }}>{dest.desc}</div>
+        <div style={{ fontSize: 13, color: "var(--ink3)", lineHeight: 1.65, marginBottom: 14, overflow: "hidden", display: "-webkit-box", WebkitLineClamp: listView ? 2 : 3, WebkitBoxOrient: "vertical" as const }}>{dest.desc}</div>
         <div style={{ display: "flex", gap: 14, fontSize: 12, color: "var(--ink4)", marginBottom: 14, flexWrap: "wrap" }}>
           <span style={{ display: "flex", alignItems: "center", gap: 4 }}><span className="material-symbols-rounded" style={{ fontSize: 13, color: "var(--gn2)" }}>calendar_today</span>{dest.season}</span>
           <span style={{ display: "flex", alignItems: "center", gap: 4 }}><span className="material-symbols-rounded" style={{ fontSize: 13, color: "var(--gn2)" }}>confirmation_number</span>{dest.packages}</span>

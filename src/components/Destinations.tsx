@@ -103,7 +103,7 @@ export default function Destinations() {
                 <div style={{ position: "absolute", inset: 0, background: "rgba(0,77,94,.5)", opacity: isExpanded ? 0 : 1, transition: "opacity .5s" }} />
 
                 {/* Package badge */}
-                <div className="syne" style={{ position: "absolute", top: 16, left: 16, background: "rgba(249,246,240,.1)", backdropFilter: "blur(10px)", border: "1px solid rgba(249,246,240,.15)", borderRadius: 50, padding: "5px 13px", fontSize: 9.5, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "rgba(249,246,240,.7)", opacity: isExpanded ? 1 : 0, transition: "opacity .4s" }}>
+                <div className="syne" style={{ position: "absolute", top: 16, left: 16, background: "rgba(0,20,28,.6)", backdropFilter: "blur(12px)", border: "1px solid rgba(249,246,240,.2)", borderRadius: 50, padding: "6px 14px", fontSize: 10, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "#fff", opacity: isExpanded ? 1 : 0, transition: "opacity .4s", boxShadow: "0 4px 12px rgba(0,0,0,.3)" }}>
                   {d.packageCount} packages
                 </div>
 
