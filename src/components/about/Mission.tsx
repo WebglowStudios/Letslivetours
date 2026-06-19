@@ -1,64 +1,56 @@
 "use client";
 
-const pillars = [
-  { icon: "explore", title: "Curated Experiences", desc: "Every destination is handpicked, every hotel vetted, every activity designed to immerse you in the local culture." },
-  { icon: "eco", title: "Sustainable Travel", desc: "We partner with eco-conscious hotels and support local communities to ensure travel benefits everyone." },
-  { icon: "star", title: "Unmatched Quality", desc: "From 5-star accommodations to private transfers, we never compromise on the details that matter." },
+const differentiators = [
+  { icon: "person_pin", title: "Traveler-First Approach", desc: "Every itinerary is designed with a \"What if I were the traveler?\" mindset." },
+  { icon: "tune", title: "Personalized Experiences", desc: "We create travel solutions based on individual preferences and requirements — no cookie-cutter trips." },
+  { icon: "all_inclusive", title: "Seamless Planning", desc: "From visas and flights to accommodations and activities, we manage every aspect of the journey." },
+  { icon: "handshake", title: "Trusted Network", desc: "We collaborate with 200+ travel partners worldwide to ensure quality, reliability, and smooth experiences." },
+  { icon: "payments", title: "Value for Money", desc: "Our focus is on delivering meaningful experiences while maximizing value for every traveler." },
 ];
 
 export default function Mission() {
   return (
-    <section id="mission" style={{ position: "relative", padding: "100px 0", overflow: "hidden" }}>
-      <div style={{ position: "absolute", inset: 0 }}>
-        <img src="https://images.unsplash.com/photo-1476514525535-07fb3b4ae5f1?w=1600&q=80" alt="Mission" style={{ width: "100%", height: "100%", objectFit: "cover", filter: "brightness(.18) saturate(.4)" }} />
-      </div>
-      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg, rgba(0,77,94,.95) 0%, rgba(0,77,94,.8) 100%)" }} />
-
+    <section style={{ padding: "100px 0", background: "var(--iv2)" }}>
       <div className="container">
-        <div className="mission-grid" style={{ position: "relative", zIndex: 2, display: "grid", gridTemplateColumns: "1fr 1fr", gap: 80, alignItems: "center" }}>
-          {/* Left */}
-          <div className="rv-l">
-            <div className="syne" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "var(--gd)", display: "flex", alignItems: "center", gap: 10 }}>
-              <span style={{ display: "block", width: 22, height: 1.5, background: "var(--gd)" }} />
-              Our Mission
-            </div>
-            <h2 className="serif" style={{ fontSize: "clamp(38px, 5vw, 64px)", fontWeight: 700, lineHeight: 1, letterSpacing: -2, color: "#fff", marginTop: 12 }}>
-              Redefining <em style={{ fontStyle: "italic", color: "var(--gd)" }}>Travel</em><br />One Journey at a Time
-            </h2>
-            <p style={{ fontSize: 16, color: "rgba(249,246,240,.6)", lineHeight: 1.78, marginTop: 20, maxWidth: 440 }}>
-              We exist to create journeys that go beyond sightseeing — experiences that connect you to cultures, landscapes, and moments that stay with you forever.
-            </p>
+        {/* Head */}
+        <div className="rv" style={{ textAlign: "center", marginBottom: 60 }}>
+          <div className="syne" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 3, textTransform: "uppercase", color: "var(--cu)", display: "flex", alignItems: "center", gap: 10, justifyContent: "center" }}>
+            <span style={{ display: "block", width: 22, height: 1.5, background: "var(--cu)" }} />
+            What Makes Us Different
           </div>
+          <h2 className="serif" style={{ fontSize: "clamp(34px, 4.5vw, 54px)", fontWeight: 700, lineHeight: 1.08, letterSpacing: -1, marginTop: 12 }}>
+            Why Travelers <em style={{ fontStyle: "italic", color: "var(--cu)" }}>Choose Us</em>
+          </h2>
+          <p style={{ fontSize: 15, color: "var(--ink3)", marginTop: 12, lineHeight: 1.72, maxWidth: 540, marginLeft: "auto", marginRight: "auto" }}>
+            We eliminate industry clutter and create a platform where every traveler can confidently discover, plan, and experience their perfect journey.
+          </p>
+        </div>
 
-          {/* Right */}
-          <div className="rv-r" style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-            {pillars.map((p, i) => (
-              <div key={i} className="mp-card" style={{ background: "rgba(249,246,240,.06)", border: "1px solid rgba(249,246,240,.12)", borderRadius: "var(--r)", padding: 28, transition: "var(--tr)" }}>
-                <div style={{ display: "flex", alignItems: "center", gap: 14, marginBottom: 12 }}>
-                  <div style={{ width: 46, height: 46, borderRadius: 12, background: "rgba(249,246,240,.08)", border: "1px solid rgba(249,246,240,.12)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                    <span className="material-symbols-rounded" style={{ fontSize: 22, color: "var(--gd)" }}>{p.icon}</span>
-                  </div>
-                  <div className="syne" style={{ fontSize: 15, fontWeight: 700, color: "#fff" }}>{p.title}</div>
-                </div>
-                <div style={{ fontSize: 13.5, color: "rgba(249,246,240,.55)", lineHeight: 1.68 }}>{p.desc}</div>
+        {/* Cards */}
+        <div className="diff-grid" style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 20 }}>
+          {differentiators.map((d, i) => (
+            <div key={i} className="rv diff-card" style={{ background: "#fff", border: "1px solid var(--line)", borderRadius: "var(--r-xl)", padding: "36px 30px", transition: "var(--tr)", position: "relative", overflow: "hidden" }}>
+              <div style={{ width: 52, height: 52, borderRadius: 14, background: "var(--gn-gl)", border: "1px solid rgba(0,77,94,.1)", display: "flex", alignItems: "center", justifyContent: "center", marginBottom: 20 }}>
+                <span className="material-symbols-rounded" style={{ fontSize: 24, color: "var(--gn2)" }}>{d.icon}</span>
               </div>
-            ))}
-          </div>
+              <div className="syne" style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)", marginBottom: 10 }}>{d.title}</div>
+              <div style={{ fontSize: 13.5, color: "var(--ink3)", lineHeight: 1.7 }}>{d.desc}</div>
+            </div>
+          ))}
         </div>
       </div>
 
       <style jsx>{`
-        .mp-card:hover {
-          background: rgba(249,246,240,.1) !important;
-          border-color: rgba(249,246,240,.22) !important;
-          transform: translateX(6px);
+        .diff-card:hover {
+          transform: translateY(-6px);
+          box-shadow: var(--sh-lg);
+          border-color: var(--gn3) !important;
         }
         @media (max-width: 1100px) {
-          .mission-grid { grid-template-columns: 1fr !important; }
+          .diff-grid { grid-template-columns: repeat(2, 1fr) !important; }
         }
         @media (max-width: 768px) {
-          .mission-grid { gap: 40px !important; }
-          .mp-card { padding: 20px !important; }
+          .diff-grid { grid-template-columns: 1fr !important; }
         }
       `}</style>
     </section>
