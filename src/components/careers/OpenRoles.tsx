@@ -13,6 +13,10 @@ interface Role {
   location: string;
   type: string;
   experience: string;
+  description?: string;
+  requirements?: string[];
+  responsibilities?: string[];
+  benefits?: string[];
 }
 
 const roles: Role[] = [
@@ -96,6 +100,10 @@ export default function OpenRoles() {
             location: (r.location as string) || "Remote",
             type: (r.type as string) || "Full-time",
             experience: (r.experience as string) || "",
+            description: (r.description as string) || "",
+            requirements: (r.requirements as string[]) || [],
+            responsibilities: (r.responsibilities as string[]) || [],
+            benefits: (r.benefits as string[]) || [],
           }));
           if (mapped.length > 0) {
             setFetchedRoles(mapped);
@@ -118,6 +126,7 @@ export default function OpenRoles() {
   const [applyCoverLetter, setApplyCoverLetter] = useState("");
 
   const filtered = active === "all" ? fetchedRoles : fetchedRoles.filter(r => r.dept === active);
+  const [expandedRole, setExpandedRole] = useState<number | null>(null);
 
   const openApplyModal = (role: Role) => {
     setApplyRole(role);
@@ -210,24 +219,86 @@ export default function OpenRoles() {
             </div>
           ) : filtered.map((role, i) => (
             <div key={i} className="role-card rv">
-              <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
-                <div className={`role-dept-icon ${role.iconCls}`}>
-                  <span className="material-symbols-rounded">{role.icon}</span>
+              <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 20, flex: 1, minWidth: 0 }}>
+                  <div className={`role-dept-icon ${role.iconCls}`}>
+                    <span className="material-symbols-rounded">{role.icon}</span>
+                  </div>
+                  <div>
+                    <div className="syne" style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--ink4)", marginBottom: 4 }}>{role.deptLabel}</div>
+                    <div className="serif" style={{ fontSize: 19, fontWeight: 600, color: "var(--ink)", marginBottom: 8 }}>{role.title}</div>
+                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
+                      <span className="role-tag loc syne"><span className="material-symbols-rounded" style={{ fontSize: 12 }}>location_on</span>{role.location}</span>
+                      <span className="role-tag type syne">{role.type}</span>
+                      <span className="role-tag exp syne">{role.experience}</span>
+                    </div>
+                  </div>
                 </div>
-                <div>
-                  <div className="syne" style={{ fontSize: 10.5, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--ink4)", marginBottom: 4 }}>{role.deptLabel}</div>
-                  <div className="serif" style={{ fontSize: 19, fontWeight: 600, color: "var(--ink)", marginBottom: 8 }}>{role.title}</div>
-                  <div style={{ display: "flex", gap: 8, flexWrap: "wrap" }}>
-                    <span className="role-tag loc syne"><span className="material-symbols-rounded" style={{ fontSize: 12 }}>location_on</span>{role.location}</span>
-                    <span className="role-tag type syne">{role.type}</span>
-                    <span className="role-tag exp syne">{role.experience}</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 12, flexShrink: 0 }}>
+                  {(role.requirements?.length || role.responsibilities?.length || role.benefits?.length) ? (
+                    <button
+                      onClick={() => setExpandedRole(expandedRole === i ? null : i)}
+                      className="syne"
+                      style={{ padding: "8px 16px", background: "transparent", border: "1.5px solid var(--line2)", borderRadius: 50, fontSize: 11, fontWeight: 600, color: "var(--ink3)", cursor: "pointer", display: "flex", alignItems: "center", gap: 5, transition: "var(--tr)" }}
+                    >
+                      <span className="material-symbols-rounded" style={{ fontSize: 14, transition: "transform .3s", transform: expandedRole === i ? "rotate(180deg)" : "none" }}>expand_more</span>
+                      {expandedRole === i ? "Less" : "Details"}
+                    </button>
+                  ) : null}
+                  <button className="role-apply syne" onClick={() => openApplyModal(role)}>Apply Now</button>
+                  <div className="role-arrow">
+                    <span className="material-symbols-rounded">arrow_forward</span>
                   </div>
                 </div>
               </div>
-              <div style={{ display: "flex", alignItems: "center", gap: 16, flexShrink: 0 }}>
-                <button className="role-apply syne" onClick={() => openApplyModal(role)}>Apply Now</button>
-                <div className="role-arrow">
-                  <span className="material-symbols-rounded">arrow_forward</span>
+
+              {/* Expandable details */}
+              <div style={{ maxHeight: expandedRole === i ? 600 : 0, overflow: "hidden", transition: "max-height .4s ease" }}>
+                <div style={{ paddingTop: 20, marginTop: 20, borderTop: "1px solid var(--line)" }}>
+                  {role.description && (
+                    <p style={{ fontSize: 13.5, color: "var(--ink3)", lineHeight: 1.7, marginBottom: 18 }}>{role.description}</p>
+                  )}
+                  <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(250px, 1fr))", gap: 20 }}>
+                    {role.requirements && role.requirements.length > 0 && (
+                      <div>
+                        <div className="syne" style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--gn2)", marginBottom: 10 }}>Requirements</div>
+                        <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 6 }}>
+                          {role.requirements.map((req, ri) => (
+                            <li key={ri} style={{ fontSize: 13, color: "var(--ink2)", display: "flex", alignItems: "flex-start", gap: 8, lineHeight: 1.5 }}>
+                              <span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--cu)", marginTop: 2, flexShrink: 0 }}>check_circle</span>
+                              {req}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {role.responsibilities && role.responsibilities.length > 0 && (
+                      <div>
+                        <div className="syne" style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--gn2)", marginBottom: 10 }}>Responsibilities</div>
+                        <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 6 }}>
+                          {role.responsibilities.map((resp, ri) => (
+                            <li key={ri} style={{ fontSize: 13, color: "var(--ink2)", display: "flex", alignItems: "flex-start", gap: 8, lineHeight: 1.5 }}>
+                              <span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--gd)", marginTop: 2, flexShrink: 0 }}>arrow_right</span>
+                              {resp}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                    {role.benefits && role.benefits.length > 0 && (
+                      <div>
+                        <div className="syne" style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--gn2)", marginBottom: 10 }}>Benefits</div>
+                        <ul style={{ listStyle: "none", padding: 0, margin: 0, display: "flex", flexDirection: "column", gap: 6 }}>
+                          {role.benefits.map((ben, bi) => (
+                            <li key={bi} style={{ fontSize: 13, color: "var(--ink2)", display: "flex", alignItems: "flex-start", gap: 8, lineHeight: 1.5 }}>
+                              <span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--cu)", marginTop: 2, flexShrink: 0 }}>star</span>
+                              {ben}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </div>
             </div>
