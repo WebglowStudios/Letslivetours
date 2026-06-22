@@ -233,75 +233,146 @@ function buildStayContent(stay: any): string {
   return html;
 }
 
-/* ── Helper: build HTML content for transfers ── */
-function buildTransferContent(transfer: any): string {
+/* ── Helper: build HTML for a single leg route visual ── */
+function buildLegRouteHtml(leg: { from?: string; to?: string; stops?: string[]; transferType?: string; vehicleType?: string }): string {
   let html = "";
 
-  // Transfer type + vehicle
-  if (transfer.transferType || transfer.vehicleType) {
-    html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">`;
-    if (transfer.transferType) {
-      html += `<span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--ink3)"><span class="material-symbols-rounded" style="font-size:16px;color:var(--gn3)">directions_bus</span>${transfer.transferType}</span>`;
+  // Transfer type & vehicle badge for this leg
+  if (leg.transferType || leg.vehicleType) {
+    html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">`;
+    if (leg.transferType) {
+      html += `<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;background:var(--gn-gl);color:var(--gn);padding:4px 12px;border-radius:6px"><span class="material-symbols-rounded" style="font-size:13px">directions_bus</span>${leg.transferType}</span>`;
+    }
+    if (leg.vehicleType) {
+      html += `<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;background:rgba(41,196,216,.08);color:var(--gn2);padding:4px 12px;border-radius:6px"><span class="material-symbols-rounded" style="font-size:13px">directions_car</span>${leg.vehicleType}</span>`;
     }
     html += `</div>`;
-    if (transfer.vehicleType) {
-      html += `<p style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:16px">Transfer in ${transfer.vehicleType}</p>`;
-    }
   }
 
-  // From → To route
-  if (transfer.from || transfer.to) {
-    html += `<div style="border-top:1px dashed var(--line2);padding-top:14px;margin-bottom:14px">`;
-
-    // Build stops HTML for inside the route block
+  // Route visual: from → stops → to
+  if (leg.from || leg.to) {
     let stopsHtml = "";
-    if (transfer.stops && transfer.stops.length > 0) {
-      stopsHtml = transfer.stops.map((stop: string) =>
-        `<div style="display:flex;align-items:center;gap:6px;padding:6px 0;font-size:13px;color:var(--ink3)">
+    if (leg.stops && leg.stops.length > 0) {
+      stopsHtml = leg.stops.map((stop: string) =>
+        `<div style="display:flex;align-items:center;gap:6px;padding:4px 0;font-size:12px;color:var(--ink3)">
           <span style="width:6px;height:6px;border-radius:50%;background:var(--ink4);flex-shrink:0"></span>
           ${stop}
         </div>`
       ).join("");
     }
 
-    // Single layout: left spine (dots + continuous dotted line) + right cards
-    html += `<div style="display:flex;gap:14px;align-items:stretch">`;
-
-    // Left spine — one column holding open dot, dotted line, filled dot
-    html += `<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:14px">
-      <div style="width:14px;height:14px;border-radius:50%;border:2.5px solid var(--cu);background:#fff;flex-shrink:0"></div>
-      <div style="flex:1;width:0;border-left:2px dotted var(--cu);margin:4px 0;min-height:40px"></div>
-      <div style="width:14px;height:14px;border-radius:50%;background:var(--cu);flex-shrink:0"></div>
+    html += `<div style="display:flex;gap:12px;align-items:stretch">`;
+    // Left spine
+    html += `<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:12px">
+      <div style="width:12px;height:12px;border-radius:50%;border:2.5px solid var(--cu);background:#fff;flex-shrink:0"></div>
+      <div style="flex:1;width:0;border-left:2px dotted var(--cu);margin:3px 0;min-height:24px"></div>
+      <div style="width:12px;height:12px;border-radius:50%;background:var(--cu);flex-shrink:0"></div>
     </div>`;
-
-    // Right content — from card, optional stops, to card
-    html += `<div style="flex:1;display:flex;flex-direction:column;gap:8px">`;
-
-    if (transfer.from) {
-      html += `<div style="background:#fffbf0;border:1px solid #fde68a;border-radius:10px;padding:10px 14px">
-        <div style="font-size:10px;font-weight:700;color:var(--cu);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">From</div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--ink)">
-          <span class="material-symbols-rounded" style="font-size:18px;color:var(--ink3)">location_on</span>${transfer.from}
+    // Right content
+    html += `<div style="flex:1;display:flex;flex-direction:column;gap:4px">`;
+    if (leg.from) {
+      html += `<div style="background:#fffbf0;border:1px solid #fde68a;border-radius:8px;padding:8px 12px">
+        <div style="font-size:9px;font-weight:700;color:var(--cu);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">From</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--ink)">
+          <span class="material-symbols-rounded" style="font-size:15px;color:var(--ink3)">location_on</span>${leg.from}
         </div>
       </div>`;
     }
-
     if (stopsHtml) {
-      html += `<div style="padding:2px 12px">${stopsHtml}</div>`;
+      html += `<div style="padding:2px 10px">${stopsHtml}</div>`;
     }
-
-    if (transfer.to) {
-      html += `<div style="background:#fffbf0;border:1px solid #fde68a;border-radius:10px;padding:10px 14px">
-        <div style="font-size:10px;font-weight:700;color:var(--cu);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">To</div>
-        <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--ink)">
-          <span class="material-symbols-rounded" style="font-size:18px;color:var(--ink3)">location_on</span>${transfer.to}
+    if (leg.to) {
+      html += `<div style="background:#fffbf0;border:1px solid #fde68a;border-radius:8px;padding:8px 12px">
+        <div style="font-size:9px;font-weight:700;color:var(--cu);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">To</div>
+        <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--ink)">
+          <span class="material-symbols-rounded" style="font-size:15px;color:var(--ink3)">location_on</span>${leg.to}
         </div>
       </div>`;
     }
+    html += `</div></div>`;
+  }
 
-    html += `</div>`; // close right content
-    html += `</div>`; // close flex row
-    html += `</div>`; // close border-top wrapper
+  return html;
+}
+
+/* ── Helper: build HTML content for transfers ── */
+function buildTransferContent(transfer: any): string {
+  let html = "";
+
+  // Check if we have the new legs format
+  const legs = transfer.legs && transfer.legs.length > 0 ? transfer.legs : null;
+
+  if (legs) {
+    // New format: render each leg separately
+    if (legs.length === 1) {
+      // Single leg — render inline (no numbering)
+      html += buildLegRouteHtml(legs[0]);
+    } else {
+      // Multiple legs — render each with a separator
+      html += `<div style="display:flex;flex-direction:column;gap:16px">`;
+      legs.forEach((leg: any, idx: number) => {
+        html += `<div style="border:1px solid var(--line);border-radius:12px;padding:14px;${idx > 0 ? "" : ""}">`;
+        html += `<div class="syne" style="font-size:10px;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--ink4);margin-bottom:8px">Leg ${idx + 1}</div>`;
+        html += buildLegRouteHtml(leg);
+        html += `</div>`;
+      });
+      html += `</div>`;
+    }
+  } else {
+    // Old format: use top-level from/to/transferType/vehicleType/stops
+    if (transfer.transferType || transfer.vehicleType) {
+      html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">`;
+      if (transfer.transferType) {
+        html += `<span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--ink3)"><span class="material-symbols-rounded" style="font-size:16px;color:var(--gn3)">directions_bus</span>${transfer.transferType}</span>`;
+      }
+      html += `</div>`;
+      if (transfer.vehicleType) {
+        html += `<p style="font-size:14px;font-weight:600;color:var(--ink);margin-bottom:16px">Transfer in ${transfer.vehicleType}</p>`;
+      }
+    }
+
+    if (transfer.from || transfer.to) {
+      html += `<div style="border-top:1px dashed var(--line2);padding-top:14px;margin-bottom:14px">`;
+
+      let stopsHtml = "";
+      if (transfer.stops && transfer.stops.length > 0) {
+        stopsHtml = transfer.stops.map((stop: string) =>
+          `<div style="display:flex;align-items:center;gap:6px;padding:6px 0;font-size:13px;color:var(--ink3)">
+            <span style="width:6px;height:6px;border-radius:50%;background:var(--ink4);flex-shrink:0"></span>
+            ${stop}
+          </div>`
+        ).join("");
+      }
+
+      html += `<div style="display:flex;gap:14px;align-items:stretch">`;
+      html += `<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:14px">
+        <div style="width:14px;height:14px;border-radius:50%;border:2.5px solid var(--cu);background:#fff;flex-shrink:0"></div>
+        <div style="flex:1;width:0;border-left:2px dotted var(--cu);margin:4px 0;min-height:40px"></div>
+        <div style="width:14px;height:14px;border-radius:50%;background:var(--cu);flex-shrink:0"></div>
+      </div>`;
+      html += `<div style="flex:1;display:flex;flex-direction:column;gap:8px">`;
+      if (transfer.from) {
+        html += `<div style="background:#fffbf0;border:1px solid #fde68a;border-radius:10px;padding:10px 14px">
+          <div style="font-size:10px;font-weight:700;color:var(--cu);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">From</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--ink)">
+            <span class="material-symbols-rounded" style="font-size:18px;color:var(--ink3)">location_on</span>${transfer.from}
+          </div>
+        </div>`;
+      }
+      if (stopsHtml) {
+        html += `<div style="padding:2px 12px">${stopsHtml}</div>`;
+      }
+      if (transfer.to) {
+        html += `<div style="background:#fffbf0;border:1px solid #fde68a;border-radius:10px;padding:10px 14px">
+          <div style="font-size:10px;font-weight:700;color:var(--cu);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">To</div>
+          <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--ink)">
+            <span class="material-symbols-rounded" style="font-size:18px;color:var(--ink3)">location_on</span>${transfer.to}
+          </div>
+        </div>`;
+      }
+      html += `</div></div>`;
+      html += `</div>`;
+    }
   }
 
   if (transfer.description) {

@@ -12,6 +12,7 @@ import Highlights from "@/components/destination-detail/Highlights";
 import GroupDeal from "@/components/destination-detail/GroupDeal";
 import WhyDubai from "@/components/destination-detail/WhyDubai";
 import TravelTips from "@/components/destination-detail/TravelTips";
+import DestinationArticles from "@/components/destination-detail/DestinationArticles";
 import DetailPartners from "@/components/destination-detail/DetailPartners";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
@@ -245,6 +246,7 @@ export default function DestinationDetailPage() {
 
       <WhyDubai destinationName={destinationName} whyVisit={destination?.whyVisit || []} />
       <TravelTips tips={destination?.travelTips || []} />
+      <DestinationArticles destinationName={destinationName} />
       <DetailPartners partners={destination?.partners || []} />
       <Footer />
       <ScrollToTop />
