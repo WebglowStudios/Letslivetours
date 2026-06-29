@@ -15,21 +15,26 @@ interface Article {
 
 interface Props {
   destinationName: string;
+  destinationId?: string;
 }
 
-export default function DestinationArticles({ destinationName }: Props) {
+export default function DestinationArticles({ destinationName, destinationId }: Props) {
   const [articles, setArticles] = useState<Article[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    if (!destinationName) {
+    if (!destinationName && !destinationId) {
       setLoading(false);
       return;
     }
 
     async function fetchArticles() {
       try {
-        const res = await api.get(`/articles?tag=${encodeURIComponent(destinationName)}&limit=5`);
+        // Prefer destination ID (exact match) over tag name (fuzzy)
+        const query = destinationId
+          ? `/articles?destination=${encodeURIComponent(destinationId)}&limit=5`
+          : `/articles?tag=${encodeURIComponent(destinationName)}&limit=5`;
+        const res = await api.get(query);
         if (res.status === "success" && res.data && res.data.length > 0) {
           setArticles(
             res.data.map((a: { coverImage?: string; category: string; title: string; excerpt: string; readTime: number; slug: string }) => ({

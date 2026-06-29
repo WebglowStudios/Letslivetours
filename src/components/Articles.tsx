@@ -57,7 +57,7 @@ export default function Articles() {
               Stories from <em style={{ fontStyle: "italic", color: "var(--cu)" }}>the Road</em>
             </h2>
           </div>
-          <a href="#" className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 13, fontWeight: 600, color: "var(--gn2)", borderBottom: "1.5px solid var(--gn-gl)", paddingBottom: 2 }}>
+          <a href="/articles" className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 13, fontWeight: 600, color: "var(--gn2)", borderBottom: "1.5px solid var(--gn-gl)", paddingBottom: 2, textDecoration: "none" }}>
             Read all posts <span className="material-symbols-rounded" style={{ fontSize: 16 }}>arrow_forward</span>
           </a>
           <div className="syne" style={{ position: "absolute", top: -30, right: 0, fontSize: 140, fontWeight: 800, color: "rgba(0,77,94,.04)", lineHeight: 1, pointerEvents: "none", letterSpacing: -5 }}>06</div>

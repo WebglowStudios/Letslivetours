@@ -246,7 +246,7 @@ export default function DestinationDetailPage() {
 
       <WhyDubai destinationName={destinationName} whyVisit={destination?.whyVisit || []} />
       <TravelTips tips={destination?.travelTips || []} />
-      <DestinationArticles destinationName={destinationName} />
+      <DestinationArticles destinationName={destinationName} destinationId={destination?._id} />
       <DetailPartners partners={destination?.partners || []} />
       <Footer />
       <ScrollToTop />
