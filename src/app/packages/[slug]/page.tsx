@@ -159,7 +159,7 @@ export default function PackageDetailPage() {
           {/* Right Column (Sticky) */}
           <div style={{ position: "sticky", top: 84 }}>
             <PriceCard pkg={pkg} slug={slug} />
-            <EnquiryForm packageName={packageName} />
+            <EnquiryForm packageName={packageName} packageId={pkg?._id} />
           </div>
         </div>
 

@@ -10,6 +10,7 @@ import PackageTabs from "@/components/package-detail/PackageTabs";
 import InclusionsExclusions from "@/components/package-detail/InclusionsExclusions";
 import KnowBeforeYouGo from "@/components/package-detail/KnowBeforeYouGo";
 import ThingsToCarry from "@/components/package-detail/ThingsToCarry";
+import EnquiryForm from "@/components/package-detail/EnquiryForm";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
@@ -93,6 +94,10 @@ export default function CustomItineraryPage() {
               <p style={{ fontSize: 11, color: "var(--ink4)", textAlign: "center", marginTop: 12 }}>
                 Clicking confirm will start the booking process for this custom itinerary.
               </p>
+            </div>
+            {/* Enquiry form for questions/modifications */}
+            <div style={{ marginTop: 20 }}>
+              <EnquiryForm packageName={pkg.name} packageId={pkg._id} />
             </div>
           </div>
         </div>

@@ -5,9 +5,10 @@ import { api } from "@/lib/api";
 
 interface EnquiryFormProps {
   packageName: string;
+  packageId?: string;
 }
 
-export default function EnquiryForm({ packageName }: EnquiryFormProps) {
+export default function EnquiryForm({ packageName, packageId }: EnquiryFormProps) {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -33,6 +34,7 @@ export default function EnquiryForm({ packageName }: EnquiryFormProps) {
         travelDate: travelDate || undefined,
         message: message || undefined,
         packageName: packageName || undefined,
+        package: packageId || undefined,
         source: "website",
       });
 
