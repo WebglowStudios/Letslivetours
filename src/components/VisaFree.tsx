@@ -66,42 +66,60 @@ export default function VisaFree() {
           ))}
         </div>
 
-        {/* Mobile Carousel */}
+        {/* Mobile Carousel - Sliding cards */}
         <div className="visa-mobile-carousel" style={{ display: "none", flexDirection: "column", gap: 16 }}>
-          <div style={{ position: "relative", width: "100%", height: 380, borderRadius: 20, overflow: "hidden" }}>
-            {visas.map((v, i) => (
-              <a
-                key={i}
-                href={`/destinations/${v.slug}`}
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  opacity: i === slide ? 1 : 0,
-                  transform: i === slide ? "translateX(0)" : i > slide ? "translateX(50px)" : "translateX(-50px)",
-                  transition: "opacity .5s ease, transform .5s ease",
-                  textDecoration: "none",
-                  pointerEvents: i === slide ? "auto" : "none",
-                }}
-              >
-                <img src={v.img} alt={v.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,30,40,.92) 0%, rgba(0,30,40,.2) 50%, transparent 70%)" }} />
-                {/* Visa badge */}
-                <div className="syne" style={{ position: "absolute", top: 14, left: 14, display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(74,194,138,.15)", backdropFilter: "blur(8px)", border: "1px solid rgba(74,194,138,.3)", borderRadius: 50, padding: "5px 14px", fontSize: 9, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "#4AC28A" }}>
-                  <span className="material-symbols-rounded" style={{ fontSize: 12 }}>{v.icon}</span>{v.badge}
+          <div style={{ width: "100%", overflow: "hidden" }}>
+            <div
+              style={{
+                display: "flex",
+                transition: "transform 0.4s cubic-bezier(.4,0,.2,1)",
+                transform: `translateX(-${slide * 100}%)`,
+              }}
+            >
+              {visas.map((v, i) => (
+                <div
+                  key={i}
+                  style={{
+                    flex: "0 0 100%",
+                    width: "100%",
+                    minWidth: "100%",
+                    padding: "0 16px",
+                    boxSizing: "border-box",
+                  }}
+                >
+                  <a
+                    href={`/destinations/${v.slug}`}
+                    style={{
+                      display: "block",
+                      width: "100%",
+                      height: 420,
+                      position: "relative",
+                      borderRadius: 20,
+                      overflow: "hidden",
+                      textDecoration: "none",
+                    }}
+                  >
+                    <img src={v.img} alt={v.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,30,40,.92) 0%, rgba(0,30,40,.2) 50%, transparent 70%)" }} />
+                    {/* Visa badge */}
+                    <div className="syne" style={{ position: "absolute", top: 14, left: 14, display: "inline-flex", alignItems: "center", gap: 5, background: "rgba(74,194,138,.15)", backdropFilter: "blur(8px)", border: "1px solid rgba(74,194,138,.3)", borderRadius: 50, padding: "5px 14px", fontSize: 9, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "#4AC28A" }}>
+                      <span className="material-symbols-rounded" style={{ fontSize: 12 }}>{v.icon}</span>{v.badge}
+                    </div>
+                    {/* Content */}
+                    <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "24px 20px" }}>
+                      <div className="serif" style={{ fontSize: 28, fontWeight: 700, color: "#fff", lineHeight: 1.1, marginBottom: 6 }}>
+                        {v.name}
+                      </div>
+                      <div style={{ fontSize: 12, color: "rgba(255,255,255,.55)", marginBottom: 12 }}>{v.info}</div>
+                      <div className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 700, color: "var(--cu)", letterSpacing: 0.5 }}>
+                        Explore
+                        <span className="material-symbols-rounded" style={{ fontSize: 14 }}>arrow_forward</span>
+                      </div>
+                    </div>
+                  </a>
                 </div>
-                {/* Content */}
-                <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "24px 20px" }}>
-                  <div className="serif" style={{ fontSize: 28, fontWeight: 700, color: "#fff", lineHeight: 1.1, marginBottom: 6 }}>
-                    {v.name}
-                  </div>
-                  <div style={{ fontSize: 12, color: "rgba(255,255,255,.55)", marginBottom: 12 }}>{v.info}</div>
-                  <div className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 6, fontSize: 11, fontWeight: 700, color: "var(--cu)", letterSpacing: 0.5 }}>
-                    Explore
-                    <span className="material-symbols-rounded" style={{ fontSize: 14 }}>arrow_forward</span>
-                  </div>
-                </div>
-              </a>
-            ))}
+              ))}
+            </div>
           </div>
 
           {/* Nav: arrows + dots */}

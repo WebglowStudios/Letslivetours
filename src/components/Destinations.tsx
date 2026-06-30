@@ -141,60 +141,79 @@ export default function Destinations() {
           })}
         </div>
 
-        {/* Mobile Carousel - Full-width infinite slider */}
+        {/* Mobile Carousel - Sliding cards */}
         <div className="dest-mobile-carousel" style={{ display: "none", flexDirection: "column", gap: 16 }}>
           {/* Slider container */}
-          <div style={{ position: "relative", width: "100%", height: 400, borderRadius: 20, overflow: "hidden" }}>
-            {destinations.map((d, i) => {
-              const img = d.heroImage || d.images?.[0] || "";
-              return (
-                <Link
-                  key={i}
-                  href={`/destinations/${d.slug}`}
-                  style={{
-                    position: "absolute",
-                    inset: 0,
-                    opacity: i === mobileSlide ? 1 : 0,
-                    transform: i === mobileSlide ? "translateX(0)" : i > mobileSlide ? "translateX(60px)" : "translateX(-60px)",
-                    transition: "opacity .5s ease, transform .5s ease",
-                    textDecoration: "none",
-                    pointerEvents: i === mobileSlide ? "auto" : "none",
-                  }}
-                >
-                  <img src={img} alt={d.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                  <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,20,28,.9) 0%, rgba(0,20,28,.2) 50%, transparent 70%)" }} />
-                  {/* Badge */}
-                  <div className="syne" style={{ position: "absolute", top: 14, left: 14, background: "rgba(255,255,255,.12)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,.15)", borderRadius: 50, padding: "5px 14px", fontSize: 9, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "rgba(255,255,255,.8)" }}>
-                    {d.packageCount} packages
+          <div style={{ width: "100%", overflow: "hidden" }}>
+            <div
+              className="dest-mobile-track"
+              style={{
+                display: "flex",
+                transition: "transform 0.4s cubic-bezier(.4,0,.2,1)",
+                transform: `translateX(-${mobileSlide * 100}%)`,
+              }}
+            >
+              {destinations.map((d, i) => {
+                const img = d.heroImage || d.images?.[0] || "";
+                return (
+                  <div
+                    key={i}
+                    style={{
+                      flex: "0 0 100%",
+                      width: "100%",
+                      minWidth: "100%",
+                      padding: "0 16px",
+                      boxSizing: "border-box",
+                    }}
+                  >
+                    <Link
+                      href={`/destinations/${d.slug}`}
+                      style={{
+                        display: "block",
+                        width: "100%",
+                        height: 420,
+                        position: "relative",
+                        borderRadius: 20,
+                        overflow: "hidden",
+                        textDecoration: "none",
+                      }}
+                    >
+                      <img src={img} alt={d.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,20,28,.9) 0%, rgba(0,20,28,.2) 50%, transparent 70%)" }} />
+                      {/* Badge */}
+                      <div className="syne" style={{ position: "absolute", top: 14, left: 14, background: "rgba(255,255,255,.12)", backdropFilter: "blur(8px)", border: "1px solid rgba(255,255,255,.15)", borderRadius: 50, padding: "5px 14px", fontSize: 9, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "rgba(255,255,255,.8)" }}>
+                        {d.packageCount} packages
+                      </div>
+                      {/* Content */}
+                      <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "24px 20px" }}>
+                        <div className="syne" style={{ fontSize: 9, fontWeight: 700, letterSpacing: 2.5, textTransform: "uppercase", color: "var(--cu)", marginBottom: 6 }}>
+                          {d.country || d.region}
+                        </div>
+                        <div className="serif" style={{ fontSize: 28, fontWeight: 700, color: "#fff", lineHeight: 1.1, marginBottom: 8 }}>
+                          {d.name}
+                        </div>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12, color: "rgba(255,255,255,.55)" }}>
+                          <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                            <span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--cu)" }}>star</span>
+                            {d.rating}
+                          </span>
+                          {d.bestSeason && (
+                            <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                              <span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--cu)" }}>calendar_today</span>
+                              {d.bestSeason}
+                            </span>
+                          )}
+                        </div>
+                        <div className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 14, fontSize: 11, fontWeight: 700, color: "var(--cu)", letterSpacing: 0.5 }}>
+                          Explore
+                          <span className="material-symbols-rounded" style={{ fontSize: 14 }}>arrow_forward</span>
+                        </div>
+                      </div>
+                    </Link>
                   </div>
-                  {/* Content */}
-                  <div style={{ position: "absolute", bottom: 0, left: 0, right: 0, padding: "24px 20px" }}>
-                    <div className="syne" style={{ fontSize: 9, fontWeight: 700, letterSpacing: 2.5, textTransform: "uppercase", color: "var(--cu)", marginBottom: 6 }}>
-                      {d.country || d.region}
-                    </div>
-                    <div className="serif" style={{ fontSize: 28, fontWeight: 700, color: "#fff", lineHeight: 1.1, marginBottom: 8 }}>
-                      {d.name}
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 10, fontSize: 12, color: "rgba(255,255,255,.55)" }}>
-                      <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                        <span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--cu)" }}>star</span>
-                        {d.rating}
-                      </span>
-                      {d.bestSeason && (
-                        <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                          <span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--cu)" }}>calendar_today</span>
-                          {d.bestSeason}
-                        </span>
-                      )}
-                    </div>
-                    <div className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 6, marginTop: 14, fontSize: 11, fontWeight: 700, color: "var(--cu)", letterSpacing: 0.5 }}>
-                      Explore
-                      <span className="material-symbols-rounded" style={{ fontSize: 14 }}>arrow_forward</span>
-                    </div>
-                  </div>
-                </Link>
-              );
-            })}
+                );
+              })}
+            </div>
           </div>
 
           {/* Navigation: dots + arrows */}

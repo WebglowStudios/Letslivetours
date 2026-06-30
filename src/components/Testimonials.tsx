@@ -134,27 +134,59 @@ export default function Testimonials() {
           {testimonials.map((t, i) => renderCard(t, i, true))}
         </div>
 
-        {/* Mobile: Carousel */}
+        {/* Mobile: Sliding cards carousel */}
         <div className="test-mobile-carousel" style={{ display: "none", flexDirection: "column", gap: 16 }}>
           {/* Slider */}
-          <div style={{ position: "relative", minHeight: 380, width: "100%" }}>
-            {testimonials.map((t, i) => (
-              <div
-                key={i}
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  opacity: i === slide ? 1 : 0,
-                  transform: i === slide ? "translateX(0) scale(1)" : "translateX(40px) scale(0.95)",
-                  transition: "opacity .45s ease, transform .45s ease",
-                  pointerEvents: i === slide ? "auto" : "none",
-                  display: "flex",
-                  justifyContent: "center",
-                }}
-              >
-                {renderCard(t, i, false)}
-              </div>
-            ))}
+          <div style={{ width: "100%", overflow: "hidden" }}>
+            <div
+              style={{
+                display: "flex",
+                transition: "transform 0.4s cubic-bezier(.4,0,.2,1)",
+                transform: `translateX(-${slide * 100}%)`,
+              }}
+            >
+              {testimonials.map((t, i) => (
+                <div
+                  key={i}
+                  style={{
+                    flex: "0 0 100%",
+                    width: "100%",
+                    minWidth: "100%",
+                    padding: "0 16px",
+                    boxSizing: "border-box",
+                  }}
+                >
+                  <div
+                    style={{
+                      background: "#fff",
+                      padding: "14px 14px 20px",
+                      boxShadow: "0 8px 36px rgba(0,77,94,.12)",
+                      border: "1px solid var(--line)",
+                      borderRadius: 4,
+                    }}
+                  >
+                    <div style={{ width: "100%", height: 220, overflow: "hidden", borderRadius: 8 }}>
+                      <img src={t.img} alt={t.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    </div>
+                    <div style={{ paddingTop: 14 }}>
+                      <div style={{ display: "flex", gap: 2, color: "var(--cu)", marginBottom: 8 }}>
+                        {[...Array(5)].map((_, j) => (
+                          <span key={j} className="material-symbols-rounded" style={{ fontSize: 14 }}>star</span>
+                        ))}
+                      </div>
+                      <div className="serif" style={{ fontSize: 13, color: "var(--ink2)", lineHeight: 1.65, fontStyle: "italic", marginBottom: 12 }}>
+                        &ldquo;{t.text}&rdquo;
+                      </div>
+                      <div className="syne" style={{ fontSize: 11, fontWeight: 700, color: "var(--ink)", letterSpacing: 0.5 }}>{t.name}</div>
+                      <div style={{ fontSize: 10.5, color: "var(--ink3)", display: "flex", alignItems: "center", gap: 4, marginTop: 3 }}>
+                        <span className="material-symbols-rounded" style={{ fontSize: 12, color: "var(--gn3)" }}>flight</span>
+                        {t.trip}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </div>
 
           {/* Navigation */}
