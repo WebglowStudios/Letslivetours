@@ -112,7 +112,7 @@ export default function Navbar() {
         }}
       >
         <img
-          src="/logo.png"
+          src={scrolled ? "/logo_blue.png" : "/logo_white.png"}
           alt="LetsLive Tours"
           style={{
             height: 60,
@@ -447,7 +447,7 @@ export default function Navbar() {
       >
         {/* Drawer header */}
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px", borderBottom: "1px solid var(--line)" }}>
-          <img src="/logo.png" alt="LetsLive Tours" style={{ height: 32, width: "auto" }} />
+          <img src="/logo_blue.png" alt="LetsLive Tours" style={{ height: 32, width: "auto" }} />
           <button
             onClick={() => setMobileMenuOpen(false)}
             style={{ width: 36, height: 36, borderRadius: "50%", background: "var(--iv)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}

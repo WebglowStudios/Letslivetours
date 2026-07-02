@@ -28,7 +28,7 @@ export default function Footer() {
           {/* Brand */}
           <div>
             <Link href="/" style={{ display: "inline-block", textDecoration: "none" }}>
-              <img src="/logo.png" alt="LetsLive Tours" style={{ height: 120, width: "auto" }} />
+              <img src="/logo_white.png" alt="LetsLive Tours" style={{ height: 120, width: "auto" }} />
             </Link>
             <div style={{ fontSize: 13.5, color: "rgba(249,246,240,.35)", lineHeight: 1.72, maxWidth: 280, marginTop: 14 }}>
               Premium-curated journeys to the world&apos;s most extraordinary destinations — crafted for those who seek more than the ordinary.
