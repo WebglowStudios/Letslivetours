@@ -5,6 +5,8 @@ import { useParams, useRouter } from "next/navigation";
 import { api } from "@/lib/api";
 import Link from "next/link";
 import { generateBookingPdf } from "@/lib/generateBookingPdf";
+import { openRazorpayCheckout } from "@/lib/razorpay";
+import { useAuth } from "@/hooks/useAuth";
 
 interface BookingDetail {
   _id: string;
@@ -27,10 +29,12 @@ interface BookingDetail {
 export default function BookingDetailPage() {
   const params = useParams();
   const router = useRouter();
+  const { user } = useAuth();
   const [booking, setBooking] = useState<BookingDetail | null>(null);
   const [loading, setLoading] = useState(true);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [payingBalance, setPayingBalance] = useState(false);
 
   useEffect(() => {
     async function fetchBooking() {
@@ -59,6 +63,54 @@ export default function BookingDetailPage() {
       console.error("Failed to cancel booking:", err);
     } finally {
       setCancelling(false);
+    }
+  };
+
+  const handlePayBalance = async () => {
+    if (!booking || !user) return;
+    setPayingBalance(true);
+    try {
+      const orderRes = await api.post("/payments/create-order", {
+        bookingId: booking._id,
+        paymentType: "balance",
+      });
+      if (orderRes.status !== "success") {
+        alert(orderRes.message || "Could not initiate payment.");
+        setPayingBalance(false);
+        return;
+      }
+      const { orderId, amountPaise, keyId, amount } = orderRes.data;
+      await openRazorpayCheckout({
+        key: keyId,
+        amount: amountPaise,
+        currency: "INR",
+        name: "LetsLive Tours",
+        description: `Balance payment — ${booking.bookingId}`,
+        order_id: orderId,
+        prefill: { name: `${user.firstName} ${user.lastName}`, email: user.email },
+        theme: { color: "#00AECC" },
+        handler: async (response) => {
+          try {
+            await api.post("/payments/verify", {
+              razorpay_order_id: response.razorpay_order_id,
+              razorpay_payment_id: response.razorpay_payment_id,
+              razorpay_signature: response.razorpay_signature,
+              bookingId: booking._id,
+              paymentType: "balance",
+              amount,
+            });
+            setBooking((prev) => prev ? { ...prev, paymentStatus: "paid" } : null);
+            alert("Balance paid successfully! Your booking is now fully paid.");
+          } catch {
+            alert("Payment received but verification failed. Please contact support.");
+          }
+          setPayingBalance(false);
+        },
+        modal: { ondismiss: () => setPayingBalance(false) },
+      });
+    } catch {
+      alert("Failed to initiate payment. Please try again.");
+      setPayingBalance(false);
     }
   };
 
@@ -306,6 +358,41 @@ export default function BookingDetailPage() {
           >
             Cancel Booking
           </button>
+        </div>
+      )}
+
+      {/* Pay Balance Button — shown when partially paid and booking is active */}
+      {booking.paymentStatus === "partial" && booking.status !== "cancelled" && (
+        <div style={{ marginTop: canCancel ? 12 : 32 }}>
+          <button
+            onClick={handlePayBalance}
+            disabled={payingBalance}
+            className="syne"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
+              padding: "14px 28px",
+              background: payingBalance ? "var(--ink4)" : "var(--cu)",
+              color: "#fff",
+              border: "none",
+              borderRadius: "var(--r)",
+              fontSize: 14,
+              fontWeight: 700,
+              cursor: payingBalance ? "not-allowed" : "pointer",
+              transition: "var(--tr)",
+              boxShadow: "0 6px 20px rgba(0,174,204,.25)",
+              opacity: payingBalance ? 0.7 : 1,
+            }}
+          >
+            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>
+              {payingBalance ? "hourglass_empty" : "payments"}
+            </span>
+            {payingBalance ? "Opening Payment…" : "Pay Remaining Balance"}
+          </button>
+          <p style={{ fontSize: 11, color: "var(--ink4)", marginTop: 8 }}>
+            Your deposit was paid. Complete the balance payment to fully confirm your booking.
+          </p>
         </div>
       )}
 
