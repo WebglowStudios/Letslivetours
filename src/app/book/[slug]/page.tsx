@@ -146,6 +146,14 @@ function BookingContent() {
     if (!pkg) return;
     if (!user) { router.push(`/login?redirect=/book/${slug}`); return; }
 
+    // ── Client-side validation ──────────────────────────────────────────────
+    if (!firstName.trim()) { setSubmitError("First name is required."); return; }
+    if (!lastName.trim()) { setSubmitError("Last name is required."); return; }
+    if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setSubmitError("A valid email address is required."); return; }
+    if (!phone.trim()) { setSubmitError("Phone number is required."); return; }
+    if (!travelDate) { setSubmitError("Please select a travel date."); return; }
+    // ────────────────────────────────────────────────────────────────────────
+
     setSubmitError("");
     setSubmitting(true);
 
