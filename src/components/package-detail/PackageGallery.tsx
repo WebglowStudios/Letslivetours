@@ -36,20 +36,35 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
     sections.push({ img: activityImages[0], icon: "paragliding", label: "Activities" });
   }
 
-  // Fill 3 grid cells: labeled sections first, then general images (no label), then fallback to hero
-  const gridCells: { img: string; icon?: string; label?: string }[] = [];
-  for (let i = 0; i < 3; i++) {
-    if (i < sections.length) {
-      gridCells.push(sections[i]);
-    } else {
-      // Pick a general image not already used — skip index 0 (hero shown as main)
-      const fallbackIdx = i + 1;
-      const fallbackImg = allImages[fallbackIdx] || allImages[0] || "";
-      gridCells.push({ img: fallbackImg });
+  // galleryImages must be declared BEFORE the cell-building logic that references it
+  const galleryImages = allImages.length > 0 ? allImages : (heroImage ? [heroImage] : []);
+
+  // Build a pool of RIGHT-SIDE cells from:
+  //   1. Labeled category images (destination, stay, activities)
+  //   2. Extra general images (not already used as hero)
+  // Never reuse the hero image. Never repeat the same URL.
+  const usedUrls = new Set<string>(galleryImages[0] ? [galleryImages[0]] : []);
+  const rightCells: { img: string; icon?: string; label?: string }[] = [];
+
+  // Add labeled sections first
+  for (const s of sections) {
+    if (!usedUrls.has(s.img)) {
+      rightCells.push(s);
+      usedUrls.add(s.img);
     }
   }
 
-  const galleryImages = allImages.length > 0 ? allImages : (heroImage ? [heroImage] : []);
+  // Fill remaining slots (up to 4 total) with general images
+  for (const img of allImages) {
+    if (rightCells.length >= 4) break;
+    if (!usedUrls.has(img)) {
+      rightCells.push({ img });
+      usedUrls.add(img);
+    }
+  }
+
+  // How many right cells we actually show (max 4)
+  const cellCount = rightCells.length;
 
   // Filtered images for lightbox
   const getFilteredImages = () => {
@@ -123,17 +138,22 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
         className="pkg-gallery"
         style={{
           display: "grid",
-          gridTemplateColumns: "1fr 1fr",
+          // If there are right-side cells: 2-column layout. Otherwise: single column.
+          gridTemplateColumns: cellCount > 0 ? "1fr 1fr" : "1fr",
           gap: 12,
           marginBottom: 32,
           borderRadius: "var(--r-xl)",
           overflow: "hidden",
         }}
       >
-        {/* Main image */}
+        {/* Main image — spans 2 rows only when there are right cells */}
         <div
           className="gallery-main"
-          style={{ gridRow: "span 2", position: "relative", cursor: "pointer" }}
+          style={{
+            gridRow: cellCount > 0 ? "span 2" : "span 1",
+            position: "relative",
+            cursor: "pointer",
+          }}
           onClick={() => openModal(0)}
         >
           <img
@@ -143,86 +163,113 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
           />
         </div>
 
-        {/* 2x2 grid */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
-          {[0, 1, 2, 3].map((i) => (
-            <div
-              key={i}
-              className="gallery-cell"
-              style={{
-                position: "relative",
-                overflow: "hidden",
-                borderRadius: "var(--r)",
-                cursor: "pointer",
-              }}
-              onClick={() => (i < 3 ? openModal(i + 1) : openModal(0))}
-            >
-              <img
-                src={i < 3 ? (gridCells[i]?.img || galleryImages[0]) : (galleryImages[4] || galleryImages[0])}
-                alt={gridCells[i]?.label || "View All"}
-                style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s ease" }}
-              />
+        {/* Right side: adaptive grid based on actual cell count */}
+        {cellCount > 0 && (
+          <div
+            style={{
+              display: "grid",
+              // 1 cell → single row
+              // 2 cells → 2 rows stacked
+              // 3+ cells → top cell full width + bottom row splits into 2 columns
+              gridTemplateRows: cellCount === 1 ? "1fr" : cellCount === 2 ? "1fr 1fr" : "1fr 1fr",
+              gridTemplateColumns: "1fr",
+              gap: 12,
+            }}
+          >
+            {/* Top cell (or only cell for count 1-2): always full width */}
+            {rightCells[0] && (
               <div
-                style={{
-                  position: "absolute",
-                  inset: 0,
-                  background: "linear-gradient(to top, rgba(0,20,28,.5) 0%, transparent 55%)",
-                }}
-              />
-              {i < 3 && gridCells[i]?.label ? (
-                <div
-                  style={{
-                    position: "absolute",
-                    bottom: 12,
-                    left: 14,
-                    fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif",
-                    fontSize: 12,
-                    fontWeight: 700,
-                    color: "#fff",
-                    textShadow: "0 1px 6px rgba(0,0,0,.5)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 5,
-                  }}
-                >
-                  <span className="material-symbols-rounded" style={{ fontSize: 15 }}>
-                    {gridCells[i]?.icon}
-                  </span>
-                  {gridCells[i]?.label}
-                </div>
-              ) : i === 3 ? (
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openModal(0);
-                  }}
-                  style={{
-                    position: "absolute",
-                    bottom: 12,
-                    left: 14,
-                    fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif",
-                    fontSize: 12,
-                    fontWeight: 700,
-                    color: "#fff",
-                    background: "rgba(0,20,28,.55)",
-                    backdropFilter: "blur(6px)",
-                    border: "1px solid rgba(255,255,255,.2)",
-                    borderRadius: 8,
-                    padding: "6px 14px",
-                    transition: "var(--tr)",
-                    display: "flex",
-                    alignItems: "center",
-                    gap: 6,
-                    cursor: "pointer",
-                  }}
-                >
-                  <span className="material-symbols-rounded" style={{ fontSize: 16 }}>photo_library</span>
-                  View All Photos
-                </button>
-              ) : null}
-            </div>
-          ))}
-        </div>
+                className="gallery-cell"
+                style={{ position: "relative", overflow: "hidden", borderRadius: "var(--r)", cursor: "pointer" }}
+                onClick={() => openModal(1)}
+              >
+                <img src={rightCells[0].img} alt={rightCells[0].label || "Photo 2"} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s ease" }} />
+                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,20,28,.5) 0%, transparent 55%)" }} />
+                {rightCells[0].label && (
+                  <div style={{ position: "absolute", bottom: 12, left: 14, fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif", fontSize: 12, fontWeight: 700, color: "#fff", textShadow: "0 1px 6px rgba(0,0,0,.5)", display: "flex", alignItems: "center", gap: 5 }}>
+                    <span className="material-symbols-rounded" style={{ fontSize: 15 }}>{rightCells[0].icon}</span>
+                    {rightCells[0].label}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* Second row: if 2 cells → single cell; if 3+ → two cells side by side */}
+            {cellCount === 2 && rightCells[1] && (
+              <div
+                className="gallery-cell"
+                style={{ position: "relative", overflow: "hidden", borderRadius: "var(--r)", cursor: "pointer" }}
+                onClick={() => openModal(2)}
+              >
+                <img src={rightCells[1].img} alt={rightCells[1].label || "Photo 3"} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s ease" }} />
+                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,20,28,.5) 0%, transparent 55%)" }} />
+                {rightCells[1].label && (
+                  <div style={{ position: "absolute", bottom: 12, left: 14, fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif", fontSize: 12, fontWeight: 700, color: "#fff", textShadow: "0 1px 6px rgba(0,0,0,.5)", display: "flex", alignItems: "center", gap: 5 }}>
+                    <span className="material-symbols-rounded" style={{ fontSize: 15 }}>{rightCells[1].icon}</span>
+                    {rightCells[1].label}
+                  </div>
+                )}
+              </div>
+            )}
+
+            {/* 3+ images: bottom row is a 2-column split (cells 2 & 3 side by side) */}
+            {cellCount >= 3 && (
+              <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                {/* Always show cells at index 1 and 2 side by side */}
+                {rightCells.slice(1, 3).map((cell, idx) => {
+                  const cellIdx = idx + 1;
+                  // "View All" appears on rightmost bottom cell when there are more images than visible
+                  const isRightmost = idx === 1;
+                  const showViewAll = isRightmost && allImages.length > (cellCount + 1);
+                  return (
+                    <div
+                      key={cellIdx}
+                      className="gallery-cell"
+                      style={{ position: "relative", overflow: "hidden", borderRadius: "var(--r)", cursor: "pointer" }}
+                      onClick={() => openModal(cellIdx + 1)}
+                    >
+                      <img src={cell.img} alt={cell.label || `Photo ${cellIdx + 2}`} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s ease" }} />
+                      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,20,28,.5) 0%, transparent 55%)" }} />
+                      {!showViewAll && cell.label && (
+                        <div style={{ position: "absolute", bottom: 12, left: 14, fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif", fontSize: 12, fontWeight: 700, color: "#fff", textShadow: "0 1px 6px rgba(0,0,0,.5)", display: "flex", alignItems: "center", gap: 5 }}>
+                          <span className="material-symbols-rounded" style={{ fontSize: 15 }}>{cell.icon}</span>
+                          {cell.label}
+                        </div>
+                      )}
+                      {showViewAll && (
+                        <button
+                          onClick={(e) => { e.stopPropagation(); openModal(0); }}
+                          style={{ position: "absolute", bottom: 12, left: 14, fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif", fontSize: 12, fontWeight: 700, color: "#fff", background: "rgba(0,20,28,.55)", backdropFilter: "blur(6px)", border: "1px solid rgba(255,255,255,.2)", borderRadius: 8, padding: "6px 14px", transition: "var(--tr)", display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }}
+                        >
+                          <span className="material-symbols-rounded" style={{ fontSize: 16 }}>photo_library</span>
+                          View All Photos
+                        </button>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            )}
+
+            {/* 4 cells: a 4th full-width row below the split row */}
+            {cellCount === 4 && rightCells[3] && (
+              <div
+                className="gallery-cell"
+                style={{ position: "relative", overflow: "hidden", borderRadius: "var(--r)", cursor: "pointer" }}
+                onClick={() => openModal(4)}
+              >
+                <img src={rightCells[3].img} alt={rightCells[3].label || "Photo 5"} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s ease" }} />
+                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,20,28,.5) 0%, transparent 55%)" }} />
+                {rightCells[3].label && (
+                  <div style={{ position: "absolute", bottom: 12, left: 14, fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif", fontSize: 12, fontWeight: 700, color: "#fff", textShadow: "0 1px 6px rgba(0,0,0,.5)", display: "flex", alignItems: "center", gap: 5 }}>
+                    <span className="material-symbols-rounded" style={{ fontSize: 15 }}>{rightCells[3].icon}</span>
+                    {rightCells[3].label}
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Lightbox Modal */}
