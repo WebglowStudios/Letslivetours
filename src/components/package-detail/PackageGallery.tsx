@@ -46,24 +46,25 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
   const usedUrls = new Set<string>(galleryImages[0] ? [galleryImages[0]] : []);
   const rightCells: { img: string; icon?: string; label?: string }[] = [];
 
-  // Add labeled sections first
+  // Add labeled sections first (max 3)
   for (const s of sections) {
+    if (rightCells.length >= 3) break;
     if (!usedUrls.has(s.img)) {
       rightCells.push(s);
       usedUrls.add(s.img);
     }
   }
 
-  // Fill remaining slots (up to 4 total) with general images
+  // Fill remaining slots (up to 3 total) with general images
   for (const img of allImages) {
-    if (rightCells.length >= 4) break;
+    if (rightCells.length >= 3) break;
     if (!usedUrls.has(img)) {
       rightCells.push({ img });
       usedUrls.add(img);
     }
   }
 
-  // How many right cells we actually show (max 4)
+  // How many right cells we actually show (max 3)
   const cellCount = rightCells.length;
 
   // Filtered images for lightbox
@@ -251,23 +252,6 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
               </div>
             )}
 
-            {/* 4 cells: a 4th full-width row below the split row */}
-            {cellCount === 4 && rightCells[3] && (
-              <div
-                className="gallery-cell"
-                style={{ position: "relative", overflow: "hidden", borderRadius: "var(--r)", cursor: "pointer" }}
-                onClick={() => openModal(4)}
-              >
-                <img src={rightCells[3].img} alt={rightCells[3].label || "Photo 5"} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s ease" }} />
-                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,20,28,.5) 0%, transparent 55%)" }} />
-                {rightCells[3].label && (
-                  <div style={{ position: "absolute", bottom: 12, left: 14, fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif", fontSize: 12, fontWeight: 700, color: "#fff", textShadow: "0 1px 6px rgba(0,0,0,.5)", display: "flex", alignItems: "center", gap: 5 }}>
-                    <span className="material-symbols-rounded" style={{ fontSize: 15 }}>{rightCells[3].icon}</span>
-                    {rightCells[3].label}
-                  </div>
-                )}
-              </div>
-            )}
           </div>
         )}
       </div>
