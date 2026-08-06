@@ -189,27 +189,6 @@ function buildItineraryContent(day: any): string {
   return html;
 }
 
-/* ── Helper: build HTML content for activities ── */
-function buildActivityContent(activity: any): string {
-  let html = "";
-  if (activity.description) {
-    html += `<p style="margin-bottom:10px">${activity.description}</p>`;
-  }
-  if (activity.duration) {
-    html += `<div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;background:var(--gn-gl);color:var(--gn);padding:5px 14px;border-radius:6px;margin-bottom:12px">
-      <span class="material-symbols-rounded" style="font-size:14px">schedule</span>
-      ${activity.duration}
-    </div>`;
-  }
-  if (activity.details && activity.details.length > 0) {
-    html += sectionLabel("checklist", "Activity Details");
-    html += buildBulletList(activity.details, "var(--cu)");
-  }
-  if (activity.images && activity.images.length > 0) {
-    html += `<div class="acc-images">${activity.images.map((img: string) => `<img src="${img}" alt="" class="acc-thumb" data-lightbox />`).join("")}</div>`;
-  }
-  return html;
-}
 
 /* ── Helper: build HTML content for stays ── */
 function buildStayContent(stay: any): string {
@@ -388,6 +367,12 @@ function buildTransferContent(transfer: any): string {
   return html;
 }
 
+/* ── Helper: build activities-from-itinerary content for a day ── */
+function buildDayActivitiesContent(day: any): string {
+  if (!day.activities || day.activities.length === 0) return "";
+  return buildBulletList(day.activities, "var(--cu)");
+}
+
 const tabs = [
   { id: "itinerary", label: "Itinerary" },
   { id: "activities", label: "Activities" },
@@ -416,7 +401,6 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
   };
 
   const itinerary = pkg?.itinerary || [];
-  const activities = pkg?.activities || [];
   const stays = pkg?.stays || [];
   const transfers = pkg?.transfers || [];
   const images = pkg?.images || [];
@@ -440,12 +424,15 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
           content: buildItineraryContent(day),
         }));
       case "activities":
-        return activities.map((act: any, i: number) => ({
-          badge: `Activity ${i + 1}`,
-          badgeType: "activity",
-          title: act.title,
-          content: buildActivityContent(act),
-        }));
+        // Show activity strings from each itinerary day
+        return itinerary
+          .filter((day: any) => day.activities && day.activities.length > 0)
+          .map((day: any) => ({
+            badge: `Day ${day.day}`,
+            badgeType: "activity",
+            title: day.title || `Day ${day.day}`,
+            content: buildDayActivitiesContent(day),
+          }));
       case "stay":
         return stays.map((s: any, i: number) => ({
           badge: `Stay ${i + 1}`,
