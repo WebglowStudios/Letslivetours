@@ -373,12 +373,7 @@ function buildDayActivitiesContent(day: any): string {
   return buildBulletList(day.activities, "var(--cu)");
 }
 
-const tabs = [
-  { id: "itinerary", label: "Itinerary" },
-  { id: "activities", label: "Activities" },
-  { id: "stay", label: "Stay" },
-  { id: "transfers", label: "Transfers" },
-];
+// Tabs definition removed from here, moved inside the component to be dynamic
 
 export default function PackageTabs({ pkg }: PackageTabsProps) {
   const [activeTab, setActiveTab] = useState("itinerary");
@@ -406,6 +401,23 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
   const images = pkg?.images || [];
   const duration = pkg?.duration;
   const destination = pkg?.destination;
+
+  const hasItinerary = itinerary.length > 0;
+  const hasActivities = itinerary.some((day: any) => day.activities && day.activities.length > 0);
+  const hasStays = stays.length > 0;
+  const hasTransfers = transfers.length > 0 || !!pkg?.transferSummary;
+
+  const availableTabs = [
+    ...(hasItinerary ? [{ id: "itinerary", label: "Itinerary" }] : []),
+    ...(hasActivities ? [{ id: "activities", label: "Activities" }] : []),
+    ...(hasStays ? [{ id: "stay", label: "Stay" }] : []),
+    ...(hasTransfers ? [{ id: "transfers", label: "Transfers" }] : []),
+  ];
+
+  // If the active tab is not in the available tabs, switch to the first available one
+  if (availableTabs.length > 0 && !availableTabs.some((t) => t.id === activeTab)) {
+    setActiveTab(availableTabs[0].id);
+  }
 
   const itinImages = images.slice(0, 5);
 
@@ -454,43 +466,49 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
 
   const tabData = getTabData(activeTab);
 
+  if (availableTabs.length === 0) {
+    return null; // Don't render anything if there's no data for any tab
+  }
+
   return (
     <div style={{ marginBottom: 28 }}>
       {/* Tab Navigation */}
-      <div
-        style={{
-          display: "flex",
-          gap: 0,
-          overflowX: "auto",
-          borderBottom: "2px solid var(--line)",
-          marginBottom: 0,
-        }}
-      >
-        {tabs.map((tab) => (
-          <button
-            key={tab.id}
-            onClick={() => setActiveTab(tab.id)}
-            className="syne"
-            style={{
-              fontSize: 13,
-              fontWeight: 600,
-              color: activeTab === tab.id ? "var(--gn)" : "var(--ink3)",
-              padding: "12px 20px",
-              whiteSpace: "nowrap",
-              borderBottom: `2.5px solid ${activeTab === tab.id ? "var(--cu)" : "transparent"}`,
-              marginBottom: -2,
-              transition: "var(--tr)",
-              cursor: "pointer",
-              background: "none",
-              borderTop: "none",
-              borderLeft: "none",
-              borderRight: "none",
-            }}
-          >
-            {tab.label}
-          </button>
-        ))}
-      </div>
+      {availableTabs.length > 1 && (
+        <div
+          style={{
+            display: "flex",
+            gap: 0,
+            overflowX: "auto",
+            borderBottom: "2px solid var(--line)",
+            marginBottom: 0,
+          }}
+        >
+          {availableTabs.map((tab) => (
+            <button
+              key={tab.id}
+              onClick={() => setActiveTab(tab.id)}
+              className="syne"
+              style={{
+                fontSize: 13,
+                fontWeight: 600,
+                color: activeTab === tab.id ? "var(--gn)" : "var(--ink3)",
+                padding: "12px 20px",
+                whiteSpace: "nowrap",
+                borderBottom: `2.5px solid ${activeTab === tab.id ? "var(--cu)" : "transparent"}`,
+                marginBottom: -2,
+                transition: "var(--tr)",
+                cursor: "pointer",
+                background: "none",
+                borderTop: "none",
+                borderLeft: "none",
+                borderRight: "none",
+              }}
+            >
+              {tab.label}
+            </button>
+          ))}
+        </div>
+      )}
 
       {/* Tab Panels */}
       <div style={{ paddingTop: 20 }}>
@@ -602,20 +620,65 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
             ))}
           </div>
         ) : (
-          <div
-            style={{
-              padding: "40px 20px",
-              textAlign: "center",
-              color: "var(--ink4)",
-              fontFamily: "var(--font-inter), 'Inter', sans-serif",
-              fontSize: 14,
-            }}
-          >
-            <span className="material-symbols-rounded" style={{ fontSize: 36, display: "block", marginBottom: 8, color: "var(--ink4)" }}>
-              info
-            </span>
-            No information available
-          </div>
+          /* Transfers tab: show summary card if no day-wise entries but summary text exists */
+          activeTab === "transfers" && !transfers.length && pkg?.transferSummary ? (
+            <div
+              style={{
+                background: "#fff",
+                borderRadius: "var(--r)",
+                border: "1.5px solid var(--line)",
+                padding: "20px 22px",
+                boxShadow: "var(--sh-sm, none)",
+              }}
+            >
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 14 }}>
+                <div
+                  style={{
+                    width: 36,
+                    height: 36,
+                    borderRadius: "50%",
+                    background: "var(--gn-gl)",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    flexShrink: 0,
+                  }}
+                >
+                  <span className="material-symbols-rounded" style={{ fontSize: 18, color: "var(--gn)" }}>directions_bus</span>
+                </div>
+                <div>
+                  <p className="syne" style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)", marginBottom: 2 }}>Transfer Details</p>
+                  <p style={{ fontSize: 11, color: "var(--ink4)", fontFamily: "var(--font-inter), 'Inter', sans-serif" }}>Overall arrangements for this trip</p>
+                </div>
+              </div>
+              <p
+                style={{
+                  fontFamily: "var(--font-inter), 'Inter', sans-serif",
+                  fontSize: 13.5,
+                  color: "var(--ink2)",
+                  lineHeight: 1.8,
+                  whiteSpace: "pre-wrap",
+                }}
+              >
+                {pkg.transferSummary}
+              </p>
+            </div>
+          ) : (
+            <div
+              style={{
+                padding: "40px 20px",
+                textAlign: "center",
+                color: "var(--ink4)",
+                fontFamily: "var(--font-inter), 'Inter', sans-serif",
+                fontSize: 14,
+              }}
+            >
+              <span className="material-symbols-rounded" style={{ fontSize: 36, display: "block", marginBottom: 8, color: "var(--ink4)" }}>
+                info
+              </span>
+              No information available
+            </div>
+          )
         )}
       </div>
 
