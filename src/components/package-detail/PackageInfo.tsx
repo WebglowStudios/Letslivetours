@@ -6,7 +6,8 @@ interface PackageInfoProps {
 
 export default function PackageInfo({ pkg }: PackageInfoProps) {
   const name = pkg?.name || "Package";
-  const destination = pkg?.destination;
+  const destinationName = pkg?.destination?.name || pkg?.customDestinationText;
+  const destinationCountry = pkg?.destination?.country;
   const duration = pkg?.duration;
   const hotelRating = pkg?.hotelRating;
   const rating = pkg?.rating || 0;
@@ -43,10 +44,10 @@ export default function PackageInfo({ pkg }: PackageInfoProps) {
             {duration.nights} Nights / {duration.days} Days
           </span>
         )}
-        {destination && (
+        {destinationName && (
           <span className="syne" style={{ fontSize: 13, fontWeight: 500, color: "var(--ink3)", display: "flex", alignItems: "center", gap: 5 }}>
             <span className="material-symbols-rounded" style={{ fontSize: 15, color: "var(--gn3)" }}>location_on</span>
-            {destination.name}{destination.country ? `, ${destination.country}` : ""}
+            {destinationName}{destinationCountry ? `, ${destinationCountry}` : ""}
           </span>
         )}
         {hotelRating && (

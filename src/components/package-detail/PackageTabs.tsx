@@ -400,7 +400,7 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
   const transfers = pkg?.transfers || [];
   const images = pkg?.images || [];
   const duration = pkg?.duration;
-  const destination = pkg?.destination;
+  const destinationName = pkg?.destination?.name || pkg?.customDestinationText;
 
   const hasItinerary = itinerary.length > 0;
   const hasActivities = itinerary.some((day: any) => day.activities && day.activities.length > 0);
@@ -548,7 +548,7 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
                 className="syne"
                 style={{ fontSize: 13, fontWeight: 500, color: "rgba(255,255,255,.8)", marginTop: 4 }}
               >
-                Days in {destination?.name || "your destination"}
+                Days in {destinationName || "your destination"}
               </div>
             </div>
             {itinImages.length > 1 && (
