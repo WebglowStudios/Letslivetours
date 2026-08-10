@@ -28,6 +28,12 @@ export default function EnquiryDetailsPage() {
   const [enquiry, setEnquiry] = useState<any>(null);
   const [loading, setLoading] = useState(true);
 
+  // Feedback state
+  const [feedbackRating, setFeedbackRating] = useState(0);
+  const [feedbackComments, setFeedbackComments] = useState("");
+  const [submittingFeedback, setSubmittingFeedback] = useState(false);
+  const [feedbackSuccess, setFeedbackSuccess] = useState(false);
+
   useEffect(() => {
     async function fetchEnquiry() {
       try {
@@ -42,6 +48,31 @@ export default function EnquiryDetailsPage() {
     }
     fetchEnquiry();
   }, [id, router]);
+
+  useEffect(() => {
+    if (enquiry?.feedback) {
+      setFeedbackRating(enquiry.feedback.rating || 0);
+      setFeedbackComments(enquiry.feedback.comments || "");
+    }
+  }, [enquiry]);
+
+  async function handleSubmitFeedback() {
+    if (!feedbackRating) return;
+    setSubmittingFeedback(true);
+    try {
+      await api.post(`/enquiries/customer/me/${id}/feedback`, {
+        rating: feedbackRating,
+        comments: feedbackComments,
+      });
+      setFeedbackSuccess(true);
+      setTimeout(() => setFeedbackSuccess(false), 3000);
+    } catch (err) {
+      console.error("Failed to submit feedback:", err);
+      alert("Failed to submit feedback. Please try again.");
+    } finally {
+      setSubmittingFeedback(false);
+    }
+  }
 
   const getStatusStyle = (status: string) => {
     switch (status) {
@@ -186,6 +217,48 @@ export default function EnquiryDetailsPage() {
                     {enquiry.assignedTo.description}
                   </div>
                 )}
+                
+                {/* Feedback Section */}
+                <div style={{ marginTop: 8, paddingTop: 16, borderTop: "1px solid var(--line)" }}>
+                  <p className="syne" style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)", marginBottom: 12 }}>Rate your Travel Expert</p>
+                  
+                  {enquiry.feedback && !feedbackSuccess && feedbackRating === enquiry.feedback.rating ? (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+                      <div style={{ display: "flex", gap: 4 }}>
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <span key={star} className="material-symbols-rounded" style={{ fontSize: 20, color: star <= feedbackRating ? "#FFB400" : "var(--line)", cursor: "pointer", transition: "color 0.2s" }} onClick={() => setFeedbackRating(star)}>
+                            star
+                          </span>
+                        ))}
+                      </div>
+                      {enquiry.feedback.comments && (
+                        <p style={{ fontSize: 13, color: "var(--ink2)", fontStyle: "italic", background: "var(--iv)", padding: "8px 12px", borderRadius: 8 }}>"{enquiry.feedback.comments}"</p>
+                      )}
+                      <p style={{ fontSize: 11, color: "var(--ink4)" }}>Click the stars above to update your rating.</p>
+                    </div>
+                  ) : (
+                    <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                      <div style={{ display: "flex", gap: 4 }}>
+                        {[1, 2, 3, 4, 5].map((star) => (
+                          <span key={star} className="material-symbols-rounded" style={{ fontSize: 24, color: star <= feedbackRating ? "#FFB400" : "var(--line)", cursor: "pointer", transition: "color 0.2s", WebkitTapHighlightColor: "transparent" }} onClick={() => setFeedbackRating(star)}>
+                            star
+                          </span>
+                        ))}
+                      </div>
+                      <textarea
+                        value={feedbackComments}
+                        onChange={(e) => setFeedbackComments(e.target.value)}
+                        placeholder="Share your experience (optional)..."
+                        style={{ width: "100%", padding: 12, borderRadius: "var(--r)", border: "1px solid var(--line)", fontSize: 13, resize: "vertical", minHeight: 80, fontFamily: "inherit", outline: "none" }}
+                      />
+                      <button onClick={handleSubmitFeedback} disabled={submittingFeedback || !feedbackRating} style={{ background: feedbackRating ? "var(--ink)" : "var(--line)", color: feedbackRating ? "#fff" : "var(--ink4)", padding: "10px", borderRadius: "50px", fontSize: 13, fontWeight: 600, border: "none", cursor: feedbackRating ? "pointer" : "not-allowed", display: "flex", alignItems: "center", justifyContent: "center", gap: 8, transition: "all 0.2s" }}>
+                        {submittingFeedback ? <span className="material-symbols-rounded" style={{ fontSize: 16, animation: "spin 1s linear infinite" }}>sync</span> : null}
+                        {feedbackSuccess ? "Submitted!" : (enquiry.feedback ? "Update Feedback" : "Submit Feedback")}
+                      </button>
+                      {feedbackSuccess && <p style={{ fontSize: 12, color: "var(--gn)", textAlign: "center", fontWeight: 600 }}>Thank you for your feedback!</p>}
+                    </div>
+                  )}
+                </div>
               </div>
             ) : (
               <div style={{ textAlign: "center", padding: "16px 0" }}>
