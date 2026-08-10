@@ -167,14 +167,25 @@ export default function EnquiryDetailsPage() {
             <h3 className="syne" style={{ fontSize: 16, fontWeight: 700, color: "var(--ink)", marginBottom: 16 }}>Your Travel Expert</h3>
             
             {enquiry.assignedTo ? (
-              <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
-                <div style={{ width: 48, height: 48, borderRadius: "50%", background: "var(--gn-gl)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--gn2)", fontWeight: 700, fontSize: 18 }} className="syne">
-                  {enquiry.assignedTo.firstName[0]}{enquiry.assignedTo.lastName[0]}
+              <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+                  {enquiry.assignedTo.avatar ? (
+                    <img src={enquiry.assignedTo.avatar} alt={`${enquiry.assignedTo.firstName} ${enquiry.assignedTo.lastName}`} style={{ width: 48, height: 48, borderRadius: "50%", objectFit: "cover" }} />
+                  ) : (
+                    <div style={{ width: 48, height: 48, borderRadius: "50%", background: "var(--gn-gl)", display: "flex", alignItems: "center", justifyContent: "center", color: "var(--gn2)", fontWeight: 700, fontSize: 18 }} className="syne">
+                      {enquiry.assignedTo.firstName?.[0]}{enquiry.assignedTo.lastName?.[0]}
+                    </div>
+                  )}
+                  <div>
+                    <p style={{ fontSize: 15, fontWeight: 600, color: "var(--ink)" }}>{enquiry.assignedTo.firstName} {enquiry.assignedTo.lastName}</p>
+                    <p style={{ fontSize: 13, color: "var(--ink3)" }}>Currently reviewing your request</p>
+                  </div>
                 </div>
-                <div>
-                  <p style={{ fontSize: 15, fontWeight: 600, color: "var(--ink)" }}>{enquiry.assignedTo.firstName} {enquiry.assignedTo.lastName}</p>
-                  <p style={{ fontSize: 13, color: "var(--ink3)" }}>Currently reviewing your request</p>
-                </div>
+                {enquiry.assignedTo.description && (
+                  <div style={{ fontSize: 13, color: "var(--ink2)", lineHeight: 1.5, background: "var(--iv)", padding: 14, borderRadius: "var(--r)", border: "1px solid var(--line)" }}>
+                    {enquiry.assignedTo.description}
+                  </div>
+                )}
               </div>
             ) : (
               <div style={{ textAlign: "center", padding: "16px 0" }}>
