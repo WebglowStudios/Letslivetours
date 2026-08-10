@@ -61,6 +61,15 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
     return "₹" + val.toLocaleString("en-IN");
   };
 
+  const priceUnit = pkg?.priceUnit || "person";
+  const unitLabels = {
+    group: { top: "Total Group", bottom: "total group price" },
+    couple: { top: "Per Couple", bottom: "per couple price" },
+    person: { top: "Per Adult", bottom: "per person (twin sharing)" },
+  };
+  const unitTopLabel = unitLabels[priceUnit as keyof typeof unitLabels]?.top || "Per Adult";
+  const unitBottomLabel = unitLabels[priceUnit as keyof typeof unitLabels]?.bottom || "per person (twin sharing)";
+
   // Generate star string
   const fullStars = Math.floor(rating);
   const hasHalf = rating - fullStars >= 0.5;
@@ -113,7 +122,7 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
               marginBottom: 4,
             }}
           >
-            Per Adult
+            {unitTopLabel}
           </div>
           {hasDiscount && (
             <div
@@ -142,7 +151,7 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
               marginTop: 3,
             }}
           >
-            per person (twin sharing)
+            {unitBottomLabel}
           </div>
           {hasDiscount && (
             <div
