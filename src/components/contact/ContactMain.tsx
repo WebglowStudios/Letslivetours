@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { api } from "@/lib/api";
+import PhoneInput from "@/components/ui/PhoneInput";
 
 export default function ContactMain() {
   const [activeTab, setActiveTab] = useState<"general" | "booking" | "support">("general");
@@ -185,7 +186,7 @@ export default function ContactMain() {
 
                   <div style={{ marginBottom: 20, display: "flex", flexDirection: "column", gap: 7 }}>
                     <label className="syne" style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--ink3)" }}>Phone Number</label>
-                    <input type="tel" placeholder="+91 98765 43210" value={phone} onChange={(e) => setPhone(e.target.value)} style={{ padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, color: "var(--ink)", fontSize: 14, outline: "none", transition: "border-color .2s, box-shadow .2s", width: "100%" }} />
+                    <PhoneInput value={phone} onChange={setPhone} placeholder="98765 43210" style={{ borderRadius: 12 }} />
                   </div>
 
                   {showDest && (

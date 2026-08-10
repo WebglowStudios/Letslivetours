@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { api } from "@/lib/api";
+import PhoneInput from "@/components/ui/PhoneInput";
 
 interface PriceCardProps {
   pkg: any;
@@ -266,7 +267,7 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
           ) : (
             <>
               <input type="text" value={cbName} onChange={(e) => setCbName(e.target.value)} placeholder="Your Name *" style={{ width: "100%", padding: "9px 12px", border: "1px solid var(--line2)", borderRadius: 8, fontSize: 13, marginBottom: 8, outline: "none" }} />
-              <input type="tel" value={cbPhone} onChange={(e) => setCbPhone(e.target.value)} placeholder="Phone Number *" style={{ width: "100%", padding: "9px 12px", border: "1px solid var(--line2)", borderRadius: 8, fontSize: 13, marginBottom: 8, outline: "none" }} />
+              <PhoneInput value={cbPhone} onChange={setCbPhone} placeholder="Phone Number *" style={{ marginBottom: 8 }} required />
               <input type="email" value={cbEmail} onChange={(e) => setCbEmail(e.target.value)} placeholder="Email (optional)" style={{ width: "100%", padding: "9px 12px", border: "1px solid var(--line2)", borderRadius: 8, fontSize: 13, marginBottom: 10, outline: "none" }} />
               <button onClick={handleCallbackSubmit} disabled={cbLoading || !cbName.trim() || !cbPhone.trim()} className="syne" style={{ width: "100%", padding: 10, background: "var(--gn)", color: "#fff", border: "none", borderRadius: 50, fontSize: 13, fontWeight: 700, cursor: "pointer", opacity: cbLoading ? 0.6 : 1 }}>
                 {cbLoading ? "Submitting..." : "Request Callback"}

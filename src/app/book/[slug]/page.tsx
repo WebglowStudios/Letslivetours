@@ -6,6 +6,7 @@ import { api } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import { openRazorpayCheckout } from "@/lib/razorpay";
 import Navbar from "@/components/Navbar";
+import PhoneInput from "@/components/ui/PhoneInput";
 
 interface PackageData {
   _id: string;
@@ -300,7 +301,6 @@ function BookingContent() {
                   { label: "First Name *", val: firstName, set: setFirstName, type: "text", ph: "John", req: true },
                   { label: "Last Name *", val: lastName, set: setLastName, type: "text", ph: "Doe", req: true },
                   { label: "Email *", val: email, set: setEmail, type: "email", ph: "john@email.com", req: true },
-                  { label: "Phone", val: phone, set: setPhone, type: "tel", ph: "+91 98765 43210", req: false },
                 ].map((f, i) => (
                   <div key={i}>
                     <label className="syne" style={{ display: "block", fontSize: 9.5, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--ink4)", marginBottom: 6 }}>{f.label}</label>
@@ -308,6 +308,10 @@ function BookingContent() {
                       style={{ width: "100%", padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, fontSize: 14, color: "var(--ink)", outline: "none" }} />
                   </div>
                 ))}
+                <div>
+                  <label className="syne" style={{ display: "block", fontSize: 9.5, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--ink4)", marginBottom: 6 }}>Phone</label>
+                  <PhoneInput value={phone} onChange={setPhone} placeholder="98765 43210" style={{ padding: "4px 4px" }} />
+                </div>
               </div>
             </div>
 

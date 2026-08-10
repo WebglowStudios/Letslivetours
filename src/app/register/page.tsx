@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
+import PhoneInput from "@/components/ui/PhoneInput";
 
 function getPasswordStrength(password: string): { label: string; color: string; width: string } {
   let score = 0;
@@ -232,12 +233,10 @@ export default function RegisterPage() {
               <label className="syne" style={labelStyle}>
                 Phone Number <span style={{ fontWeight: 400, letterSpacing: 0, textTransform: "none", fontSize: 10, color: "var(--ink4)" }}>(optional)</span>
               </label>
-              <input
-                type="tel"
+              <PhoneInput
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+91 98765 43210"
-                style={inputStyle}
+                onChange={setPhone}
+                placeholder="98765 43210"
               />
             </div>
 

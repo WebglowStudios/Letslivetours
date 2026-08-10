@@ -2,6 +2,7 @@
 
 import { useState, FormEvent } from "react";
 import { api } from "@/lib/api";
+import PhoneInput from "@/components/ui/PhoneInput";
 
 interface EnquiryFormProps {
   packageName: string;
@@ -181,25 +182,12 @@ export default function EnquiryForm({ packageName, packageId }: EnquiryFormProps
           >
             Phone Number
           </label>
-          <input
-            className="form-input"
-            type="tel"
-            placeholder="+91 98765 43210"
-            required
+          <PhoneInput
             value={phone}
-            onChange={(e) => setPhone(e.target.value)}
-            style={{
-              width: "100%",
-              fontFamily: "var(--font-inter), 'Inter', sans-serif",
-              fontSize: 13.5,
-              color: "var(--ink)",
-              background: "var(--iv)",
-              border: "1.5px solid var(--line2)",
-              borderRadius: 10,
-              padding: "10px 14px",
-              transition: "var(--tr)",
-              outline: "none",
-            }}
+            onChange={setPhone}
+            placeholder="98765 43210"
+            required
+            style={{ borderRadius: 10 }}
           />
         </div>
 

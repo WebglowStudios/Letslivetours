@@ -2,6 +2,7 @@
 
 import { useState, FormEvent, useEffect } from "react";
 import { api } from "@/lib/api";
+import PhoneInput from "@/components/ui/PhoneInput";
 
 interface Role {
   id?: string;
@@ -404,13 +405,12 @@ export default function OpenRoles() {
 
                   <div style={{ marginBottom: 14, display: "flex", flexDirection: "column", gap: 6 }}>
                     <label className="syne" style={{ fontSize: 10, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--ink3)" }}>Phone</label>
-                    <input
-                      type="tel"
-                      placeholder="+91 98765 43210"
-                      required
+                    <PhoneInput
                       value={applyPhone}
-                      onChange={(e) => setApplyPhone(e.target.value)}
-                      style={{ padding: "12px 14px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 10, color: "var(--ink)", fontSize: 13.5, outline: "none", width: "100%", transition: "border-color .2s" }}
+                      onChange={setApplyPhone}
+                      placeholder="98765 43210"
+                      required
+                      style={{ borderRadius: 10 }}
                     />
                   </div>
 

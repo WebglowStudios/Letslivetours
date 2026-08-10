@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { api } from "@/lib/api";
+import PhoneInput from "@/components/ui/PhoneInput";
 
 export default function ProfilePage() {
   const { user, refreshUser } = useAuth();
@@ -175,12 +176,10 @@ export default function ProfilePage() {
             </div>
             <div>
               <label className="syne" style={labelStyle}>Phone</label>
-              <input
-                type="tel"
+              <PhoneInput
                 value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                style={inputStyle}
-                placeholder="+1 (555) 000-0000"
+                onChange={setPhone}
+                placeholder="98765 43210"
               />
             </div>
             <div>
