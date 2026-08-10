@@ -68,7 +68,9 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
 
   // Build meta rows from pkg data
   const flightsIncluded = pkg?.flightsIncluded || false;
-  const travellerCount = pkg?.travellerCount || "";
+  const travellerCount = pkg?.adultCount || pkg?.childCount 
+    ? `${pkg?.adultCount || 0} Adult(s)${pkg?.childCount ? `, ${pkg?.childCount} Child(ren)` : ""}`
+    : pkg?.travellerCount || "";
 
   const metaRows = [
     duration ? { icon: "calendar_today", label: "Duration:", value: `${duration.nights} Nights / ${duration.days} Days` } : null,
