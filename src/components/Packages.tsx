@@ -171,7 +171,7 @@ export default function Packages() {
                       <div style={{ fontSize: 10, color: "rgba(249,246,240,.35)", letterSpacing: 0.5, marginBottom: 2 }}>from</div>
                       <div className="serif" style={{ fontSize: 24, color: "var(--iv)", lineHeight: 1 }}>{formatPrice(pkg.price)}<small style={{ fontFamily: "var(--font-inter),'Inter',sans-serif", fontSize: 12, color: "rgba(249,246,240,.35)" }}>/person</small></div>
                     </div>
-                    <span className="syne" style={{ padding: "9px 18px", background: "var(--cu)", borderRadius: 50, color: "#fff", fontSize: 11.5, fontWeight: 700, letterSpacing: 0.5 }}>Book Now</span>
+                    <span className="syne" style={{ padding: "9px 18px", background: "var(--cu)", borderRadius: 50, color: "#fff", fontSize: 11.5, fontWeight: 700, letterSpacing: 0.5 }}>View Package</span>
                   </div>
                 </div>
               </Link>

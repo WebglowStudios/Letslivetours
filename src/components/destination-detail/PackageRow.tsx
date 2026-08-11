@@ -93,7 +93,7 @@ export default function PackageRow({ eyebrow, title, titleEm, subtitle, cards, a
                       <div style={{ fontSize: 12, color: "var(--ink4)", textDecoration: "line-through" }}>{c.origPrice}</div>
                       <div className="serif" style={{ fontSize: 20, fontWeight: 700, color: "var(--gn)", lineHeight: 1 }}>{c.price} <small style={{ fontFamily: "var(--font-inter),'Inter',sans-serif", fontSize: 11, fontWeight: 400, color: "var(--ink3)" }}>{c.perUnit}</small></div>
                     </div>
-                    <Link href={`/packages/${c.slug || c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '')}`} className="syne" style={{ fontSize: 12, fontWeight: 700, color: "#fff", background: "var(--gn)", padding: "9px 18px", borderRadius: 50, border: "none", cursor: "pointer", transition: "var(--tr)", textDecoration: "none", display: "inline-block" }}>Book Now</Link>
+                    <Link href={`/packages/${c.slug || c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '')}`} className="syne" style={{ fontSize: 12, fontWeight: 700, color: "#fff", background: "var(--gn)", padding: "9px 18px", borderRadius: 50, border: "none", cursor: "pointer", transition: "var(--tr)", textDecoration: "none", display: "inline-block" }}>View Package</Link>
                   </div>
                 </div>
               </div>

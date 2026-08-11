@@ -388,7 +388,7 @@ export default function Navbar() {
             textDecoration: "none",
           }}
         >
-          Book Now
+          Explore Packages
         </Link>
 
         {/* Hamburger button */}
@@ -544,7 +544,7 @@ export default function Navbar() {
             className="syne"
             style={{ width: "100%", padding: "12px", background: "var(--cu)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center", display: "block" }}
           >
-            Book Now
+            Explore Packages
           </Link>
         </div>
       </div>
