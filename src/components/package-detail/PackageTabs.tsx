@@ -395,6 +395,7 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
     activities: null,
     stay: null,
     transfers: null,
+    policies: null,
   });
   const [itinIdx, setItinIdx] = useState(0);
   const [lightboxOpen, setLightboxOpen] = useState(false);
@@ -419,12 +420,14 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
   const hasActivities = itinerary.some((day: any) => day.activities && day.activities.length > 0);
   const hasStays = stays.length > 0;
   const hasTransfers = transfers.length > 0 || !!pkg?.transferSummary;
+  const hasPolicies = (pkg?.paymentPolicy?.length > 0) || (pkg?.cancellationPolicy?.length > 0) || (pkg?.flightCancellationPolicy?.length > 0);
 
   const availableTabs = [
     ...(hasItinerary ? [{ id: "itinerary", label: "Itinerary" }] : []),
     ...(hasActivities ? [{ id: "activities", label: "Activities" }] : []),
     ...(hasStays ? [{ id: "stay", label: "Stay" }] : []),
     ...(hasTransfers ? [{ id: "transfers", label: "Transfers" }] : []),
+    ...(hasPolicies ? [{ id: "policies", label: "Policies" }] : []),
   ];
 
   // If the active tab is not in the available tabs, switch to the first available one
@@ -472,6 +475,27 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
           title: t.title,
           content: buildTransferContent(t),
         }));
+      case "policies":
+        return [
+          ...(pkg?.paymentPolicy?.length ? [{
+            badge: "Policy",
+            badgeType: "transfer",
+            title: "Payment Policy",
+            content: buildBulletList(pkg.paymentPolicy, "var(--cu)")
+          }] : []),
+          ...(pkg?.cancellationPolicy?.length ? [{
+            badge: "Policy",
+            badgeType: "transfer",
+            title: "Cancellation Policy",
+            content: buildBulletList(pkg.cancellationPolicy, "var(--cu)")
+          }] : []),
+          ...(pkg?.flightCancellationPolicy?.length ? [{
+            badge: "Policy",
+            badgeType: "transfer",
+            title: "Flight Cancellation Policy",
+            content: buildBulletList(pkg.flightCancellationPolicy, "var(--cu)")
+          }] : [])
+        ];
       default:
         return [];
     }
