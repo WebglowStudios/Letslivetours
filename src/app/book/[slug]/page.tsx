@@ -62,6 +62,10 @@ function BookingContent() {
   const [submitError, setSubmitError] = useState("");
   const [bookingId, setBookingId] = useState("");
   const [success, setSuccess] = useState(false);
+  const [couponInput, setCouponInput] = useState("");
+  const [appliedCoupon, setAppliedCoupon] = useState<{ code: string; type: string; value: number; discountAmount: number } | null>(null);
+  const [couponError, setCouponError] = useState("");
+  const [couponLoading, setCouponLoading] = useState(false);
 
   useEffect(() => {
     if (user) {
@@ -128,14 +132,46 @@ function BookingContent() {
 
   // how much the user will actually pay right now
   const chargeNow = useMemo(() => {
-    if (!paymentConfig || !pkg) return priceBreakdown.total;
-    if (paymentConfig.mode === "full" || chosenPayment === "full") return priceBreakdown.total;
+    let finalTotal = priceBreakdown.total;
+    if (appliedCoupon) {
+      finalTotal -= appliedCoupon.discountAmount;
+    }
+    
+    if (!paymentConfig || !pkg) return finalTotal;
+    if (paymentConfig.mode === "full" || chosenPayment === "full") return finalTotal;
     // partial deposit — scale deposit to actual total
     if (paymentConfig.depositType === "percent") {
-      return Math.round((paymentConfig.depositValue / 100) * priceBreakdown.total);
+      return Math.round((paymentConfig.depositValue / 100) * finalTotal);
     }
     return paymentConfig.depositValue;
-  }, [paymentConfig, chosenPayment, priceBreakdown.total, pkg]);
+  }, [paymentConfig, chosenPayment, priceBreakdown.total, pkg, appliedCoupon]);
+
+  const handleApplyCoupon = async () => {
+    if (!couponInput.trim()) return;
+    setCouponLoading(true);
+    setCouponError("");
+    try {
+      const res = await api.post("/coupons/validate", {
+        code: couponInput.trim(),
+        packageId: pkg?._id,
+        totalAmount: priceBreakdown.total,
+      });
+      if (res.status === "success") {
+        setAppliedCoupon(res.data);
+      }
+    } catch (err: any) {
+      setCouponError(err.response?.data?.message || "Invalid discount code");
+      setAppliedCoupon(null);
+    } finally {
+      setCouponLoading(false);
+    }
+  };
+
+  const removeCoupon = () => {
+    setAppliedCoupon(null);
+    setCouponInput("");
+    setCouponError("");
+  };
 
   const fmt = (n: number) =>
     new Intl.NumberFormat("en-IN", { style: "currency", currency: "INR", maximumFractionDigits: 0 }).format(n);
@@ -175,6 +211,7 @@ function BookingContent() {
         specialRequests,
         contactPhone: phone,
         contactEmail: email,
+        couponCode: appliedCoupon?.code,
       });
 
       if (bookingRes.status !== "success" || !bookingRes.data) {
@@ -428,8 +465,20 @@ function BookingContent() {
                 )}
                 <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 10, borderTop: "1px solid var(--line)" }}>
                   <span className="syne" style={{ fontSize: 11, fontWeight: 700, color: "var(--ink)" }}>Package Total</span>
-                  <span className="serif" style={{ fontSize: 20, fontWeight: 700, color: "var(--gn)" }}>{fmt(priceBreakdown.total)}</span>
+                  <span className="serif" style={{ fontSize: 20, fontWeight: 700, color: "var(--ink)", textDecoration: appliedCoupon ? "line-through" : "none", opacity: appliedCoupon ? 0.5 : 1 }}>{fmt(priceBreakdown.total)}</span>
                 </div>
+                {appliedCoupon && (
+                  <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 5 }}>
+                    <span className="syne" style={{ fontSize: 11, fontWeight: 700, color: "var(--gn2)" }}>Discount ({appliedCoupon.code})</span>
+                    <span className="serif" style={{ fontSize: 18, fontWeight: 700, color: "var(--gn2)" }}>-{fmt(appliedCoupon.discountAmount)}</span>
+                  </div>
+                )}
+                {appliedCoupon && (
+                  <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 10 }}>
+                    <span className="syne" style={{ fontSize: 13, fontWeight: 800, color: "var(--ink)" }}>Final Total</span>
+                    <span className="serif" style={{ fontSize: 22, fontWeight: 800, color: "var(--gn)" }}>{fmt(priceBreakdown.total - appliedCoupon.discountAmount)}</span>
+                  </div>
+                )}
                 {paymentConfig?.mode === "partial" && chosenPayment === "deposit" && (
                   <div style={{ marginTop: 10, padding: "10px 12px", background: "rgba(245,166,35,.08)", border: "1px solid rgba(245,166,35,.2)", borderRadius: 10, fontSize: 12, color: "var(--cu-d)" }}>
                     <div style={{ display: "flex", justifyContent: "space-between", marginBottom: 4 }}>
@@ -438,8 +487,44 @@ function BookingContent() {
                     </div>
                     <div style={{ display: "flex", justifyContent: "space-between", color: "var(--ink4)" }}>
                       <span>Balance due ({paymentConfig.balanceDueDays}d before travel)</span>
-                      <strong>{fmt(priceBreakdown.total - chargeNow)}</strong>
+                      <strong>{fmt((priceBreakdown.total - (appliedCoupon ? appliedCoupon.discountAmount : 0)) - chargeNow)}</strong>
                     </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Discount Code Input */}
+              <div style={{ marginBottom: 16 }}>
+                {!appliedCoupon ? (
+                  <div>
+                    <div style={{ display: "flex", gap: 8 }}>
+                      <input
+                        type="text"
+                        placeholder="Discount code"
+                        value={couponInput}
+                        onChange={(e) => setCouponInput(e.target.value.toUpperCase())}
+                        className="syne"
+                        style={{ flex: 1, padding: "10px 14px", border: "1px solid var(--line)", borderRadius: 8, fontSize: 13, outline: "none", textTransform: "uppercase" }}
+                      />
+                      <button
+                        type="button"
+                        onClick={handleApplyCoupon}
+                        disabled={couponLoading || !couponInput.trim()}
+                        className="syne"
+                        style={{ padding: "10px 16px", background: "var(--ink2)", color: "#fff", border: "none", borderRadius: 8, fontSize: 13, fontWeight: 700, cursor: (couponLoading || !couponInput.trim()) ? "not-allowed" : "pointer" }}
+                      >
+                        {couponLoading ? "…" : "Apply"}
+                      </button>
+                    </div>
+                    {couponError && <p style={{ color: "#e11d48", fontSize: 12, marginTop: 6 }}>{couponError}</p>}
+                  </div>
+                ) : (
+                  <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "rgba(41,196,216,.1)", border: "1px dashed var(--gn2)", padding: "10px 14px", borderRadius: 8 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6 }}>
+                      <span className="material-symbols-rounded" style={{ fontSize: 16, color: "var(--gn2)" }}>sell</span>
+                      <span className="syne" style={{ fontSize: 13, fontWeight: 700, color: "var(--gn2)" }}>{appliedCoupon.code} applied</span>
+                    </div>
+                    <button type="button" onClick={removeCoupon} style={{ background: "none", border: "none", color: "var(--ink4)", cursor: "pointer", fontSize: 12, textDecoration: "underline" }}>Remove</button>
                   </div>
                 )}
               </div>
