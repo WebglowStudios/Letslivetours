@@ -48,6 +48,7 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
   const price = pkg?.price || 0;
   const originalPrice = pkg?.originalPrice || 0;
   const discount = pkg?.discount || 0;
+  const discountType = pkg?.discountType || "percent";
   const duration = pkg?.duration;
   const hotelRating = pkg?.hotelRating || "";
   const rating = pkg?.rating || 0;
@@ -170,7 +171,7 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
               }}
             >
               <span className="material-symbols-rounded" style={{ fontSize: 14 }}>local_offer</span>
-              You save {formatPrice(savings)} ({discount}% off)
+              You save {formatPrice(savings)} {discountType === "percent" ? `(${discount}% off)` : ""}
             </div>
           )}
         </div>
