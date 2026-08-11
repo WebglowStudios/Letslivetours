@@ -14,6 +14,16 @@ const badgeStyles: Record<string, React.CSSProperties> = {
   transfer: { background: "var(--gn-gl)", color: "var(--gn)" },
 };
 
+/* ── HELPER: Dynamic Vehicle Icon ── */
+function getVehicleIcon(type?: string): string {
+  const t = (type || "").toLowerCase();
+  if (t.includes("flight") || t.includes("plane") || t.includes("air")) return "flight";
+  if (t.includes("train") || t.includes("rail")) return "train";
+  if (t.includes("boat") || t.includes("ferry") || t.includes("ship") || t.includes("cruise") || t.includes("speed boat") || t.includes("speed-boat")) return "directions_boat";
+  if (t.includes("bus") || t.includes("coach")) return "directions_bus";
+  return "directions_car"; // default
+}
+
 /* ── ACCORDION ITEM ── */
 function AccordionItem({
   item,
@@ -220,10 +230,12 @@ function buildLegRouteHtml(leg: { from?: string; to?: string; stops?: string[]; 
   if (leg.transferType || leg.vehicleType) {
     html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:10px;flex-wrap:wrap">`;
     if (leg.transferType) {
-      html += `<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;background:var(--gn-gl);color:var(--gn);padding:4px 12px;border-radius:6px"><span class="material-symbols-rounded" style="font-size:13px">directions_bus</span>${leg.transferType}</span>`;
+      const icon1 = getVehicleIcon(leg.transferType);
+      html += `<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:700;background:var(--gn-gl);color:var(--gn);padding:4px 12px;border-radius:6px"><span class="material-symbols-rounded" style="font-size:13px">${icon1}</span>${leg.transferType}</span>`;
     }
     if (leg.vehicleType) {
-      html += `<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;background:rgba(41,196,216,.08);color:var(--gn2);padding:4px 12px;border-radius:6px"><span class="material-symbols-rounded" style="font-size:13px">directions_car</span>${leg.vehicleType}</span>`;
+      const icon2 = getVehicleIcon(leg.vehicleType);
+      html += `<span style="display:inline-flex;align-items:center;gap:5px;font-size:11px;font-weight:600;background:rgba(41,196,216,.08);color:var(--gn2);padding:4px 12px;border-radius:6px"><span class="material-symbols-rounded" style="font-size:13px">${icon2}</span>${leg.vehicleType}</span>`;
     }
     html += `</div>`;
   }
@@ -302,7 +314,8 @@ function buildTransferContent(transfer: any): string {
     if (transfer.transferType || transfer.vehicleType) {
       html += `<div style="display:flex;align-items:center;gap:8px;margin-bottom:12px">`;
       if (transfer.transferType) {
-        html += `<span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--ink3)"><span class="material-symbols-rounded" style="font-size:16px;color:var(--gn3)">directions_bus</span>${transfer.transferType}</span>`;
+        const tIcon = getVehicleIcon(transfer.transferType);
+        html += `<span style="display:inline-flex;align-items:center;gap:5px;font-size:13px;color:var(--ink3)"><span class="material-symbols-rounded" style="font-size:16px;color:var(--gn3)">${tIcon}</span>${transfer.transferType}</span>`;
       }
       html += `</div>`;
       if (transfer.vehicleType) {
