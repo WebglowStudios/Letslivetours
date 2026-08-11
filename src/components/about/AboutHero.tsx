@@ -1,11 +1,11 @@
 "use client";
 
-export default function AboutHero() {
+export default function AboutHero({ data }: { data?: any }) {
   return (
     <section style={{ width: "100%", position: "relative", overflow: "hidden", minHeight: "75vh", display: "flex", alignItems: "center" }}>
       {/* Background */}
       <div style={{ position: "absolute", inset: 0, zIndex: 0 }}>
-        <img src="https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600&q=80" alt="About LetsLive Tours" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+        <img src={data?.bgImage || "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=1600&q=80"} alt="About LetsLive Tours" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
       </div>
       <div style={{ position: "absolute", inset: 0, zIndex: 1, background: "linear-gradient(135deg, rgba(0,77,94,.92) 0%, rgba(0,40,52,.88) 100%)" }} />
 
@@ -17,12 +17,10 @@ export default function AboutHero() {
             About LetsLive
           </div>
 
-          <h1 className="serif" style={{ fontSize: "clamp(38px, 5.5vw, 62px)", fontWeight: 700, lineHeight: 1.08, letterSpacing: -1, color: "#fff", marginBottom: 22 }}>
-            Every Trip, Planned As If<br /><em style={{ fontStyle: "italic", color: "var(--gd)" }}>We&apos;re the Travelers</em>.
-          </h1>
+          <h1 className="serif" style={{ fontSize: "clamp(38px, 5.5vw, 62px)", fontWeight: 700, lineHeight: 1.08, letterSpacing: -1, color: "#fff", marginBottom: 22 }} dangerouslySetInnerHTML={{ __html: data?.title || "Every Trip, Planned As If<br /><em style=\"font-style: italic; color: var(--gd)\">We&apos;re the Travelers</em>." }} />
 
           <p style={{ fontSize: 16, color: "rgba(249,246,240,.6)", lineHeight: 1.75, maxWidth: 560, marginBottom: 36 }}>
-            Founded in 2021, LetsLive simplifies holiday planning by combining personalized service, technology-driven convenience, and a deep understanding of what makes travel truly memorable.
+            {data?.subtitle || "Founded in 2021, LetsLive simplifies holiday planning by combining personalized service, technology-driven convenience, and a deep understanding of what makes travel truly memorable."}
           </p>
 
           <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>

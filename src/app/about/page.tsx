@@ -10,15 +10,26 @@ import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import ScrollReveal from "@/components/ScrollReveal";
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  let aboutContent = null;
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/about`, { cache: 'no-store' });
+    const data = await res.json();
+    if (data.status === 'success') {
+      aboutContent = data.data;
+    }
+  } catch (error) {
+    console.error("Failed to fetch about content:", error);
+  }
+
   return (
     <>
       <ProgressBar />
       <Navbar />
-      <AboutHero />
-      <Story />
+      <AboutHero data={aboutContent?.hero} />
+      <Story data={aboutContent?.story} vision={aboutContent?.vision} mission={aboutContent?.mission} />
       <Mission />
-      <Numbers />
+      <Numbers data={aboutContent?.stats} />
       <Services />
       <CtaBanner />
       <Footer />

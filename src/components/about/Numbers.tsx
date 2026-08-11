@@ -1,13 +1,13 @@
 "use client";
 
-const nums = [
-  { n: "23K", suf: "+", label: "Travel Experiences", desc: "Crafted with care" },
-  { n: "3L", suf: "+", label: "Travelers Served", desc: "Across the globe" },
-  { n: "40", suf: "+", label: "Countries Covered", desc: "And counting" },
-  { n: "200", suf: "+", label: "Travel Partners", desc: "Trusted network" },
-];
+export default function Numbers({ data }: { data?: any }) {
+  const nums = [
+    { n: data?.years || "3", suf: "+", label: "Years Active", desc: "Crafted with care" },
+    { n: data?.travelers || "1200", suf: "+", label: "Happy Travelers", desc: "Across the globe" },
+    { n: data?.destinations || "45", suf: "+", label: "Destinations", desc: "And counting" },
+    { n: data?.partners || "150", suf: "+", label: "Travel Partners", desc: "Trusted network" },
+  ];
 
-export default function Numbers() {
   return (
     <section style={{ padding: "80px 0", background: "var(--gn)" }}>
       <div className="container">

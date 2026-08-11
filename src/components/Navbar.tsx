@@ -60,6 +60,7 @@ export default function Navbar() {
   const links = [
     { label: "Destinations", href: "/destinations" },
     { label: "Articles", href: "/articles" },
+    { label: "Gallery", href: "/gallery" },
     { label: "About", href: "/about" },
     { label: "FAQs", href: "/faq" },
     { label: "Careers", href: "/careers" },
