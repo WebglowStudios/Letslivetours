@@ -178,8 +178,8 @@ export default function PackageDetailPage() {
             {pkg?.price ? "₹" + pkg.price.toLocaleString("en-IN") : "Get Price"}
           </div>
         </div>
-        <a
-          href={`/book/${slug}`}
+        <button
+          onClick={() => document.getElementById("enquiry-form")?.scrollIntoView({ behavior: "smooth" })}
           style={{
             fontSize: 14,
             fontWeight: 700,
@@ -187,13 +187,14 @@ export default function PackageDetailPage() {
             background: "#fff",
             padding: "12px 28px",
             borderRadius: 50,
-            textDecoration: "none",
+            border: "none",
+            cursor: "pointer",
             fontFamily: "var(--font-jakarta),'Plus Jakarta Sans',sans-serif",
             whiteSpace: "nowrap",
           }}
         >
-          Book Now
-        </a>
+          Send Enquiry
+        </button>
       </div>
 
       <style>{`

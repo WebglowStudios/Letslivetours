@@ -220,8 +220,8 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
       </div>
 
       {/* Book button */}
-      <Link
-        href={`/book/${slug}`}
+      <button
+        onClick={() => document.getElementById("enquiry-form")?.scrollIntoView({ behavior: "smooth" })}
         className="syne price-book-btn"
         style={{
           width: "100%",
@@ -241,8 +241,8 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
           display: "block",
         }}
       >
-        Book This Package
-      </Link>
+        Send Enquiry
+      </button>
 
       {/* Callback button */}
       <button
