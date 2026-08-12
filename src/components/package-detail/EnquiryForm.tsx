@@ -7,9 +7,11 @@ import PhoneInput from "@/components/ui/PhoneInput";
 interface EnquiryFormProps {
   packageName: string;
   packageId?: string;
+  isGroupTour?: boolean;
+  departures?: any[];
 }
 
-export default function EnquiryForm({ packageName, packageId }: EnquiryFormProps) {
+export default function EnquiryForm({ packageName, packageId, isGroupTour, departures = [] }: EnquiryFormProps) {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -19,6 +21,8 @@ export default function EnquiryForm({ packageName, packageId }: EnquiryFormProps
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [travelDate, setTravelDate] = useState("");
+  const [departureId, setDepartureId] = useState("");
+  const [travellerCount, setTravellerCount] = useState("1");
   const [message, setMessage] = useState("");
 
   const handleSubmit = async (e: FormEvent) => {
@@ -28,11 +32,13 @@ export default function EnquiryForm({ packageName, packageId }: EnquiryFormProps
 
     try {
       const res = await api.post("/enquiries", {
-        type: "booking",
+        type: isGroupTour ? "group-booking" : "booking",
         firstName: name,
         email,
         phone,
         travelDate: travelDate || undefined,
+        departureId: departureId || undefined,
+        travellerCount: isGroupTour ? Number(travellerCount) : undefined,
         message: message || undefined,
         packageName: packageName || undefined,
         package: packageId || undefined,
@@ -47,6 +53,8 @@ export default function EnquiryForm({ packageName, packageId }: EnquiryFormProps
           setEmail("");
           setPhone("");
           setTravelDate("");
+          setDepartureId("");
+          setTravellerCount("1");
           setMessage("");
         }, 3000);
       } else {
@@ -192,39 +200,131 @@ export default function EnquiryForm({ packageName, packageId }: EnquiryFormProps
           />
         </div>
 
-        <div style={{ marginBottom: 14 }}>
-          <label
-            className="syne"
-            style={{
-              fontSize: 12,
-              fontWeight: 700,
-              color: "var(--ink2)",
-              marginBottom: 6,
-              display: "block",
-              letterSpacing: 0.3,
-            }}
-          >
-            Travel Date
-          </label>
-          <input
-            className="form-input"
-            type="date"
-            value={travelDate}
-            onChange={(e) => setTravelDate(e.target.value)}
-            style={{
-              width: "100%",
-              fontFamily: "var(--font-inter), 'Inter', sans-serif",
-              fontSize: 13.5,
-              color: "var(--ink)",
-              background: "var(--iv)",
-              border: "1.5px solid var(--line2)",
-              borderRadius: 10,
-              padding: "10px 14px",
-              transition: "var(--tr)",
-              outline: "none",
-            }}
-          />
-        </div>
+        {isGroupTour ? (
+          <>
+            <div style={{ marginBottom: 14 }}>
+              <label
+                className="syne"
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: "var(--ink2)",
+                  marginBottom: 6,
+                  display: "block",
+                  letterSpacing: 0.3,
+                }}
+              >
+                Select Departure
+              </label>
+              <select
+                className="form-input"
+                required
+                value={departureId}
+                onChange={(e) => {
+                  setDepartureId(e.target.value);
+                  const dep = departures.find((d) => d._id === e.target.value);
+                  if (dep && dep.startDate) {
+                    setTravelDate(new Date(dep.startDate).toISOString().split("T")[0]);
+                  }
+                }}
+                style={{
+                  width: "100%",
+                  fontFamily: "var(--font-inter), 'Inter', sans-serif",
+                  fontSize: 13.5,
+                  color: "var(--ink)",
+                  background: "var(--iv)",
+                  border: "1.5px solid var(--line2)",
+                  borderRadius: 10,
+                  padding: "10px 14px",
+                  transition: "var(--tr)",
+                  outline: "none",
+                }}
+              >
+                <option value="">Select a date</option>
+                {departures.filter(d => d.startDate).map((dep) => {
+                  const sDate = new Date(dep.startDate).toLocaleDateString("en-IN", { month: "short", day: "numeric" });
+                  const eDate = dep.endDate ? new Date(dep.endDate).toLocaleDateString("en-IN", { month: "short", day: "numeric", year: "numeric" }) : "";
+                  const isSoldOut = dep.status === "sold-out" || (dep.totalSlots > 0 && (dep.bookedSlots || 0) >= dep.totalSlots);
+                  return (
+                    <option key={dep._id} value={dep._id} disabled={isSoldOut}>
+                      {sDate} {eDate ? `- ${eDate}` : ""} {isSoldOut ? "(Sold Out)" : ""}
+                    </option>
+                  );
+                })}
+              </select>
+            </div>
+            
+            <div style={{ marginBottom: 14 }}>
+              <label
+                className="syne"
+                style={{
+                  fontSize: 12,
+                  fontWeight: 700,
+                  color: "var(--ink2)",
+                  marginBottom: 6,
+                  display: "block",
+                  letterSpacing: 0.3,
+                }}
+              >
+                Number of Guests
+              </label>
+              <input
+                className="form-input"
+                type="number"
+                min="1"
+                required
+                value={travellerCount}
+                onChange={(e) => setTravellerCount(e.target.value)}
+                style={{
+                  width: "100%",
+                  fontFamily: "var(--font-inter), 'Inter', sans-serif",
+                  fontSize: 13.5,
+                  color: "var(--ink)",
+                  background: "var(--iv)",
+                  border: "1.5px solid var(--line2)",
+                  borderRadius: 10,
+                  padding: "10px 14px",
+                  transition: "var(--tr)",
+                  outline: "none",
+                }}
+              />
+            </div>
+          </>
+        ) : (
+          <div style={{ marginBottom: 14 }}>
+            <label
+              className="syne"
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: "var(--ink2)",
+                marginBottom: 6,
+                display: "block",
+                letterSpacing: 0.3,
+              }}
+            >
+              Travel Date
+            </label>
+            <input
+              className="form-input"
+              type="date"
+              value={travelDate}
+              onChange={(e) => setTravelDate(e.target.value)}
+              style={{
+                width: "100%",
+                fontFamily: "var(--font-inter), 'Inter', sans-serif",
+                fontSize: 13.5,
+                color: "var(--ink)",
+                background: "var(--iv)",
+                border: "1.5px solid var(--line2)",
+                borderRadius: 10,
+                padding: "10px 14px",
+                transition: "var(--tr)",
+                outline: "none",
+              }}
+            />
+          </div>
+        )}
 
         <div style={{ marginBottom: 14 }}>
           <label
