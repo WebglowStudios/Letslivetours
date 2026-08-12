@@ -383,6 +383,16 @@ export function generateBookingPdf(booking: BookingData): void {
   doc.setFontSize(9);
   doc.setTextColor(...C.amber);
   doc.text("PAYMENT: " + pStatus.toUpperCase(), W - M - 10, y + 16, { align: "right" });
+  
+  if (booking.paymentStatus === "pending" || booking.paymentStatus === "partial") {
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(...C.teal);
+    doc.textWithLink("Click here to pay balance online", W - M - 10, y + 22, { 
+      url: `https://letslivetours.in/dashboard/bookings/${booking._id}`,
+      align: "right"
+    });
+  }
 
   y += payBoxH + 10;
 
