@@ -1,29 +1,44 @@
 "use client";
 
-import { useState, FormEvent } from "react";
+import React, { useState, FormEvent, useEffect } from "react";
 import { api } from "@/lib/api";
 import PhoneInput from "@/components/ui/PhoneInput";
+import { useAuth } from "@/hooks/useAuth";
 
 interface EnquiryFormProps {
   packageName: string;
   packageId?: string;
   isGroupTour?: boolean;
   departures?: any[];
+  selectedDepartureId?: string;
+  onSuccess?: () => void;
 }
 
-export default function EnquiryForm({ packageName, packageId, isGroupTour, departures = [] }: EnquiryFormProps) {
+export default function EnquiryForm({ packageName, packageId, isGroupTour, departures = [], selectedDepartureId, onSuccess }: EnquiryFormProps) {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
 
   // Form state
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [phone, setPhone] = useState("");
+  const { user } = useAuth();
+  const [name, setName] = useState(user ? `${user.firstName || ""} ${user.lastName || ""}`.trim() : "");
+  const [email, setEmail] = useState(user?.email || "");
+  const [phone, setPhone] = useState(user?.phone || "");
   const [travelDate, setTravelDate] = useState("");
-  const [departureId, setDepartureId] = useState("");
+  const [departureId, setDepartureId] = useState(selectedDepartureId || "");
   const [travellerCount, setTravellerCount] = useState("1");
   const [message, setMessage] = useState("");
+
+  // Sync selectedDepartureId prop with local state and auto-fill travelDate
+  useEffect(() => {
+    if (selectedDepartureId) {
+      setDepartureId(selectedDepartureId);
+      const dep = departures.find((d) => d._id === selectedDepartureId);
+      if (dep && dep.startDate) {
+        setTravelDate(new Date(dep.startDate).toISOString().split("T")[0]);
+      }
+    }
+  }, [selectedDepartureId, departures]);
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -32,7 +47,7 @@ export default function EnquiryForm({ packageName, packageId, isGroupTour, depar
 
     try {
       const res = await api.post("/enquiries", {
-        type: isGroupTour ? "group-booking" : "booking",
+        type: isGroupTour ? "group-tour" : "booking",
         firstName: name,
         email,
         phone,
@@ -48,14 +63,18 @@ export default function EnquiryForm({ packageName, packageId, isGroupTour, depar
       if (res.status === "success") {
         setSubmitted(true);
         setTimeout(() => {
-          setSubmitted(false);
-          setName("");
-          setEmail("");
-          setPhone("");
-          setTravelDate("");
-          setDepartureId("");
-          setTravellerCount("1");
-          setMessage("");
+          if (onSuccess) {
+            onSuccess();
+          } else {
+            setSubmitted(false);
+            setName(user ? `${user.firstName || ""} ${user.lastName || ""}`.trim() : "");
+            setEmail(user?.email || "");
+            setPhone(user?.phone || "");
+            setTravelDate("");
+            setDepartureId("");
+            setTravellerCount("1");
+            setMessage("");
+          }
         }, 3000);
       } else {
         setError(res.message || "Something went wrong. Please try again.");
@@ -78,34 +97,42 @@ export default function EnquiryForm({ packageName, packageId, isGroupTour, depar
         boxShadow: "var(--sh)",
       }}
     >
-      <h3
-        className="serif"
-        style={{ fontSize: 19, fontWeight: 600, color: "var(--ink)", marginBottom: 4 }}
-      >
-        Send an Enquiry
-      </h3>
-      {packageName && (
-        <p
-          style={{
-            fontFamily: "var(--font-inter), 'Inter', sans-serif",
-            fontSize: 12,
-            color: "var(--ink4)",
-            marginBottom: 18,
-          }}
-        >
-          About: {packageName}
-        </p>
-      )}
-
-      {error && (
-        <div style={{ padding: "10px 14px", background: "rgba(229,57,53,.08)", border: "1px solid rgba(229,57,53,.2)", borderRadius: 8, marginBottom: 14, fontSize: 12.5, color: "#e53935", display: "flex", alignItems: "center", gap: 8 }}>
-          <span className="material-symbols-rounded" style={{ fontSize: 16 }}>error</span>
-          {error}
+      {submitted ? (
+        <div style={{ textAlign: "center", padding: "40px 10px" }}>
+          <span className="material-symbols-rounded" style={{ fontSize: 48, color: "var(--gn)", marginBottom: 16 }}>check_circle</span>
+          <h3 className="serif" style={{ fontSize: 24, fontWeight: 600, color: "var(--ink)", marginBottom: 8 }}>Form Sent</h3>
+          <p style={{ fontSize: 14, color: "var(--ink3)" }}>Thank you! We have received your enquiry and will get back to you shortly.</p>
         </div>
-      )}
+      ) : (
+        <>
+          <h3
+            className="serif"
+            style={{ fontSize: 19, fontWeight: 600, color: "var(--ink)", marginBottom: 4 }}
+          >
+            Send an Enquiry
+          </h3>
+          {packageName && (
+            <p
+              style={{
+                fontFamily: "var(--font-inter), 'Inter', sans-serif",
+                fontSize: 12,
+                color: "var(--ink4)",
+                marginBottom: 18,
+              }}
+            >
+              About: {packageName}
+            </p>
+          )}
 
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: 14 }}>
+          {error && (
+            <div style={{ padding: "10px 14px", background: "rgba(229,57,53,.08)", border: "1px solid rgba(229,57,53,.2)", borderRadius: 8, marginBottom: 14, fontSize: 12.5, color: "#e53935", display: "flex", alignItems: "center", gap: 8 }}>
+              <span className="material-symbols-rounded" style={{ fontSize: 16 }}>error</span>
+              {error}
+            </div>
+          )}
+
+          <form onSubmit={handleSubmit}>
+            <div style={{ marginBottom: 14 }}>
           <label
             className="syne"
             style={{
@@ -202,6 +229,7 @@ export default function EnquiryForm({ packageName, packageId, isGroupTour, depar
 
         {isGroupTour ? (
           <>
+            {!selectedDepartureId && (
             <div style={{ marginBottom: 14 }}>
               <label
                 className="syne"
@@ -253,6 +281,7 @@ export default function EnquiryForm({ packageName, packageId, isGroupTour, depar
                 })}
               </select>
             </div>
+            )}
             
             <div style={{ marginBottom: 14 }}>
               <label
@@ -386,12 +415,14 @@ export default function EnquiryForm({ packageName, packageId, isGroupTour, depar
             opacity: loading ? 0.7 : 1,
           }}
         >
-          <span className="material-symbols-rounded" style={{ fontSize: 18 }}>
-            {submitted ? "check_circle" : loading ? "hourglass_empty" : "send"}
-          </span>
-          {submitted ? "Enquiry Sent!" : loading ? "Sending..." : "Send Enquiry"}
-        </button>
-      </form>
+            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>
+              {loading ? "hourglass_empty" : "send"}
+            </span>
+            {loading ? "Sending..." : "Send Enquiry"}
+          </button>
+        </form>
+        </>
+      )}
 
       <style jsx>{`
         .form-input:focus {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useMemo } from "react";
-import { useParams, useRouter } from "next/navigation";
+import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
 import { openRazorpayCheckout } from "@/lib/razorpay";
@@ -39,6 +39,7 @@ interface TravellerEntry {
 function BookingContent() {
   const params = useParams();
   const router = useRouter();
+  const searchParams = useSearchParams();
   const { user } = useAuth();
   const slug = params.slug as string;
 
@@ -51,7 +52,7 @@ function BookingContent() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
-  const [travelDate, setTravelDate] = useState("");
+  const [travelDate, setTravelDate] = useState(searchParams?.get("travelDate") || "");
   const [specialRequests, setSpecialRequests] = useState("");
   const [travellers, setTravellers] = useState<TravellerEntry[]>([]);
 
@@ -181,7 +182,12 @@ function BookingContent() {
   const handleSubmit = async (e?: React.FormEvent) => {
     if (e) e.preventDefault();
     if (!pkg) return;
-    if (!user) { router.push(`/login?redirect=/book/${slug}`); return; }
+    if (!user) {
+      const currentQuery = searchParams?.toString();
+      const redirectUrl = `/book/${slug}${currentQuery ? `?${currentQuery}` : ""}`;
+      router.push(`/login?redirect=${encodeURIComponent(redirectUrl)}`);
+      return;
+    }
 
     // ── Client-side validation ──────────────────────────────────────────────
     if (!firstName.trim()) { setSubmitError("First name is required."); return; }
@@ -212,6 +218,8 @@ function BookingContent() {
         contactPhone: phone,
         contactEmail: email,
         couponCode: appliedCoupon?.code,
+        departureId: searchParams?.get("departureId") || undefined,
+        enquiryId: searchParams?.get("enquiryId") || undefined,
       });
 
       if (bookingRes.status !== "success" || !bookingRes.data) {
@@ -358,7 +366,13 @@ function BookingContent() {
                 <span className="material-symbols-rounded" style={{ fontSize: 18, color: "var(--gn2)" }}>calendar_today</span>Travel Date
               </h3>
               <input type="date" required min={tomorrow} value={travelDate} onChange={(e) => setTravelDate(e.target.value)}
-                style={{ width: "100%", padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, fontSize: 14, color: "var(--ink)", outline: "none" }} />
+                disabled={!!searchParams?.get("travelDate")}
+                style={{ width: "100%", padding: "13px 16px", background: searchParams?.get("travelDate") ? "var(--line)" : "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, fontSize: 14, color: searchParams?.get("travelDate") ? "var(--ink3)" : "var(--ink)", outline: "none", cursor: searchParams?.get("travelDate") ? "not-allowed" : "auto" }} />
+              {searchParams?.get("travelDate") && (
+                <p style={{ fontSize: 11, color: "var(--gn2)", marginTop: 8, fontWeight: 600 }}>
+                  ✓ Date locked in from your booking link.
+                </p>
+              )}
             </div>
 
             {/* Additional Travellers */}

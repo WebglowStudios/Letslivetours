@@ -17,6 +17,7 @@ import ThingsToCarry from "@/components/package-detail/ThingsToCarry";
 import PriceCard from "@/components/package-detail/PriceCard";
 import EnquiryForm from "@/components/package-detail/EnquiryForm";
 import Reviews from "@/components/package-detail/Reviews";
+import DepartureGrid from "@/components/package-detail/DepartureGrid";
 
 export default function PackageDetailPage() {
   const params = useParams();
@@ -26,6 +27,8 @@ export default function PackageDetailPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [pkg, setPkg] = useState<any>(null);
   const [notFound, setNotFound] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [selectedDeparture, setSelectedDeparture] = useState<string>("");
 
   useEffect(() => {
     if (!slug) return;
@@ -142,7 +145,7 @@ export default function PackageDetailPage() {
           className="content-grid"
           style={{
             display: "grid",
-            gridTemplateColumns: "1fr 380px",
+            gridTemplateColumns: pkg?.isGroupTour ? "1fr" : "1fr 380px",
             gap: 32,
             alignItems: "start",
           }}
@@ -150,6 +153,18 @@ export default function PackageDetailPage() {
           {/* Left Column */}
           <div>
             <PackageInfo pkg={pkg} />
+            
+            {pkg?.isGroupTour && (
+              <DepartureGrid
+                departures={pkg?.departures || []}
+                originalPrice={pkg?.originalPrice || pkg?.price}
+                onSelectSlot={(depId) => {
+                  setSelectedDeparture(depId);
+                  setShowModal(true);
+                }}
+              />
+            )}
+            
             <PackageTabs pkg={pkg} />
             <InclusionsExclusions inclusions={pkg?.inclusions || []} exclusions={pkg?.exclusions || []} />
             <KnowBeforeYouGo items={pkg?.knowBeforeYouGo || []} />
@@ -157,11 +172,82 @@ export default function PackageDetailPage() {
           </div>
 
           {/* Right Column (Sticky) */}
-          <div style={{ position: "sticky", top: 84 }}>
-            <PriceCard pkg={pkg} slug={slug} />
-            <EnquiryForm packageName={packageName} packageId={pkg?._id} isGroupTour={pkg?.isGroupTour} departures={pkg?.departures} />
-          </div>
+          {!pkg?.isGroupTour && (
+            <div style={{ position: "sticky", top: 84 }}>
+              <PriceCard pkg={pkg} slug={slug} />
+              <EnquiryForm packageName={packageName} packageId={pkg?._id} isGroupTour={pkg?.isGroupTour} departures={pkg?.departures} />
+            </div>
+          )}
         </div>
+
+        {/* Modal Overlay for Group Tour Enquiry */}
+        {pkg?.isGroupTour && showModal && (
+          <div
+            style={{
+              position: "fixed",
+              top: 0,
+              left: 0,
+              right: 0,
+              bottom: 0,
+              backgroundColor: "rgba(0, 0, 0, 0.5)",
+              zIndex: 9999,
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              padding: 24,
+              backdropFilter: "blur(4px)",
+            }}
+            onClick={() => setShowModal(false)}
+          >
+            <div
+              style={{
+                width: "100%",
+                maxWidth: 400,
+                position: "relative",
+                backgroundColor: "#fff",
+                borderRadius: "var(--r-xl)",
+                boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
+                maxHeight: "90vh",
+                overflowY: "auto",
+              }}
+              onClick={(e) => e.stopPropagation()}
+            >
+              <button
+                onClick={() => setShowModal(false)}
+                style={{
+                  position: "absolute",
+                  top: 16,
+                  right: 16,
+                  background: "rgba(0,0,0,0.05)",
+                  border: "none",
+                  borderRadius: "50%",
+                  width: 32,
+                  height: 32,
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  cursor: "pointer",
+                  zIndex: 10,
+                  transition: "background 0.2s",
+                }}
+                onMouseOver={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.1)"}
+                onMouseOut={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.05)"}
+              >
+                <span className="material-symbols-rounded" style={{ fontSize: 18, color: "var(--ink2)" }}>close</span>
+              </button>
+              <div style={{ padding: 4 }}>
+                <EnquiryForm
+                  packageName={packageName}
+                  packageId={pkg?._id}
+                  isGroupTour={pkg?.isGroupTour}
+                  departures={pkg?.departures}
+                  selectedDepartureId={selectedDeparture}
+                  onSuccess={() => setShowModal(false)}
+                />
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* Reviews */}
         <Reviews packageId={pkg?._id} />
@@ -179,7 +265,14 @@ export default function PackageDetailPage() {
           </div>
         </div>
         <button
-          onClick={() => document.getElementById("enquiry-form")?.scrollIntoView({ behavior: "smooth" })}
+          onClick={() => {
+            if (pkg?.isGroupTour) {
+              const grid = document.querySelector(".departure-grid-container");
+              if (grid) grid.scrollIntoView({ behavior: "smooth" });
+            } else {
+              document.getElementById("enquiry-form")?.scrollIntoView({ behavior: "smooth" });
+            }
+          }}
           style={{
             fontSize: 14,
             fontWeight: 700,
