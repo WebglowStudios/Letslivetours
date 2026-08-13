@@ -492,7 +492,7 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
           ...(pkg?.flightCancellationPolicy?.length ? [{
             badge: "Policy",
             badgeType: "transfer",
-            title: "Flight Cancellation Policy",
+            title: "Trains / Flight Cancellation Policy",
             content: buildBulletList(pkg.flightCancellationPolicy, "var(--cu)")
           }] : [])
         ];

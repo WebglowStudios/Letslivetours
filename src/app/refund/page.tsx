@@ -68,7 +68,7 @@ export default function RefundPage() {
                 <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--ink2)", marginBottom: 12, marginTop: 20 }}>5.1 Flight Booking Policy</h3>
                 <p>100% payment is required at the time of flight booking. The flight ticket will be issued within 1 to 6 hours of receiving payment.</p>
 
-                <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--ink2)", marginBottom: 12, marginTop: 20 }}>5.2 Flight Cancellation Policy</h3>
+                <h3 style={{ fontSize: 16, fontWeight: 600, color: "var(--ink2)", marginBottom: 12, marginTop: 20 }}>5.2 Trains / Flight Cancellation Policy</h3>
                 <ul>
                   <li>Any cancellations, delays, or changes to flight schedules are the responsibility of the airline.</li>
                   <li>Refunds for flight cancellations or rescheduling are subject to the airline&apos;s terms and conditions.</li>
