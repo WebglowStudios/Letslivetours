@@ -27,8 +27,6 @@ export default function PackageDetailPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [pkg, setPkg] = useState<any>(null);
   const [notFound, setNotFound] = useState(false);
-  const [showModal, setShowModal] = useState(false);
-  const [selectedDeparture, setSelectedDeparture] = useState<string>("");
 
   useEffect(() => {
     if (!slug) return;
@@ -159,8 +157,7 @@ export default function PackageDetailPage() {
                 departures={pkg?.departures || []}
                 originalPrice={pkg?.originalPrice || pkg?.price}
                 onSelectSlot={(depId) => {
-                  setSelectedDeparture(depId);
-                  setShowModal(true);
+                  window.location.href = `/book/${slug}?departureId=${depId}`;
                 }}
               />
             )}
@@ -179,75 +176,6 @@ export default function PackageDetailPage() {
             </div>
           )}
         </div>
-
-        {/* Modal Overlay for Group Tour Enquiry */}
-        {pkg?.isGroupTour && showModal && (
-          <div
-            style={{
-              position: "fixed",
-              top: 0,
-              left: 0,
-              right: 0,
-              bottom: 0,
-              backgroundColor: "rgba(0, 0, 0, 0.5)",
-              zIndex: 9999,
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              padding: 24,
-              backdropFilter: "blur(4px)",
-            }}
-            onClick={() => setShowModal(false)}
-          >
-            <div
-              style={{
-                width: "100%",
-                maxWidth: 400,
-                position: "relative",
-                backgroundColor: "#fff",
-                borderRadius: "var(--r-xl)",
-                boxShadow: "0 20px 40px rgba(0,0,0,0.15)",
-                maxHeight: "90vh",
-                overflowY: "auto",
-              }}
-              onClick={(e) => e.stopPropagation()}
-            >
-              <button
-                onClick={() => setShowModal(false)}
-                style={{
-                  position: "absolute",
-                  top: 16,
-                  right: 16,
-                  background: "rgba(0,0,0,0.05)",
-                  border: "none",
-                  borderRadius: "50%",
-                  width: 32,
-                  height: 32,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  cursor: "pointer",
-                  zIndex: 10,
-                  transition: "background 0.2s",
-                }}
-                onMouseOver={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.1)"}
-                onMouseOut={(e) => e.currentTarget.style.background = "rgba(0,0,0,0.05)"}
-              >
-                <span className="material-symbols-rounded" style={{ fontSize: 18, color: "var(--ink2)" }}>close</span>
-              </button>
-              <div style={{ padding: 4 }}>
-                <EnquiryForm
-                  packageName={packageName}
-                  packageId={pkg?._id}
-                  isGroupTour={pkg?.isGroupTour}
-                  departures={pkg?.departures}
-                  selectedDepartureId={selectedDeparture}
-                  onSuccess={() => setShowModal(false)}
-                />
-              </div>
-            </div>
-          </div>
-        )}
 
         {/* Reviews */}
         <Reviews packageId={pkg?._id} />

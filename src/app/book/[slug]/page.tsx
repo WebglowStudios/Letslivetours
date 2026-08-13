@@ -17,6 +17,15 @@ interface PackageData {
   price: number;
   images: string[];
   description?: string;
+  isGroupTour?: boolean;
+  departures?: {
+    _id: string;
+    startDate: string;
+    endDate?: string;
+    price: number;
+    totalSlots: number;
+    bookedSlots?: number;
+  }[];
 }
 
 interface PaymentConfig {
@@ -53,6 +62,8 @@ function BookingContent() {
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
   const [travelDate, setTravelDate] = useState(searchParams?.get("travelDate") || "");
+  const [departureId, setDepartureId] = useState(searchParams?.get("departureId") || "");
+  const [departurePrice, setDeparturePrice] = useState<number | null>(null);
   const [specialRequests, setSpecialRequests] = useState("");
   const [travellers, setTravellers] = useState<TravellerEntry[]>([]);
 
@@ -82,9 +93,19 @@ function BookingContent() {
       try {
         const res = await api.get(`/packages/${slug}`);
         if (res.status === "success" && res.data) {
-          setPkg(res.data);
+          const fetchedPkg = res.data;
+          setPkg(fetchedPkg);
+          
+          if (fetchedPkg.isGroupTour && departureId && fetchedPkg.departures) {
+            const dep = fetchedPkg.departures.find((d: any) => String(d._id) === departureId);
+            if (dep) {
+              setTravelDate(dep.startDate.split('T')[0]);
+              if (dep.price > 0) setDeparturePrice(dep.price);
+            }
+          }
+          
           // fetch payment config
-          const cfgRes = await api.get(`/payments/config/${res.data._id}`);
+          const cfgRes = await api.get(`/payments/config/${fetchedPkg._id}`);
           if (cfgRes.status === "success") {
             setPaymentConfig(cfgRes.data);
             // default to full unless partial is required
@@ -100,7 +121,7 @@ function BookingContent() {
       }
     }
     load();
-  }, [slug]);
+  }, [slug, departureId]);
 
   useEffect(() => {
     if (success) {
@@ -124,12 +145,17 @@ function BookingContent() {
   const adultsCount = 1 + travellers.filter((t) => t.type === "adult").length;
   const childrenCount = travellers.filter((t) => t.type === "child").length;
 
+  const basePrice = useMemo(() => {
+    if (!pkg) return 0;
+    return departurePrice !== null ? departurePrice : pkg.price;
+  }, [pkg, departurePrice]);
+
   const priceBreakdown = useMemo(() => {
     if (!pkg) return { adultTotal: 0, childTotal: 0, total: 0 };
-    const adultTotal = pkg.price * adultsCount;
-    const childTotal = pkg.price * 0.7 * childrenCount;
+    const adultTotal = basePrice * adultsCount;
+    const childTotal = basePrice * 0.7 * childrenCount;
     return { adultTotal, childTotal, total: adultTotal + childTotal };
-  }, [pkg, adultsCount, childrenCount]);
+  }, [pkg, adultsCount, childrenCount, basePrice]);
 
   // how much the user will actually pay right now
   const chargeNow = useMemo(() => {
@@ -366,11 +392,11 @@ function BookingContent() {
                 <span className="material-symbols-rounded" style={{ fontSize: 18, color: "var(--gn2)" }}>calendar_today</span>Travel Date
               </h3>
               <input type="date" required min={tomorrow} value={travelDate} onChange={(e) => setTravelDate(e.target.value)}
-                disabled={!!searchParams?.get("travelDate")}
-                style={{ width: "100%", padding: "13px 16px", background: searchParams?.get("travelDate") ? "var(--line)" : "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, fontSize: 14, color: searchParams?.get("travelDate") ? "var(--ink3)" : "var(--ink)", outline: "none", cursor: searchParams?.get("travelDate") ? "not-allowed" : "auto" }} />
-              {searchParams?.get("travelDate") && (
+                disabled={!!searchParams?.get("travelDate") || !!departureId}
+                style={{ width: "100%", padding: "13px 16px", background: (searchParams?.get("travelDate") || departureId) ? "var(--line)" : "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, fontSize: 14, color: (searchParams?.get("travelDate") || departureId) ? "var(--ink3)" : "var(--ink)", outline: "none", cursor: (searchParams?.get("travelDate") || departureId) ? "not-allowed" : "auto" }} />
+              {(searchParams?.get("travelDate") || departureId) && (
                 <p style={{ fontSize: 11, color: "var(--gn2)", marginTop: 8, fontWeight: 600 }}>
-                  ✓ Date locked in from your booking link.
+                  ✓ Date locked in for your selected tour departure.
                 </p>
               )}
             </div>
@@ -468,12 +494,12 @@ function BookingContent() {
               <div style={{ borderTop: "1px solid var(--line)", paddingTop: 14, marginBottom: 14 }}>
                 <div className="syne" style={{ fontSize: 9, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--ink4)", marginBottom: 10 }}>Price Breakdown</div>
                 <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--ink3)", marginBottom: 5 }}>
-                  <span>Adults ({adultsCount} × {fmt(pkg.price)})</span>
+                  <span>Adults ({adultsCount} × {fmt(basePrice)})</span>
                   <span style={{ fontWeight: 600, color: "var(--ink)" }}>{fmt(priceBreakdown.adultTotal)}</span>
                 </div>
                 {childrenCount > 0 && (
                   <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--ink3)", marginBottom: 5 }}>
-                    <span>Children ({childrenCount} × {fmt(pkg.price * 0.7)})</span>
+                    <span>Children ({childrenCount} × {fmt(basePrice * 0.7)})</span>
                     <span style={{ fontWeight: 600, color: "var(--ink)" }}>{fmt(priceBreakdown.childTotal)}</span>
                   </div>
                 )}

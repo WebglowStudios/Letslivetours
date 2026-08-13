@@ -11,6 +11,7 @@ import InclusionsExclusions from "@/components/package-detail/InclusionsExclusio
 import KnowBeforeYouGo from "@/components/package-detail/KnowBeforeYouGo";
 import ThingsToCarry from "@/components/package-detail/ThingsToCarry";
 import EnquiryForm from "@/components/package-detail/EnquiryForm";
+import DepartureGrid from "@/components/package-detail/DepartureGrid";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
@@ -70,36 +71,50 @@ export default function CustomItineraryPage() {
           activityImages={pkg.activityImages || []}
         />
 
-        <div className="content-grid" style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 32, alignItems: "start" }}>
+        <div className="content-grid" style={{ display: "grid", gridTemplateColumns: pkg?.isGroupTour ? "1fr" : "1fr 380px", gap: 32, alignItems: "start" }}>
           <div>
             <PackageInfo pkg={pkg} />
+
+            {pkg?.isGroupTour && (
+              <DepartureGrid
+                departures={pkg?.departures || []}
+                originalPrice={pkg?.originalPrice || pkg?.price}
+                onSelectSlot={(depId) => {
+                  window.location.href = `/book/${id}?departureId=${depId}`;
+                }}
+              />
+            )}
+
             <PackageTabs pkg={pkg} />
             <InclusionsExclusions inclusions={pkg.inclusions || []} exclusions={pkg.exclusions || []} />
             <KnowBeforeYouGo items={pkg.knowBeforeYouGo || []} />
             <ThingsToCarry items={pkg.thingsToCarry || []} />
           </div>
-          <div style={{ position: "sticky", top: 84 }}>
-            {/* Simplified price card for custom itinerary */}
-            <div style={{ background: "#fff", borderRadius: "var(--r-xl)", border: "1.5px solid var(--line)", padding: 24, boxShadow: "var(--sh)" }}>
-              <div className="syne" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--ink4)", marginBottom: 4 }}>
-                {pkg.duration?.nights}N / {pkg.duration?.days}D • {pkg.hotelRating || ""}
+          
+          {!pkg?.isGroupTour && (
+            <div style={{ position: "sticky", top: 84 }}>
+              {/* Simplified price card for custom itinerary */}
+              <div style={{ background: "#fff", borderRadius: "var(--r-xl)", border: "1.5px solid var(--line)", padding: 24, boxShadow: "var(--sh)" }}>
+                <div className="syne" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--ink4)", marginBottom: 4 }}>
+                  {pkg.duration?.nights}N / {pkg.duration?.days}D • {pkg.hotelRating || ""}
+                </div>
+                <div className="serif" style={{ fontSize: 28, fontWeight: 700, color: "var(--gn)", marginBottom: 4 }}>
+                  ₹{(pkg.price || 0).toLocaleString("en-IN")}
+                </div>
+                <div style={{ fontSize: 12, color: "var(--ink3)", marginBottom: 20 }}>per person (estimated)</div>
+                <a href={`/book/${id}`} className="syne" style={{ display: "block", width: "100%", textAlign: "center", padding: 14, background: "var(--cu)", color: "#fff", borderRadius: 50, fontSize: 14, fontWeight: 700, textDecoration: "none" }}>
+                  Confirm This Itinerary
+                </a>
+                <p style={{ fontSize: 11, color: "var(--ink4)", textAlign: "center", marginTop: 12 }}>
+                  Clicking confirm will start the booking process for this custom itinerary.
+                </p>
               </div>
-              <div className="serif" style={{ fontSize: 28, fontWeight: 700, color: "var(--gn)", marginBottom: 4 }}>
-                ₹{(pkg.price || 0).toLocaleString("en-IN")}
+              {/* Enquiry form for questions/modifications */}
+              <div style={{ marginTop: 20 }}>
+                <EnquiryForm packageName={pkg.name} packageId={pkg._id} isGroupTour={pkg?.isGroupTour} departures={pkg?.departures} />
               </div>
-              <div style={{ fontSize: 12, color: "var(--ink3)", marginBottom: 20 }}>per person (estimated)</div>
-              <a href={`/book/${id}`} className="syne" style={{ display: "block", width: "100%", textAlign: "center", padding: 14, background: "var(--cu)", color: "#fff", borderRadius: 50, fontSize: 14, fontWeight: 700, textDecoration: "none" }}>
-                Confirm This Itinerary
-              </a>
-              <p style={{ fontSize: 11, color: "var(--ink4)", textAlign: "center", marginTop: 12 }}>
-                Clicking confirm will start the booking process for this custom itinerary.
-              </p>
             </div>
-            {/* Enquiry form for questions/modifications */}
-            <div style={{ marginTop: 20 }}>
-              <EnquiryForm packageName={pkg.name} packageId={pkg._id} />
-            </div>
-          </div>
+          )}
         </div>
       </div>
       <Footer />
