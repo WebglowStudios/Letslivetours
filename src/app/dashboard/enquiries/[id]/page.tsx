@@ -74,21 +74,25 @@ export default function EnquiryDetailsPage() {
     }
   }
 
-  const getStatusStyle = (status: string) => {
+  // Map internal admin statuses → customer-friendly labels & colours
+  const getStatusMeta = (status: string) => {
     switch (status) {
       case "new":
-        return { background: "rgba(0,174,204,.12)", color: "var(--gn2)", text: "Received" };
+        return { background: "rgba(0,174,204,.12)", color: "var(--gn2)", label: "Request Received", icon: "mark_email_read" };
       case "assigned":
+        return { background: "rgba(245,166,35,.12)", color: "var(--cu-d)", label: "Expert Assigned", icon: "support_agent" };
       case "in-progress":
+        return { background: "rgba(245,166,35,.12)", color: "var(--cu-d)", label: "Being Processed", icon: "pending_actions" };
       case "follow-up":
-        return { background: "rgba(245,166,35,.12)", color: "var(--cu-d)", text: "In Progress" };
+        return { background: "rgba(245,166,35,.12)", color: "var(--cu-d)", label: "Follow-up Scheduled", icon: "event" };
       case "converted":
+        return { background: "rgba(74,194,138,.12)", color: "#388e3c", label: "Booking Confirmed", icon: "verified" };
       case "resolved":
-        return { background: "rgba(74,194,138,.12)", color: "#388e3c", text: "Converted / Completed" };
+        return { background: "rgba(74,194,138,.12)", color: "#388e3c", label: "Completed", icon: "task_alt" };
       case "closed":
-        return { background: "rgba(220,53,69,.1)", color: "#dc3545", text: "Closed" };
+        return { background: "rgba(220,53,69,.1)", color: "#dc3545", label: "Closed", icon: "cancel" };
       default:
-        return { background: "var(--gn-gl)", color: "var(--ink3)", text: status };
+        return { background: "var(--gn-gl)", color: "var(--ink3)", label: "In Review", icon: "hourglass_empty" };
     }
   };
 
@@ -104,7 +108,7 @@ export default function EnquiryDetailsPage() {
 
   if (!enquiry) return null;
 
-  const statusStyle = getStatusStyle(enquiry.status);
+  const statusMeta = getStatusMeta(enquiry.status);
 
   return (
     <div>
@@ -144,10 +148,15 @@ export default function EnquiryDetailsPage() {
               fontWeight: 700,
               letterSpacing: 1,
               textTransform: "uppercase",
-              ...statusStyle,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              background: statusMeta.background,
+              color: statusMeta.color,
             }}
           >
-            {statusStyle.text}
+            <span className="material-symbols-rounded" style={{ fontSize: 16 }}>{statusMeta.icon}</span>
+            {statusMeta.label}
           </span>
         </div>
       </div>
@@ -188,6 +197,52 @@ export default function EnquiryDetailsPage() {
                 </div>
               </div>
             )}
+
+            {enquiry.bookingRef && (
+              <div style={{ marginTop: 24, paddingTop: 24, borderTop: "1px solid var(--line)" }}>
+                <h3 className="syne" style={{ fontSize: 16, fontWeight: 700, color: "var(--ink)", marginBottom: 16 }}>Booking Information</h3>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", background: "var(--iv)", padding: 16, borderRadius: "var(--r)", border: "1px solid var(--line)" }}>
+                  <div>
+                    <p style={{ fontSize: 13, color: "var(--ink3)", marginBottom: 4 }}>Booking Reference</p>
+                    <p style={{ fontSize: 15, fontWeight: 600, color: "var(--ink)" }}>{enquiry.bookingRef.bookingId || "Pending"}</p>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: 13, color: "var(--ink3)", marginBottom: 4 }}>Payment Status</p>
+                    <span className="syne" style={{
+                      padding: "4px 10px",
+                      borderRadius: 20,
+                      fontSize: 11,
+                      fontWeight: 700,
+                      letterSpacing: 1,
+                      textTransform: "uppercase",
+                      background: enquiry.bookingRef.paymentFinanceStatus === 'approved' ? "rgba(74,194,138,.12)" : "rgba(245,166,35,.12)",
+                      color: enquiry.bookingRef.paymentFinanceStatus === 'approved' ? "#388e3c" : "var(--cu-d)",
+                    }}>
+                      {enquiry.bookingRef.paymentFinanceStatus === 'approved' ? "Payment Received" : (enquiry.bookingRef.paymentFinanceStatus || "Pending")}
+                    </span>
+                  </div>
+                  <div>
+                    <p style={{ fontSize: 13, color: "var(--ink3)", marginBottom: 4 }}>Amount</p>
+                    <p style={{ fontSize: 15, fontWeight: 600, color: "var(--ink)" }}>{formatCurrency(enquiry.bookingRef.totalAmount || 0)}</p>
+                  </div>
+                  <Link
+                    href={`/dashboard/bookings/${enquiry.bookingRef._id}`}
+                    style={{
+                      padding: "8px 16px",
+                      background: "var(--gn)",
+                      color: "#fff",
+                      borderRadius: "var(--r)",
+                      fontSize: 13,
+                      fontWeight: 600,
+                      textDecoration: "none",
+                      display: "inline-block"
+                    }}
+                  >
+                    View Booking
+                  </Link>
+                </div>
+              </div>
+            )}
           </div>
         </div>
 
@@ -209,7 +264,13 @@ export default function EnquiryDetailsPage() {
                   )}
                   <div>
                     <p style={{ fontSize: 15, fontWeight: 600, color: "var(--ink)" }}>{enquiry.assignedTo.firstName} {enquiry.assignedTo.lastName}</p>
-                    <p style={{ fontSize: 13, color: "var(--ink3)" }}>Currently reviewing your request</p>
+                    <p style={{ fontSize: 13, color: "var(--ink3)", marginBottom: 4 }}>Currently reviewing your request</p>
+                    {enquiry.assignedTo.phone && (
+                      <p style={{ fontSize: 13, color: "var(--ink2)", display: "flex", alignItems: "center", gap: 4 }}>
+                        <span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--gn2)" }}>call</span>
+                        {enquiry.assignedTo.phone}
+                      </p>
+                    )}
                   </div>
                 </div>
                 {enquiry.assignedTo.description && (

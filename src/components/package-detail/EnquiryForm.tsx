@@ -46,9 +46,14 @@ export default function EnquiryForm({ packageName, packageId, isGroupTour, depar
     setLoading(true);
 
     try {
+      const nameParts = name.trim().split(/\s+/);
+      const firstName = nameParts[0] || name.trim();
+      const lastName = nameParts.slice(1).join(' ') || undefined;
+
       const res = await api.post("/enquiries", {
         type: isGroupTour ? "group-tour" : "booking",
-        firstName: name,
+        firstName,
+        lastName,
         email,
         phone,
         travelDate: travelDate || undefined,

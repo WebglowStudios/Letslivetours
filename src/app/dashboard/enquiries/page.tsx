@@ -62,21 +62,25 @@ export default function MyEnquiriesPage() {
     { key: "closed", label: "Closed" },
   ];
 
-  const getStatusStyle = (status: string) => {
+  // Map internal admin statuses → customer-friendly labels & colours
+  const getStatusMeta = (status: string) => {
     switch (status) {
       case "new":
-        return { background: "rgba(0,174,204,.12)", color: "var(--gn2)" };
+        return { background: "rgba(0,174,204,.12)", color: "var(--gn2)", label: "Request Received", icon: "mark_email_read" };
       case "assigned":
+        return { background: "rgba(245,166,35,.12)", color: "var(--cu-d)", label: "Expert Assigned", icon: "support_agent" };
       case "in-progress":
+        return { background: "rgba(245,166,35,.12)", color: "var(--cu-d)", label: "Being Processed", icon: "pending_actions" };
       case "follow-up":
-        return { background: "rgba(245,166,35,.12)", color: "var(--cu-d)" };
+        return { background: "rgba(245,166,35,.12)", color: "var(--cu-d)", label: "Follow-up Scheduled", icon: "event" };
       case "converted":
+        return { background: "rgba(74,194,138,.12)", color: "#388e3c", label: "Booking Confirmed", icon: "verified" };
       case "resolved":
-        return { background: "rgba(74,194,138,.12)", color: "#388e3c" };
+        return { background: "rgba(74,194,138,.12)", color: "#388e3c", label: "Completed", icon: "task_alt" };
       case "closed":
-        return { background: "rgba(220,53,69,.1)", color: "#dc3545" };
+        return { background: "rgba(220,53,69,.1)", color: "#dc3545", label: "Closed", icon: "cancel" };
       default:
-        return { background: "var(--gn-gl)", color: "var(--ink3)" };
+        return { background: "var(--gn-gl)", color: "var(--ink3)", label: "In Review", icon: "hourglass_empty" };
     }
   };
 
@@ -166,7 +170,7 @@ export default function MyEnquiriesPage() {
       ) : (
         <div style={{ display: "grid", gap: 16 }}>
           {filteredEnquiries.map((enquiry) => {
-            const statusStyle = getStatusStyle(enquiry.status);
+            const statusMeta = getStatusMeta(enquiry.status);
             
             return (
               <div
@@ -195,10 +199,15 @@ export default function MyEnquiriesPage() {
                           fontWeight: 700,
                           letterSpacing: 1,
                           textTransform: "uppercase",
-                          ...statusStyle,
+                          display: "inline-flex",
+                          alignItems: "center",
+                          gap: 5,
+                          background: statusMeta.background,
+                          color: statusMeta.color,
                         }}
                       >
-                        {enquiry.status.replace("-", " ")}
+                        <span className="material-symbols-rounded" style={{ fontSize: 14 }}>{statusMeta.icon}</span>
+                        {statusMeta.label}
                       </span>
                       <span style={{ fontSize: 13, color: "var(--ink3)" }}>
                         {formatDate(enquiry.createdAt)}
@@ -248,7 +257,9 @@ export default function MyEnquiriesPage() {
                     </p>
                     <p style={{ fontSize: 14, color: "var(--ink2)", display: "flex", alignItems: "center", gap: 6 }}>
                       <span className="material-symbols-rounded" style={{ fontSize: 16, color: "var(--gn2)" }}>support_agent</span>
-                      {enquiry.assignedTo ? `${enquiry.assignedTo.firstName} ${enquiry.assignedTo.lastName}` : "Pending Assignment"}
+                      {enquiry.assignedTo
+                        ? `${enquiry.assignedTo.firstName} ${enquiry.assignedTo.lastName}`
+                        : "An expert from our team will be assigned shortly"}
                     </p>
                   </div>
                 </div>

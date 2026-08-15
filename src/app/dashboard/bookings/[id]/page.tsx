@@ -24,6 +24,13 @@ interface BookingDetail {
   travellers: number | { adults?: number; children?: number; infants?: number };
   paymentStatus?: string;
   createdAt: string;
+  enquiry?: {
+    assignedTo?: {
+      firstName: string;
+      lastName: string;
+      phone?: string;
+    };
+  };
 }
 
 export default function BookingDetailPage() {
@@ -251,6 +258,16 @@ export default function BookingDetailPage() {
           </div>
         </div>
       </div>
+
+      {booking.enquiry?.assignedTo?.phone && (
+        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24, padding: "12px 16px", background: "var(--iv)", borderRadius: "var(--r)", border: "1px solid var(--line)" }}>
+          <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--gn2)" }}>support_agent</span>
+          <div>
+            <p style={{ fontSize: 13, color: "var(--ink3)", marginBottom: 2 }}>Your Travel Expert ({booking.enquiry.assignedTo.firstName} {booking.enquiry.assignedTo.lastName})</p>
+            <p className="syne" style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>{booking.enquiry.assignedTo.phone}</p>
+          </div>
+        </div>
+      )}
 
       {/* Details Grid */}
       <div className="detail-grid">
