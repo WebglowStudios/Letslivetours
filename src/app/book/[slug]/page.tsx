@@ -12,6 +12,10 @@ interface PackageData {
   _id: string;
   name: string;
   slug: string;
+  priceUnit?: string;
+  extraPersonPrice?: number;
+  adultCount?: number;
+  childCount?: number;
   destination?: { name: string };
   duration: { nights: number; days: number } | string;
   price: number;
@@ -151,10 +155,20 @@ function BookingContent() {
   }, [pkg, departurePrice]);
 
   const priceBreakdown = useMemo(() => {
-    if (!pkg) return { adultTotal: 0, childTotal: 0, total: 0 };
+    if (!pkg) return { adultTotal: 0, childTotal: 0, extraPaxTotal: 0, extraPaxCount: 0, includedPax: 0, total: 0 };
+    if (pkg.priceUnit === "group") {
+      const includedPax = (pkg.adultCount || 0) + (pkg.childCount || 0) || 1;
+      const totalPax = adultsCount + childrenCount;
+      if (totalPax > includedPax && pkg.extraPersonPrice) {
+        const extraPaxCount = totalPax - includedPax;
+        const extraPaxTotal = extraPaxCount * pkg.extraPersonPrice;
+        return { adultTotal: basePrice, childTotal: 0, extraPaxTotal, extraPaxCount, includedPax, total: basePrice + extraPaxTotal };
+      }
+      return { adultTotal: basePrice, childTotal: 0, extraPaxTotal: 0, extraPaxCount: 0, includedPax, total: basePrice };
+    }
     const adultTotal = basePrice * adultsCount;
-    const childTotal = basePrice * 0.7 * childrenCount;
-    return { adultTotal, childTotal, total: adultTotal + childTotal };
+    const childTotal = basePrice * childrenCount;
+    return { adultTotal, childTotal, extraPaxTotal: 0, extraPaxCount: 0, includedPax: 0, total: adultTotal + childTotal };
   }, [pkg, adultsCount, childrenCount, basePrice]);
 
   // how much the user will actually pay right now
@@ -493,15 +507,32 @@ function BookingContent() {
 
               <div style={{ borderTop: "1px solid var(--line)", paddingTop: 14, marginBottom: 14 }}>
                 <div className="syne" style={{ fontSize: 9, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--ink4)", marginBottom: 10 }}>Price Breakdown</div>
-                <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--ink3)", marginBottom: 5 }}>
-                  <span>Adults ({adultsCount} × {fmt(basePrice)})</span>
-                  <span style={{ fontWeight: 600, color: "var(--ink)" }}>{fmt(priceBreakdown.adultTotal)}</span>
-                </div>
-                {childrenCount > 0 && (
-                  <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--ink3)", marginBottom: 5 }}>
-                    <span>Children ({childrenCount} × {fmt(basePrice * 0.7)})</span>
-                    <span style={{ fontWeight: 600, color: "var(--ink)" }}>{fmt(priceBreakdown.childTotal)}</span>
-                  </div>
+                {pkg.priceUnit === "group" ? (
+                  <>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--ink3)", marginBottom: 5 }}>
+                      <span>Group Total (up to {priceBreakdown.includedPax || 1} pax)</span>
+                      <span style={{ fontWeight: 600, color: "var(--ink)" }}>{fmt(basePrice)}</span>
+                    </div>
+                    {priceBreakdown.extraPaxCount > 0 && (
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--ink3)", marginBottom: 5 }}>
+                        <span>Extra Persons ({priceBreakdown.extraPaxCount} × {fmt(pkg.extraPersonPrice || 0)})</span>
+                        <span style={{ fontWeight: 600, color: "var(--ink)" }}>{fmt(priceBreakdown.extraPaxTotal)}</span>
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--ink3)", marginBottom: 5 }}>
+                      <span>Adults ({adultsCount} × {fmt(basePrice)})</span>
+                      <span style={{ fontWeight: 600, color: "var(--ink)" }}>{fmt(priceBreakdown.adultTotal)}</span>
+                    </div>
+                    {childrenCount > 0 && (
+                      <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--ink3)", marginBottom: 5 }}>
+                        <span>Children ({childrenCount} × {fmt(basePrice)})</span>
+                        <span style={{ fontWeight: 600, color: "var(--ink)" }}>{fmt(priceBreakdown.childTotal)}</span>
+                      </div>
+                    )}
+                  </>
                 )}
                 <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 10, borderTop: "1px solid var(--line)" }}>
                   <span className="syne" style={{ fontSize: 11, fontWeight: 700, color: "var(--ink)" }}>Package Total</span>
