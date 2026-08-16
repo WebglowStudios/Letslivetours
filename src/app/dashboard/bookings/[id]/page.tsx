@@ -14,6 +14,8 @@ interface BookingDetail {
   package: {
     _id: string;
     name: string;
+    slug?: string;
+    isCustom?: boolean;
     destination?: { name: string };
     duration?: number | { nights?: number; days?: number };
     images?: string[];
@@ -221,6 +223,55 @@ export default function BookingDetailPage() {
             </p>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            {booking.package && (
+              <>
+                <Link
+                  href={booking.package.isCustom ? `/itinerary/${booking.package._id}` : `/tours/${booking.package.slug}`}
+                  className="syne"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    padding: "8px 16px",
+                    background: "#fff",
+                    color: "var(--ink2)",
+                    border: "1px solid var(--line2)",
+                    borderRadius: 20,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    transition: "var(--tr)",
+                    textDecoration: "none"
+                  }}
+                >
+                  <span className="material-symbols-rounded" style={{ fontSize: 16 }}>visibility</span>
+                  View Package
+                </Link>
+                <button
+                  onClick={() => {
+                    import("@/lib/generatePackagePdf").then((m) => m.generatePackagePdf(booking.package as any));
+                  }}
+                  className="syne"
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    padding: "8px 16px",
+                    background: "#fff",
+                    color: "var(--ink2)",
+                    border: "1px solid var(--line2)",
+                    borderRadius: 20,
+                    fontSize: 12,
+                    fontWeight: 600,
+                    cursor: "pointer",
+                    transition: "var(--tr)",
+                  }}
+                >
+                  <span className="material-symbols-rounded" style={{ fontSize: 16 }}>file_download</span>
+                  Package PDF
+                </button>
+              </>
+            )}
             <button
               onClick={() => generateBookingPdf(booking as Parameters<typeof generateBookingPdf>[0])}
               className="syne"
@@ -240,7 +291,7 @@ export default function BookingDetailPage() {
               }}
             >
               <span className="material-symbols-rounded" style={{ fontSize: 16 }}>download</span>
-              Download PDF
+              Booking PDF
             </button>
             <span
               className="syne"
