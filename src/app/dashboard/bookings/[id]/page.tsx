@@ -314,6 +314,18 @@ export default function BookingDetailPage() {
         </div>
       </div>
 
+      {booking.status === "cancelled" && (
+        <div style={{ padding: "16px 20px", background: "rgba(220,53,69,.05)", borderRadius: "var(--r)", border: "1px solid rgba(220,53,69,.2)", marginBottom: 24 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+            <span className="material-symbols-rounded" style={{ color: "#dc3545", fontSize: 24 }}>info</span>
+            <h4 className="syne" style={{ color: "#dc3545", margin: 0, fontWeight: 700, fontSize: 15 }}>Cancellation Initiated</h4>
+          </div>
+          <p style={{ margin: 0, color: "var(--ink2)", fontSize: 14, lineHeight: 1.5, paddingLeft: 36 }}>
+            We are processing the cancellation at our end... For any inquiries, contact us at <strong>info@letslivetours.com</strong> and <strong>+91 77700 88466</strong>.
+          </p>
+        </div>
+      )}
+
       {booking.enquiry?.assignedTo?.phone && (
         <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 24, padding: "12px 16px", background: "var(--iv)", borderRadius: "var(--r)", border: "1px solid var(--line)" }}>
           <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--gn2)" }}>support_agent</span>
@@ -593,7 +605,7 @@ export default function BookingDetailPage() {
                   Cancellation Initiated
                 </h3>
                 <p style={{ fontSize: 14, color: "var(--ink3)", marginTop: 12, lineHeight: 1.6 }}>
-                  We are processing the cancellation at our end... For any inquiries, contact us at info@letslivetours.com and +91 9876543210.
+                  We are processing the cancellation at our end... For any inquiries, contact us at info@letslivetours.com and +91 77700 88466.
                 </p>
                 <div style={{ display: "flex", gap: 12, marginTop: 28, justifyContent: "center" }}>
                   <button
