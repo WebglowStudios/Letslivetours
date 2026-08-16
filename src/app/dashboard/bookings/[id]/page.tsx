@@ -22,6 +22,7 @@ interface BookingDetail {
   };
   travelDate: string;
   status: string;
+  cancellationReason?: string;
   totalAmount: number;
   travellers: number | { adults?: number; children?: number; infants?: number };
   paymentStatus?: string;
@@ -43,6 +44,8 @@ export default function BookingDetailPage() {
   const [loading, setLoading] = useState(true);
   const [showCancelModal, setShowCancelModal] = useState(false);
   const [cancelling, setCancelling] = useState(false);
+  const [cancellationReason, setCancellationReason] = useState("");
+  const [cancelSuccess, setCancelSuccess] = useState(false);
   const [payingBalance, setPayingBalance] = useState(false);
 
   useEffect(() => {
@@ -61,12 +64,13 @@ export default function BookingDetailPage() {
   }, [params.id]);
 
   const handleCancel = async () => {
+    if (!cancellationReason.trim()) return;
     setCancelling(true);
     try {
-      const res = await api.put(`/bookings/${params.id}/cancel`);
+      const res = await api.put(`/bookings/${params.id}/cancel`, { cancellationReason });
       if (res?.status === "success") {
-        setBooking((prev) => (prev ? { ...prev, status: "cancelled" } : null));
-        setShowCancelModal(false);
+        setBooking((prev) => (prev ? { ...prev, status: "cancelled", cancellationReason } : null));
+        setCancelSuccess(true);
       }
     } catch (err) {
       console.error("Failed to cancel booking:", err);
@@ -304,7 +308,7 @@ export default function BookingDetailPage() {
                 textTransform: "capitalize",
               }}
             >
-              {booking.status}
+              {booking.status === "cancelled" && booking.cancellationReason ? "Cancellation Processing" : booking.status}
             </span>
           </div>
         </div>
@@ -517,51 +521,100 @@ export default function BookingDetailPage() {
             }}
             onClick={(e) => e.stopPropagation()}
           >
-            <span className="material-symbols-rounded" style={{ fontSize: 48, color: "#dc3545" }}>
-              warning
-            </span>
-            <h3 className="serif" style={{ fontSize: 20, fontWeight: 700, marginTop: 16, color: "var(--ink)" }}>
-              Cancel Booking?
-            </h3>
-            <p style={{ fontSize: 14, color: "var(--ink3)", marginTop: 12, lineHeight: 1.6 }}>
-              Are you sure you want to cancel this booking? This action cannot be undone.
-            </p>
-            <div style={{ display: "flex", gap: 12, marginTop: 28, justifyContent: "center" }}>
-              <button
-                onClick={() => setShowCancelModal(false)}
-                className="syne"
-                style={{
-                  padding: "12px 24px",
-                  background: "var(--iv)",
-                  color: "var(--ink2)",
-                  border: "1px solid var(--line2)",
-                  borderRadius: "var(--r)",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  cursor: "pointer",
-                }}
-              >
-                Keep Booking
-              </button>
-              <button
-                onClick={handleCancel}
-                disabled={cancelling}
-                className="syne"
-                style={{
-                  padding: "12px 24px",
-                  background: "#dc3545",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "var(--r)",
-                  fontSize: 14,
-                  fontWeight: 600,
-                  cursor: cancelling ? "not-allowed" : "pointer",
-                  opacity: cancelling ? 0.7 : 1,
-                }}
-              >
-                {cancelling ? "Cancelling..." : "Yes, Cancel"}
-              </button>
-            </div>
+            {!cancelSuccess ? (
+              <>
+                <span className="material-symbols-rounded" style={{ fontSize: 48, color: "#dc3545" }}>
+                  warning
+                </span>
+                <h3 className="serif" style={{ fontSize: 20, fontWeight: 700, marginTop: 16, color: "var(--ink)" }}>
+                  Cancel Booking?
+                </h3>
+                <p style={{ fontSize: 14, color: "var(--ink3)", marginTop: 12, lineHeight: 1.6 }}>
+                  Are you sure you want to cancel this booking? This action cannot be undone. Please provide a reason for cancellation below.
+                </p>
+                <textarea
+                  value={cancellationReason}
+                  onChange={(e) => setCancellationReason(e.target.value)}
+                  placeholder="Reason for cancellation..."
+                  style={{
+                    width: "100%",
+                    marginTop: 16,
+                    padding: 12,
+                    borderRadius: "var(--r)",
+                    border: "1px solid var(--line2)",
+                    fontSize: 14,
+                    minHeight: 80,
+                    resize: "vertical",
+                  }}
+                />
+                <div style={{ display: "flex", gap: 12, marginTop: 28, justifyContent: "center" }}>
+                  <button
+                    onClick={() => setShowCancelModal(false)}
+                    className="syne"
+                    style={{
+                      padding: "12px 24px",
+                      background: "var(--iv)",
+                      color: "var(--ink2)",
+                      border: "1px solid var(--line2)",
+                      borderRadius: "var(--r)",
+                      fontSize: 14,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Keep Booking
+                  </button>
+                  <button
+                    onClick={handleCancel}
+                    disabled={cancelling || !cancellationReason.trim()}
+                    className="syne"
+                    style={{
+                      padding: "12px 24px",
+                      background: "#dc3545",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "var(--r)",
+                      fontSize: 14,
+                      fontWeight: 600,
+                      cursor: cancelling || !cancellationReason.trim() ? "not-allowed" : "pointer",
+                      opacity: cancelling || !cancellationReason.trim() ? 0.7 : 1,
+                    }}
+                  >
+                    {cancelling ? "Cancelling..." : "Yes, Cancel"}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <span className="material-symbols-rounded" style={{ fontSize: 48, color: "var(--cu)" }}>
+                  hourglass_top
+                </span>
+                <h3 className="serif" style={{ fontSize: 20, fontWeight: 700, marginTop: 16, color: "var(--ink)" }}>
+                  Cancellation Initiated
+                </h3>
+                <p style={{ fontSize: 14, color: "var(--ink3)", marginTop: 12, lineHeight: 1.6 }}>
+                  We are processing the cancellation at our end... For any inquiries, contact us at info@letslivetours.com and +91 9876543210.
+                </p>
+                <div style={{ display: "flex", gap: 12, marginTop: 28, justifyContent: "center" }}>
+                  <button
+                    onClick={() => setShowCancelModal(false)}
+                    className="syne"
+                    style={{
+                      padding: "12px 32px",
+                      background: "var(--gn)",
+                      color: "#fff",
+                      border: "none",
+                      borderRadius: "var(--r)",
+                      fontSize: 14,
+                      fontWeight: 600,
+                      cursor: "pointer",
+                    }}
+                  >
+                    Okay
+                  </button>
+                </div>
+              </>
+            )}
           </div>
         </div>
       )}
