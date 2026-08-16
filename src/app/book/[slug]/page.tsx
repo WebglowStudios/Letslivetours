@@ -22,6 +22,7 @@ interface PackageData {
   images: string[];
   description?: string;
   isGroupTour?: boolean;
+  travelDates?: { startDate: string; endDate?: string };
   departures?: {
     _id: string;
     startDate: string;
@@ -106,6 +107,8 @@ function BookingContent() {
               setTravelDate(dep.startDate.split('T')[0]);
               if (dep.price > 0) setDeparturePrice(dep.price);
             }
+          } else if (fetchedPkg.travelDates?.startDate) {
+            setTravelDate(fetchedPkg.travelDates.startDate.split('T')[0]);
           }
           
           // fetch payment config
@@ -405,14 +408,21 @@ function BookingContent() {
               <h3 className="syne" style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: "var(--ink3)", marginBottom: 18, display: "flex", alignItems: "center", gap: 8 }}>
                 <span className="material-symbols-rounded" style={{ fontSize: 18, color: "var(--gn2)" }}>calendar_today</span>Travel Date
               </h3>
-              <input type="date" required min={tomorrow} value={travelDate} onChange={(e) => setTravelDate(e.target.value)}
-                disabled={!!searchParams?.get("travelDate") || !!departureId}
-                style={{ width: "100%", padding: "13px 16px", background: (searchParams?.get("travelDate") || departureId) ? "var(--line)" : "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, fontSize: 14, color: (searchParams?.get("travelDate") || departureId) ? "var(--ink3)" : "var(--ink)", outline: "none", cursor: (searchParams?.get("travelDate") || departureId) ? "not-allowed" : "auto" }} />
-              {(searchParams?.get("travelDate") || departureId) && (
-                <p style={{ fontSize: 11, color: "var(--gn2)", marginTop: 8, fontWeight: 600 }}>
-                  ✓ Date locked in for your selected tour departure.
-                </p>
-              )}
+              {(() => {
+                const isDateLocked = !!searchParams?.get("travelDate") || !!departureId || !!pkg?.travelDates?.startDate;
+                return (
+                  <>
+                    <input type="date" required min={tomorrow} value={travelDate} onChange={(e) => setTravelDate(e.target.value)}
+                      disabled={isDateLocked}
+                      style={{ width: "100%", padding: "13px 16px", background: isDateLocked ? "var(--line)" : "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, fontSize: 14, color: isDateLocked ? "var(--ink3)" : "var(--ink)", outline: "none", cursor: isDateLocked ? "not-allowed" : "auto" }} />
+                    {isDateLocked && (
+                      <p style={{ fontSize: 11, color: "var(--gn2)", marginTop: 8, fontWeight: 600 }}>
+                        ✓ Date locked in for your selected itinerary.
+                      </p>
+                    )}
+                  </>
+                );
+              })()}
             </div>
 
             {/* Additional Travellers */}
