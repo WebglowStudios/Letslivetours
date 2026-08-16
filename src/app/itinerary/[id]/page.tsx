@@ -101,7 +101,7 @@ export default function CustomItineraryPage() {
                 <div className="serif" style={{ fontSize: 28, fontWeight: 700, color: "var(--gn)", marginBottom: 4 }}>
                   ₹{(pkg.price || 0).toLocaleString("en-IN")}
                 </div>
-                <div style={{ fontSize: 12, color: "var(--ink3)", marginBottom: 20 }}>per person (estimated)</div>
+                <div style={{ fontSize: 12, color: "var(--ink3)", marginBottom: 20 }}>per {pkg.priceUnit || 'person'} (estimated)</div>
                 <a href={`/book/${id}`} className="syne" style={{ display: "block", width: "100%", textAlign: "center", padding: 14, background: "var(--cu)", color: "#fff", borderRadius: 50, fontSize: 14, fontWeight: 700, textDecoration: "none" }}>
                   Confirm This Itinerary
                 </a>
