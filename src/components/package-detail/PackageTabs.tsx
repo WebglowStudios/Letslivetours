@@ -178,29 +178,32 @@ function sectionLabel(icon: string, text: string): string {
 }
 
 /* ── Helper: build HTML content for a flight ── */
-function buildFlightContent(flight: any): string {
-  let html = "";
-  html += `<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">`;
-  html += `<span class="material-symbols-rounded" style="font-size:24px;color:#4338ca">flight_takeoff</span>`;
-  html += `<div>`;
-  html += `<p style="font-size:15px;font-weight:700;color:var(--ink)">${flight.airline} <span style="color:var(--ink3);font-weight:500">${flight.flightNumber}</span></p>`;
-  if (flight.class) html += `<p style="font-size:12px;color:var(--ink4)">Class: ${flight.class}</p>`;
-  html += `</div></div>`;
+function buildFlightContent(flight: any, hideHeader: boolean = false): string {
+  let html = `<div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:16px">`;
   
-  html += `<div style="display:flex;align-items:center;justify-content:space-between;background:#f8fafc;padding:12px;border-radius:8px;margin-bottom:12px">`;
+  if (!hideHeader) {
+    html += `<span class="material-symbols-rounded" style="font-size:24px;color:#4338ca">flight_takeoff</span>`;
+    html += `<div style="flex:1">`;
+    html += `<p style="font-size:15px;font-weight:700;color:var(--ink)">${flight.airline} <span style="color:var(--ink3);font-weight:500">${flight.flightNumber}</span></p>`;
+  } else {
+    html += `<div style="flex:1">`;
+  }
+  
+  if (flight.class) html += `<p style="font-size:12px;color:var(--ink4)">Class: ${flight.class}</p>`;
+
+  html += `<div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;background:var(--iv);border-radius:10px;padding:12px;border:1px solid var(--line)">`;
   html += `<div><p style="font-size:11px;color:var(--ink4);text-transform:uppercase;letter-spacing:1px;font-weight:600">Departure</p><p style="font-size:14px;font-weight:700;color:var(--ink)">${flight.departure}</p><p style="font-size:12px;color:var(--ink3)">${flight.from}</p></div>`;
-  html += `<span class="material-symbols-rounded" style="color:var(--line2)">arrow_forward</span>`;
+  
   html += `<div style="text-align:right"><p style="font-size:11px;color:var(--ink4);text-transform:uppercase;letter-spacing:1px;font-weight:600">Arrival</p><p style="font-size:14px;font-weight:700;color:var(--ink)">${flight.arrival}</p><p style="font-size:12px;color:var(--ink3)">${flight.to}</p></div>`;
   html += `</div>`;
-  
+
   if (flight.pnr) {
-    html += `<div style="display:inline-flex;align-items:center;gap:6px;background:var(--cu-gl);color:var(--cu-d);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600;margin-bottom:12px">PNR: ${flight.pnr}</div>`;
+    html += `<div style="display:inline-flex;align-items:center;gap:6px;background:var(--cu-gl);color:var(--cu-d);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600;margin-top:12px;margin-bottom:0">PNR: ${flight.pnr}</div>`;
   }
-  
   if (flight.notes) {
-    html += `<p style="font-size:13px;color:var(--ink2);margin-top:4px">${flight.notes}</p>`;
+    html += `<p style="font-size:13px;color:var(--ink2);margin-top:8px">${flight.notes}</p>`;
   }
-  
+  html += `</div></div>`;
   return html;
 }
 
@@ -516,7 +519,7 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
           badge: f.day ? `Day ${f.day}` : `Flight ${i + 1}`,
           badgeType: "flight",
           title: `${f.airline} ${f.flightNumber} (${f.from} → ${f.to})`,
-          content: buildFlightContent(f),
+          content: buildFlightContent(f, true),
         }));
       case "stay":
         return stays.map((s: any, i: number) => ({
@@ -526,27 +529,12 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
           content: buildStayContent(s),
         }));
       case "transfers": {
-        const flightItems = flights.map((f: any, i: number) => ({
-          badge: f.day ? `Day ${f.day}` : `Flight ${i + 1}`,
-          badgeType: "flight",
-          title: `Flight: ${f.from} → ${f.to}`,
-          content: buildFlightContent(f),
-        }));
-        const transferItems = transfers.map((t: any, i: number) => ({
+        return transfers.map((t: any, i: number) => ({
           badge: t.day ? `Day ${t.day}` : `Transfer ${i + 1}`,
           badgeType: "transfer",
           title: t.title,
           content: buildTransferContent(t),
         }));
-        
-        const combined = [...flightItems, ...transferItems];
-        // Sort chronologically by day if the badge starts with "Day "
-        combined.sort((a: any, b: any) => {
-          const dayA = a.badge.startsWith("Day") ? parseInt(a.badge.replace(/\\D/g, '')) || 0 : 999;
-          const dayB = b.badge.startsWith("Day") ? parseInt(b.badge.replace(/\\D/g, '')) || 0 : 999;
-          return dayA - dayB;
-        });
-        return combined;
       }
       case "policies":
         return [
