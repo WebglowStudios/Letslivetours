@@ -86,86 +86,250 @@ export default function PayInstallmentPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      <main className="flex-grow flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-        <div className="max-w-md w-full bg-white rounded-2xl shadow-xl overflow-hidden">
-          <div className="bg-[#00AECC] py-6 px-8 text-center text-white">
-            <h2 className="text-2xl font-bold font-heading">Secure Payment</h2>
-            <p className="text-sm opacity-90 mt-1">Letslive Tours</p>
-          </div>
+    <>
+      <style dangerouslySetInnerHTML={{__html: `
+        .installment-page {
+          min-height: 100vh;
+          background-color: #f0fafa;
+          display: flex;
+          flex-direction: column;
+          font-family: 'Inter', sans-serif;
+        }
+        .installment-main {
+          flex-grow: 1;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          padding: 3rem 1rem;
+        }
+        .installment-card {
+          width: 100%;
+          max-width: 480px;
+          background-color: #fff;
+          border-radius: 20px;
+          box-shadow: 0 10px 40px rgba(0, 77, 94, 0.1);
+          overflow: hidden;
+        }
+        .installment-header {
+          background-color: #00AECC;
+          padding: 1.5rem 2rem;
+          text-align: center;
+          color: white;
+        }
+        .installment-header h2 {
+          font-size: 1.5rem;
+          font-weight: 700;
+          margin: 0 0 0.25rem 0;
+        }
+        .installment-header p {
+          font-size: 0.875rem;
+          opacity: 0.9;
+          margin: 0;
+        }
+        .installment-body {
+          padding: 2rem;
+        }
+        .installment-info-group {
+          margin-bottom: 1.5rem;
+        }
+        .installment-label {
+          font-size: 0.75rem;
+          color: #6b7280;
+          text-transform: uppercase;
+          letter-spacing: 0.05em;
+          font-weight: 600;
+          margin-bottom: 0.25rem;
+          display: block;
+        }
+        .installment-value {
+          font-size: 1.125rem;
+          color: #111827;
+          font-weight: 500;
+          margin: 0;
+        }
+        .installment-box {
+          background-color: #f9fafb;
+          border: 1px solid #f3f4f6;
+          border-radius: 12px;
+          padding: 1.25rem;
+          margin-bottom: 1.5rem;
+        }
+        .installment-row {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          margin-bottom: 0.75rem;
+        }
+        .installment-row:last-child {
+          margin-bottom: 0;
+        }
+        .installment-row.total {
+          padding-top: 0.75rem;
+          border-top: 1px solid #e5e7eb;
+        }
+        .installment-row.due {
+          padding-top: 0.75rem;
+        }
+        .installment-row-label {
+          color: #4b5563;
+          font-size: 0.95rem;
+        }
+        .installment-row-val {
+          font-weight: 600;
+          color: #111827;
+          font-size: 0.95rem;
+        }
+        .installment-due-label {
+          font-size: 1.125rem;
+          font-weight: 700;
+          color: #111827;
+        }
+        .installment-due-val {
+          font-size: 1.5rem;
+          font-weight: 700;
+          color: #00AECC;
+        }
+        .installment-billed {
+          font-size: 0.875rem;
+          color: #6b7280;
+          margin-bottom: 1.5rem;
+          line-height: 1.5;
+        }
+        .installment-billed span {
+          font-weight: 500;
+          color: #111827;
+        }
+        .installment-btn {
+          width: 100%;
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          gap: 0.5rem;
+          padding: 0.875rem 1rem;
+          background-color: #00AECC;
+          color: white;
+          border: none;
+          border-radius: 12px;
+          font-size: 1.125rem;
+          font-weight: 600;
+          cursor: pointer;
+          transition: background-color 0.2s;
+        }
+        .installment-btn:hover {
+          background-color: #0099b3;
+        }
+        .installment-btn:disabled {
+          opacity: 0.7;
+          cursor: not-allowed;
+        }
+        .installment-footer {
+          text-align: center;
+          font-size: 0.75rem;
+          color: #9ca3af;
+          margin-top: 1rem;
+        }
+        .installment-status {
+          text-align: center;
+          padding: 2rem 0;
+        }
+        .status-icon {
+          width: 64px;
+          height: 64px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          margin: 0 auto 1rem auto;
+          font-size: 2rem;
+          font-weight: bold;
+        }
+        .status-icon.loading { color: #00AECC; }
+        .status-icon.error { background: #fee2e2; color: #ef4444; }
+        .status-icon.success { background: #dcfce7; color: #22c55e; }
+        .status-title {
+          font-size: 1.25rem;
+          font-weight: 600;
+          color: #111827;
+          margin: 0 0 0.5rem 0;
+        }
+        .status-desc {
+          color: #6b7280;
+          margin: 0;
+        }
+      `}} />
+      <div className="installment-page">
+        <main className="installment-main">
+          <div className="installment-card">
+            <div className="installment-header">
+              <h2>Secure Payment</h2>
+              <p>Letslive Tours</p>
+            </div>
 
-          <div className="p-8">
-            {loading ? (
-              <div className="flex flex-col items-center justify-center py-8">
-                <span className="text-2xl mb-4 font-bold text-[#00AECC]">...</span>
-                <p className="text-gray-500">Loading payment details...</p>
-              </div>
-            ) : error ? (
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-red-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-red-500 text-2xl">!</span>
+            <div className="installment-body">
+              {loading ? (
+                <div className="installment-status">
+                  <div className="status-icon loading">...</div>
+                  <p className="status-desc">Loading payment details...</p>
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">Error</h3>
-                <p className="text-gray-500">{error}</p>
-              </div>
-            ) : success ? (
-              <div className="text-center py-8">
-                <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-green-500 text-2xl">✓</span>
+              ) : error ? (
+                <div className="installment-status">
+                  <div className="status-icon error">!</div>
+                  <h3 className="status-title">Error</h3>
+                  <p className="status-desc">{error}</p>
                 </div>
-                <h3 className="text-xl font-semibold text-gray-900 mb-2">Payment Complete!</h3>
-                <p className="text-gray-500">
-                  This installment has been fully paid. Thank you!
-                </p>
-              </div>
-            ) : details ? (
-              <div className="space-y-6">
+              ) : success ? (
+                <div className="installment-status">
+                  <div className="status-icon success">✓</div>
+                  <h3 className="status-title">Payment Complete!</h3>
+                  <p className="status-desc">
+                    This installment has been fully paid. Thank you!
+                  </p>
+                </div>
+              ) : details ? (
                 <div>
-                  <label className="text-sm text-gray-500 uppercase tracking-wider font-semibold">For Package</label>
-                  <p className="text-gray-900 font-medium text-lg mt-1">{details.packageName}</p>
-                </div>
+                  <div className="installment-info-group">
+                    <span className="installment-label">For Package</span>
+                    <h3 className="installment-value">{details.packageName}</h3>
+                  </div>
 
-                <div className="bg-gray-50 p-4 rounded-xl border border-gray-100">
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-gray-600">Milestone</span>
-                    <span className="font-semibold text-gray-900">{details.milestone || 'Installment'}</span>
+                  <div className="installment-box">
+                    <div className="installment-row">
+                      <span className="installment-row-label">Milestone</span>
+                      <span className="installment-row-val">{details.milestone || 'Installment'}</span>
+                    </div>
+                    <div className="installment-row total">
+                      <span className="installment-row-label">Total Amount</span>
+                      <span className="installment-row-val">₹{details.totalAmount.toLocaleString('en-IN')}</span>
+                    </div>
+                    <div className="installment-row due">
+                      <span className="installment-due-label">Amount Due</span>
+                      <span className="installment-due-val">₹{details.amountDue.toLocaleString('en-IN')}</span>
+                    </div>
                   </div>
-                  <div className="flex justify-between items-center mb-2 pt-2 border-t border-gray-200">
-                    <span className="text-gray-600">Total Amount</span>
-                    <span className="font-medium">₹{details.totalAmount.toLocaleString('en-IN')}</span>
-                  </div>
-                  <div className="flex justify-between items-center pt-2">
-                    <span className="text-gray-900 font-bold text-lg">Amount Due</span>
-                    <span className="font-bold text-xl text-[#00AECC]">₹{details.amountDue.toLocaleString('en-IN')}</span>
-                  </div>
-                </div>
 
-                {details.customerName && (
-                  <div className="text-sm text-gray-500">
-                    <p>Billed to: <span className="font-medium text-gray-900">{details.customerName}</span></p>
-                    {details.customerEmail && <p>{details.customerEmail}</p>}
-                  </div>
-                )}
-
-                <button
-                  onClick={handlePay}
-                  disabled={paying}
-                  className="w-full flex justify-center items-center gap-2 py-3 px-4 border border-transparent rounded-xl shadow-sm text-white bg-[#00AECC] hover:bg-[#008ba3] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#00AECC] transition-colors disabled:opacity-70 disabled:cursor-not-allowed font-medium text-lg"
-                >
-                  {paying ? (
-                    <>Processing...</>
-                  ) : (
-                    <>Pay ₹{details.amountDue.toLocaleString('en-IN')}</>
+                  {details.customerName && (
+                    <div className="installment-billed">
+                      Billed to: <span>{details.customerName}</span><br/>
+                      {details.customerEmail && <>{details.customerEmail}</>}
+                    </div>
                   )}
-                </button>
-                <p className="text-xs text-center text-gray-400">
-                  Secured by Razorpay
-                </p>
-              </div>
-            ) : null}
+
+                  <button
+                    onClick={handlePay}
+                    disabled={paying}
+                    className="installment-btn"
+                  >
+                    {paying ? "Processing..." : `Pay ₹${details.amountDue.toLocaleString('en-IN')}`}
+                  </button>
+                  <div className="installment-footer">
+                    Secured by Razorpay
+                  </div>
+                </div>
+              ) : null}
+            </div>
           </div>
-        </div>
-      </main>
-    </div>
+        </main>
+      </div>
+    </>
   );
 }
