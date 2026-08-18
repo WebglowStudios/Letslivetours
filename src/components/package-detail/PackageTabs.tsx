@@ -98,8 +98,14 @@ function AccordionItem({
               fontWeight: 600,
               color: isOpen ? "var(--gn)" : "var(--ink)",
               lineHeight: 1.4,
+              display: "flex",
+              alignItems: "center",
+              gap: 6
             }}
           >
+            {item.badgeType === 'flight' && (
+              <span className="material-symbols-rounded" style={{ fontSize: 18, color: "var(--gn3)" }}>flight_takeoff</span>
+            )}
             {item.title}
           </span>
         </div>
@@ -532,7 +538,15 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
           title: t.title,
           content: buildTransferContent(t),
         }));
-        return [...flightItems, ...transferItems];
+        
+        const combined = [...flightItems, ...transferItems];
+        // Sort chronologically by day if the badge starts with "Day "
+        combined.sort((a: any, b: any) => {
+          const dayA = a.badge.startsWith("Day") ? parseInt(a.badge.replace(/\\D/g, '')) || 0 : 999;
+          const dayB = b.badge.startsWith("Day") ? parseInt(b.badge.replace(/\\D/g, '')) || 0 : 999;
+          return dayA - dayB;
+        });
+        return combined;
       }
       case "policies":
         return [
