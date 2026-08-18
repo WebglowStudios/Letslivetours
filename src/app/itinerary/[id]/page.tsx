@@ -21,6 +21,16 @@ export default function CustomItineraryPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [pkg, setPkg] = useState<any>(null);
   const [loading, setLoading] = useState(true);
+  const [isBooked, setIsBooked] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("booked") === "true") {
+        setIsBooked(true);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (!id) return;
@@ -102,12 +112,20 @@ export default function CustomItineraryPage() {
                   ₹{(pkg.price || 0).toLocaleString("en-IN")}
                 </div>
                 <div style={{ fontSize: 12, color: "var(--ink3)", marginBottom: 20 }}>per {pkg.priceUnit || 'person'} (estimated)</div>
-                <a href={`/book/${id}`} className="syne" style={{ display: "block", width: "100%", textAlign: "center", padding: 14, background: "var(--cu)", color: "#fff", borderRadius: 50, fontSize: 14, fontWeight: 700, textDecoration: "none" }}>
-                  Confirm This Itinerary
-                </a>
-                <p style={{ fontSize: 11, color: "var(--ink4)", textAlign: "center", marginTop: 12 }}>
-                  Clicking confirm will start the booking process for this custom itinerary.
-                </p>
+                {isBooked ? (
+                  <button disabled className="syne" style={{ display: "block", width: "100%", textAlign: "center", padding: 14, background: "var(--line2)", color: "var(--ink3)", borderRadius: 50, fontSize: 14, fontWeight: 700, border: "none", cursor: "not-allowed" }}>
+                    Your package is already booked
+                  </button>
+                ) : (
+                  <>
+                    <a href={`/book/${id}`} className="syne" style={{ display: "block", width: "100%", textAlign: "center", padding: 14, background: "var(--cu)", color: "#fff", borderRadius: 50, fontSize: 14, fontWeight: 700, textDecoration: "none" }}>
+                      Confirm This Itinerary
+                    </a>
+                    <p style={{ fontSize: 11, color: "var(--ink4)", textAlign: "center", marginTop: 12 }}>
+                      Clicking confirm will start the booking process for this custom itinerary.
+                    </p>
+                  </>
+                )}
               </div>
               {/* Enquiry form for questions/modifications */}
               <div style={{ marginTop: 20 }}>

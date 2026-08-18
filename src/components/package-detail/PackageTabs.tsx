@@ -12,6 +12,7 @@ const badgeStyles: Record<string, React.CSSProperties> = {
   activity: { background: "var(--cu-gl)", color: "var(--cu-d)" },
   stay: { background: "rgba(41,196,216,.12)", color: "var(--gn2)" },
   transfer: { background: "var(--gn-gl)", color: "var(--gn)" },
+  flight: { background: "#e0e7ff", color: "#4338ca" },
 };
 
 /* ── HELPER: Dynamic Vehicle Icon ── */
@@ -170,9 +171,46 @@ function sectionLabel(icon: string, text: string): string {
   </div>`;
 }
 
-/* ── Helper: build HTML content for an itinerary day ── */
-function buildItineraryContent(day: any): string {
+/* ── Helper: build HTML content for a flight ── */
+function buildFlightContent(flight: any): string {
   let html = "";
+  html += `<div style="display:flex;align-items:center;gap:12px;margin-bottom:12px">`;
+  html += `<span class="material-symbols-rounded" style="font-size:24px;color:#4338ca">flight_takeoff</span>`;
+  html += `<div>`;
+  html += `<p style="font-size:15px;font-weight:700;color:var(--ink)">${flight.airline} <span style="color:var(--ink3);font-weight:500">${flight.flightNumber}</span></p>`;
+  if (flight.class) html += `<p style="font-size:12px;color:var(--ink4)">Class: ${flight.class}</p>`;
+  html += `</div></div>`;
+  
+  html += `<div style="display:flex;align-items:center;justify-content:space-between;background:#f8fafc;padding:12px;border-radius:8px;margin-bottom:12px">`;
+  html += `<div><p style="font-size:11px;color:var(--ink4);text-transform:uppercase;letter-spacing:1px;font-weight:600">Departure</p><p style="font-size:14px;font-weight:700;color:var(--ink)">${flight.departure}</p><p style="font-size:12px;color:var(--ink3)">${flight.from}</p></div>`;
+  html += `<span class="material-symbols-rounded" style="color:var(--line2)">arrow_forward</span>`;
+  html += `<div style="text-align:right"><p style="font-size:11px;color:var(--ink4);text-transform:uppercase;letter-spacing:1px;font-weight:600">Arrival</p><p style="font-size:14px;font-weight:700;color:var(--ink)">${flight.arrival}</p><p style="font-size:12px;color:var(--ink3)">${flight.to}</p></div>`;
+  html += `</div>`;
+  
+  if (flight.pnr) {
+    html += `<div style="display:inline-flex;align-items:center;gap:6px;background:var(--cu-gl);color:var(--cu-d);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600;margin-bottom:12px">PNR: ${flight.pnr}</div>`;
+  }
+  
+  if (flight.notes) {
+    html += `<p style="font-size:13px;color:var(--ink2);margin-top:4px">${flight.notes}</p>`;
+  }
+  
+  return html;
+}
+
+/* ── Helper: build HTML content for an itinerary day ── */
+function buildItineraryContent(day: any, dayFlights: any[] = []): string {
+  let html = "";
+  if (dayFlights.length > 0) {
+    html += sectionLabel("flight", "Flights");
+    html += `<div style="margin-bottom:16px">`;
+    dayFlights.forEach((flight) => {
+      html += `<div style="border:1px solid #e0e7ff;border-radius:10px;padding:12px;margin-bottom:8px">`;
+      html += buildFlightContent(flight);
+      html += `</div>`;
+    });
+    html += `</div>`;
+  }
   if (day.description) {
     html += `<p style="margin-bottom:10px">${day.description}</p>`;
   }
@@ -419,12 +457,15 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
   const hasItinerary = itinerary.length > 0;
   const hasActivities = itinerary.some((day: any) => day.activities && day.activities.length > 0);
   const hasStays = stays.length > 0;
+  const flights = pkg?.flights || [];
+  const hasFlights = flights.length > 0;
   const hasTransfers = transfers.length > 0 || !!pkg?.transferSummary;
   const hasPolicies = (pkg?.paymentPolicy?.length > 0) || (pkg?.cancellationPolicy?.length > 0) || (pkg?.flightCancellationPolicy?.length > 0);
 
   const availableTabs = [
     ...(hasItinerary ? [{ id: "itinerary", label: "Itinerary" }] : []),
     ...(hasActivities ? [{ id: "activities", label: "Activities" }] : []),
+    ...(hasFlights ? [{ id: "flights", label: "Flights" }] : []),
     ...(hasStays ? [{ id: "stay", label: "Stay" }] : []),
     ...(hasTransfers ? [{ id: "transfers", label: "Transfers" }] : []),
     ...(hasPolicies ? [{ id: "policies", label: "Policies" }] : []),
@@ -445,12 +486,15 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
   const getTabData = (tabId: string) => {
     switch (tabId) {
       case "itinerary":
-        return itinerary.map((day: any) => ({
-          badge: `Day ${day.day}`,
-          badgeType: "day",
-          title: day.title,
-          content: buildItineraryContent(day),
-        }));
+        return itinerary.map((day: any) => {
+          const dayFlights = flights.filter((f: any) => f.day == day.day);
+          return {
+            badge: `Day ${day.day}`,
+            badgeType: "day",
+            title: day.title,
+            content: buildItineraryContent(day, dayFlights),
+          };
+        });
       case "activities":
         // Show activity strings from each itinerary day
         return itinerary
@@ -461,6 +505,13 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
             title: day.title || `Day ${day.day}`,
             content: buildDayActivitiesContent(day),
           }));
+      case "flights":
+        return flights.map((f: any, i: number) => ({
+          badge: f.day ? `Day ${f.day}` : `Flight ${i + 1}`,
+          badgeType: "flight",
+          title: `${f.airline} ${f.flightNumber} (${f.from} → ${f.to})`,
+          content: buildFlightContent(f),
+        }));
       case "stay":
         return stays.map((s: any, i: number) => ({
           badge: `Stay ${i + 1}`,
@@ -468,13 +519,21 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
           title: s.name,
           content: buildStayContent(s),
         }));
-      case "transfers":
-        return transfers.map((t: any, i: number) => ({
+      case "transfers": {
+        const flightItems = flights.map((f: any, i: number) => ({
+          badge: f.day ? `Day ${f.day}` : `Flight ${i + 1}`,
+          badgeType: "flight",
+          title: `Flight: ${f.from} → ${f.to}`,
+          content: buildFlightContent(f),
+        }));
+        const transferItems = transfers.map((t: any, i: number) => ({
           badge: t.day ? `Day ${t.day}` : `Transfer ${i + 1}`,
           badgeType: "transfer",
           title: t.title,
           content: buildTransferContent(t),
         }));
+        return [...flightItems, ...transferItems];
+      }
       case "policies":
         return [
           ...(pkg?.paymentPolicy?.length ? [{

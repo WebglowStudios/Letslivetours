@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { api } from "@/lib/api";
 import PhoneInput from "@/components/ui/PhoneInput";
 
@@ -23,6 +23,16 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
   const [cbEmail, setCbEmail] = useState("");
   const [cbLoading, setCbLoading] = useState(false);
   const [cbSent, setCbSent] = useState(false);
+  const [isBooked, setIsBooked] = useState(false);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      if (params.get("booked") === "true") {
+        setIsBooked(true);
+      }
+    }
+  }, []);
 
   const handleCallbackSubmit = async () => {
     if (!cbName.trim() || !cbPhone.trim()) return;
@@ -220,29 +230,52 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
       </div>
 
       {/* Book button */}
-      <button
-        onClick={() => document.getElementById("enquiry-form")?.scrollIntoView({ behavior: "smooth" })}
-        className="syne price-book-btn"
-        style={{
-          width: "100%",
-          fontSize: 14,
-          fontWeight: 700,
-          color: "#fff",
-          background: "var(--cu)",
-          padding: 14,
-          borderRadius: 50,
-          transition: "var(--tr)",
-          boxShadow: "0 6px 20px rgba(245,166,35,.35)",
-          marginBottom: 10,
-          border: "none",
-          cursor: "pointer",
-          textDecoration: "none",
-          textAlign: "center",
-          display: "block",
-        }}
-      >
-        Send Enquiry
-      </button>
+      {isBooked ? (
+        <button
+          disabled
+          className="syne"
+          style={{
+            width: "100%",
+            fontSize: 14,
+            fontWeight: 700,
+            color: "var(--ink3)",
+            background: "var(--line2)",
+            padding: 14,
+            borderRadius: 50,
+            marginBottom: 10,
+            border: "none",
+            cursor: "not-allowed",
+            textAlign: "center",
+            display: "block",
+          }}
+        >
+          Your package is already booked
+        </button>
+      ) : (
+        <button
+          onClick={() => document.getElementById("enquiry-form")?.scrollIntoView({ behavior: "smooth" })}
+          className="syne price-book-btn"
+          style={{
+            width: "100%",
+            fontSize: 14,
+            fontWeight: 700,
+            color: "#fff",
+            background: "var(--cu)",
+            padding: 14,
+            borderRadius: 50,
+            transition: "var(--tr)",
+            boxShadow: "0 6px 20px rgba(245,166,35,.35)",
+            marginBottom: 10,
+            border: "none",
+            cursor: "pointer",
+            textDecoration: "none",
+            textAlign: "center",
+            display: "block",
+          }}
+        >
+          Send Enquiry
+        </button>
+      )}
 
       {/* Callback button */}
       <button

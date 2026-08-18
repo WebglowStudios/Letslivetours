@@ -230,7 +230,7 @@ export default function BookingDetailPage() {
             {booking.package && (
               <>
                 <Link
-                  href={booking.package.isCustom ? `/itinerary/${booking.package._id}` : `/tours/${booking.package.slug}`}
+                  href={booking.package.isCustom ? `/itinerary/${booking.package._id}?booked=true` : `/packages/${booking.package.slug}?booked=true`}
                   className="syne"
                   style={{
                     display: "inline-flex",
