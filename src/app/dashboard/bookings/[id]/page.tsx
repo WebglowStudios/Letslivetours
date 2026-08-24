@@ -260,7 +260,12 @@ export default function BookingDetailPage() {
                   onClick={() => {
                     import("@/lib/generatePackagePdf").then((m) => m.generatePackagePdf({
                       ...booking.package,
-                      bookingMeta: { dateChangeHistory: booking.dateChangeHistory }
+                      bookingMeta: { 
+                        dateChangeHistory: booking.dateChangeHistory,
+                        totalAmount: booking.totalAmount,
+                        paidAmount: booking.paidAmount,
+                        paymentStatus: booking.paymentStatus,
+                      }
                     } as any));
                   }}
                   className="syne"
@@ -440,9 +445,17 @@ export default function BookingDetailPage() {
             <div>
               <p style={{ fontSize: 12, color: "var(--ink3)" }}>Payment Status</p>
               <p className="syne" style={{ fontSize: 15, fontWeight: 600, color: "var(--ink)", marginTop: 4, textTransform: "capitalize" }}>
-                {booking.paymentStatus || "Pending"}
+                {booking.paymentStatus === "full" ? "Fully Paid" : booking.paymentStatus || "Pending"}
               </p>
             </div>
+            {(booking.paymentStatus === "partial" || booking.paymentStatus === "full") && (
+              <div>
+                <p style={{ fontSize: 12, color: "var(--ink3)" }}>Paid Amount</p>
+                <p className="serif" style={{ fontSize: 22, fontWeight: 700, color: "var(--gn2)", marginTop: 4 }}>
+                  ₹{(booking.paidAmount || 0).toLocaleString("en-IN")}
+                </p>
+              </div>
+            )}
             {booking.paymentStatus === "partial" && (
               <div>
                 <p style={{ fontSize: 12, color: "var(--ink3)" }}>Pending Amount</p>

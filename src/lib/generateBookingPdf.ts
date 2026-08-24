@@ -250,7 +250,19 @@ export function generateBookingPdf(booking: BookingData): void {
   // Right column
   let yR = y;
   yR = field("Total Amount", fmt(booking.totalAmount), M + colW, yR);
-  yR = field("Payment Status", getStatusLabel(booking.paymentStatus || "pending"), M + colW, yR);
+  
+  const paymentStatus = booking.paymentStatus || "pending";
+  let paymentLabel = getStatusLabel(paymentStatus);
+  if (paymentStatus === "full" || paymentStatus === "paid") paymentLabel = "Fully Paid";
+  
+  if (paymentStatus === "partial" || paymentStatus === "full" || paymentStatus === "paid") {
+    yR = field("Paid Amount", fmt(booking.paidAmount || 0), M + colW, yR);
+  }
+  if (paymentStatus === "partial") {
+    yR = field("Pending Amount", fmt(booking.totalAmount - (booking.paidAmount || 0)), M + colW, yR);
+  }
+  
+  yR = field("Payment Status", paymentLabel, M + colW, yR);
   if (booking.contactEmail) {
     yR = field("Contact Email", booking.contactEmail, M + colW, yR);
   }
