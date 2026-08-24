@@ -24,6 +24,7 @@ interface BookingDetail {
   status: string;
   cancellationReason?: string;
   totalAmount: number;
+  paidAmount?: number;
   travellers: number | { adults?: number; children?: number; infants?: number };
   paymentStatus?: string;
   createdAt: string;
@@ -47,6 +48,8 @@ export default function BookingDetailPage() {
   const [cancellationReason, setCancellationReason] = useState("");
   const [cancelSuccess, setCancelSuccess] = useState(false);
   const [payingBalance, setPayingBalance] = useState(false);
+  const [showPaymentModal, setShowPaymentModal] = useState(false);
+  const [customAmountToPay, setCustomAmountToPay] = useState<number | "">("");
 
   useEffect(() => {
     async function fetchBooking() {
@@ -86,6 +89,7 @@ export default function BookingDetailPage() {
       const orderRes = await api.post("/payments/create-order", {
         bookingId: booking._id,
         paymentType: "balance",
+        customAmount: customAmountToPay === "" ? undefined : customAmountToPay,
       });
       if (orderRes.status !== "success") {
         alert(orderRes.message || "Could not initiate payment.");
@@ -112,8 +116,8 @@ export default function BookingDetailPage() {
               paymentType: "balance",
               amount,
             });
-            setBooking((prev) => prev ? { ...prev, paymentStatus: "paid" } : null);
-            alert("Balance paid successfully! Your booking is now fully paid.");
+            setBooking((prev) => prev ? { ...prev, paymentStatus: (prev.paidAmount || 0) + amount >= prev.totalAmount ? "paid" : "partial", paidAmount: (prev.paidAmount || 0) + amount } : null);
+            alert("Payment received!");
           } catch {
             alert("Payment received but verification failed. Please contact support.");
           }
@@ -418,6 +422,14 @@ export default function BookingDetailPage() {
                 {booking.paymentStatus || "Pending"}
               </p>
             </div>
+            {booking.paymentStatus === "partial" && (
+              <div>
+                <p style={{ fontSize: 12, color: "var(--ink3)" }}>Pending Amount</p>
+                <p className="serif" style={{ fontSize: 22, fontWeight: 700, color: "var(--cu)", marginTop: 4 }}>
+                  ₹{(booking.totalAmount - (booking.paidAmount || 0)).toLocaleString("en-IN")}
+                </p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -448,35 +460,58 @@ export default function BookingDetailPage() {
       {/* Pay Balance Button — shown when partially paid and booking is active */}
       {booking.paymentStatus === "partial" && booking.status !== "cancelled" && (
         <div style={{ marginTop: canCancel ? 12 : 32 }}>
-          <button
-            onClick={handlePayBalance}
-            disabled={payingBalance}
-            className="syne"
-            style={{
-              display: "inline-flex",
-              alignItems: "center",
-              gap: 8,
-              padding: "14px 28px",
-              background: payingBalance ? "var(--ink4)" : "var(--cu)",
-              color: "#fff",
-              border: "none",
-              borderRadius: "var(--r)",
-              fontSize: 14,
-              fontWeight: 700,
-              cursor: payingBalance ? "not-allowed" : "pointer",
-              transition: "var(--tr)",
-              boxShadow: "0 6px 20px rgba(0,174,204,.25)",
-              opacity: payingBalance ? 0.7 : 1,
-            }}
-          >
-            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>
-              {payingBalance ? "hourglass_empty" : "payments"}
-            </span>
-            {payingBalance ? "Opening Payment…" : "Pay Remaining Balance"}
-          </button>
-          <p style={{ fontSize: 11, color: "var(--ink4)", marginTop: 8 }}>
-            Your deposit was paid. Complete the balance payment to fully confirm your booking.
-          </p>
+          {showPaymentModal ? (
+            <div style={{ background: "rgba(0,174,204,0.04)", padding: 20, borderRadius: "var(--r)", border: "1px solid rgba(0,174,204,0.15)", maxWidth: 400 }}>
+              <p className="syne" style={{ fontSize: 14, fontWeight: 700, marginBottom: 16, color: "var(--ink2)" }}>How much would you like to pay now?</p>
+              <div style={{ display: "flex", gap: 8, marginBottom: 16 }}>
+                <input 
+                  type="number" 
+                  value={customAmountToPay} 
+                  onChange={e => setCustomAmountToPay(e.target.value === "" ? "" : Number(e.target.value))} 
+                  placeholder={`Pending: ₹${(booking.totalAmount - (booking.paidAmount || 0)).toLocaleString()}`} 
+                  style={{ flex: 1, padding: "12px 14px", borderRadius: 8, border: "1px solid #ddd", fontSize: 14, outline: "none" }} 
+                />
+              </div>
+              <div style={{ display: "flex", gap: 8 }}>
+                <button onClick={handlePayBalance} disabled={payingBalance} className="syne" style={{ padding: "10px 20px", background: "var(--cu)", color: "#fff", border: "none", borderRadius: 8, fontWeight: 600, cursor: payingBalance ? "not-allowed" : "pointer", opacity: payingBalance ? 0.7 : 1 }}>
+                   {payingBalance ? "Processing..." : "Proceed to Pay"}
+                </button>
+                <button onClick={() => setShowPaymentModal(false)} disabled={payingBalance} className="syne" style={{ padding: "10px 20px", background: "transparent", color: "var(--ink3)", border: "none", cursor: payingBalance ? "not-allowed" : "pointer", fontWeight: 600 }}>
+                   Cancel
+                </button>
+              </div>
+            </div>
+          ) : (
+            <>
+              <button
+                onClick={() => setShowPaymentModal(true)}
+                className="syne"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                  padding: "14px 28px",
+                  background: "var(--cu)",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "var(--r)",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  cursor: "pointer",
+                  transition: "var(--tr)",
+                  boxShadow: "0 6px 20px rgba(0,174,204,.25)",
+                }}
+              >
+                <span className="material-symbols-rounded" style={{ fontSize: 18 }}>
+                  payments
+                </span>
+                Pay Remaining Balance
+              </button>
+              <p style={{ fontSize: 11, color: "var(--ink4)", marginTop: 8 }}>
+                Your deposit was paid. Complete the balance payment to fully confirm your booking.
+              </p>
+            </>
+          )}
         </div>
       )}
 
