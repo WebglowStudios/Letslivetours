@@ -14,6 +14,7 @@ export default function PayInstallmentPage() {
   const [error, setError] = useState<string | null>(null);
   const [paying, setPaying] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [customAmountToPay, setCustomAmountToPay] = useState<string>("");
 
   useEffect(() => {
     if (!paymentId) return;
@@ -22,6 +23,7 @@ export default function PayInstallmentPage() {
       .then((res) => {
         if (res.status === "success") {
           setDetails(res.data);
+          setCustomAmountToPay(res.data.amountDue > 0 ? res.data.amountDue.toString() : "");
           if (res.data.status === "paid" || res.data.amountDue <= 0) {
             setSuccess(true);
           }
@@ -39,9 +41,19 @@ export default function PayInstallmentPage() {
 
   const handlePay = async () => {
     if (!details) return;
+    const finalAmount = Number(customAmountToPay);
+    if (isNaN(finalAmount) || finalAmount <= 0) {
+      alert("Please enter a valid amount to pay.");
+      return;
+    }
+    if (finalAmount > details.amountDue) {
+      alert("Amount cannot exceed the total due.");
+      return;
+    }
+
     setPaying(true);
     try {
-      const orderRes = await api.post(`/operations/public-payments/${paymentId}/create-order`, {});
+      const orderRes = await api.post(`/operations/public-payments/${paymentId}/create-order`, { customAmount: finalAmount });
       if (orderRes.status !== "success") {
         alert(orderRes.message || "Could not initiate payment.");
         setPaying(false);
@@ -314,12 +326,31 @@ export default function PayInstallmentPage() {
                     </div>
                   )}
 
+                  <div style={{ marginBottom: "1.5rem" }}>
+                    <label className="installment-label" style={{ marginBottom: "0.5rem" }}>Amount you wish to pay now (₹)</label>
+                    <input 
+                      type="number" 
+                      value={customAmountToPay} 
+                      onChange={(e) => setCustomAmountToPay(e.target.value)}
+                      style={{ 
+                        width: "100%", 
+                        padding: "0.875rem", 
+                        borderRadius: "12px", 
+                        border: "1px solid #d1d5db", 
+                        fontSize: "1.125rem", 
+                        fontWeight: "600",
+                        color: "#111827",
+                        outline: "none"
+                      }}
+                    />
+                  </div>
+
                   <button
                     onClick={handlePay}
                     disabled={paying}
                     className="installment-btn"
                   >
-                    {paying ? "Processing..." : `Pay ₹${details.amountDue.toLocaleString('en-IN')}`}
+                    {paying ? "Processing..." : `Pay ₹${Number(customAmountToPay || 0).toLocaleString('en-IN')}`}
                   </button>
                   <div className="installment-footer">
                     Secured by Razorpay
