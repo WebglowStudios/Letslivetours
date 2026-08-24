@@ -3,9 +3,22 @@
 interface InclusionsExclusionsProps {
   inclusions: string[];
   exclusions: string[];
+  isInternational?: boolean;
+  visaIncluded?: boolean;
 }
 
-export default function InclusionsExclusions({ inclusions, exclusions }: InclusionsExclusionsProps) {
+export default function InclusionsExclusions({ inclusions: rawInclusions, exclusions: rawExclusions, isInternational, visaIncluded }: InclusionsExclusionsProps) {
+  let inclusions = [...(rawInclusions || [])];
+  let exclusions = [...(rawExclusions || [])];
+
+  if (isInternational) {
+    if (visaIncluded) {
+      inclusions.unshift("Visa");
+    } else {
+      exclusions.unshift("Visa");
+    }
+  }
+
   if ((!inclusions || inclusions.length === 0) && (!exclusions || exclusions.length === 0)) {
     return null;
   }

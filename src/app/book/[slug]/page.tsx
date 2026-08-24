@@ -17,11 +17,13 @@ interface PackageData {
   adultCount?: number;
   childCount?: number;
   destination?: { name: string };
-  duration: { nights: number; days: number } | string;
+  isGroupTour: boolean;
+  isInternational?: boolean;
+  visaIncluded?: boolean;
+  duration?: { nights: number; days: number };
   price: number;
   images: string[];
   description?: string;
-  isGroupTour?: boolean;
   travelDates?: { startDate: string; endDate?: string };
   departures?: {
     _id: string;
@@ -48,6 +50,9 @@ interface TravellerEntry {
   age: string;
   phone: string;
   type: "adult" | "child" | "infant";
+  passportNumber?: string;
+  passportExpiry?: string;
+  issuingCountry?: string;
 }
 
 function BookingContent() {
@@ -66,6 +71,7 @@ function BookingContent() {
   const [lastName, setLastName] = useState("");
   const [email, setEmail] = useState("");
   const [phone, setPhone] = useState("");
+  const [panCard, setPanCard] = useState("");
   const [travelDate, setTravelDate] = useState(searchParams?.get("travelDate") || "");
   const [departureId, setDepartureId] = useState(searchParams?.get("departureId") || "");
   const [departurePrice, setDeparturePrice] = useState<number | null>(null);
@@ -238,6 +244,24 @@ function BookingContent() {
     if (!email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) { setSubmitError("A valid email address is required."); return; }
     if (!phone.trim()) { setSubmitError("Phone number is required."); return; }
     if (!travelDate) { setSubmitError("Please select a travel date."); return; }
+
+    const totalPax = adultsCount + childrenCount + travellers.filter((t) => t.type === "infant").length;
+
+    if (pkg.isInternational) {
+      if (!panCard.trim()) {
+        setSubmitError("PAN Card is required for international packages.");
+        return;
+      }
+      if (travellers.length !== totalPax) {
+        setSubmitError(`Please add details for all ${totalPax} travellers (currently ${travellers.length}).`);
+        return;
+      }
+      const missingPassports = travellers.some((t) => !t.passportNumber || !t.passportExpiry || !t.issuingCountry);
+      if (missingPassports) {
+        setSubmitError("Passport details (Number, Expiry, Country) are required for ALL travellers.");
+        return;
+      }
+    }
     // ────────────────────────────────────────────────────────────────────────
 
     setSubmitError("");
@@ -255,8 +279,16 @@ function BookingContent() {
         },
         travellersDetails: travellers
           .filter((t) => t.name)
-          .map((t) => ({ name: t.name, age: t.age ? Number(t.age) : undefined, phone: t.phone || undefined, type: t.type })),
-        primaryTraveller: { firstName, lastName, email, phone },
+          .map((t) => ({
+            name: t.name,
+            age: t.age ? Number(t.age) : undefined,
+            phone: t.phone || undefined,
+            type: t.type,
+            passportNumber: t.passportNumber || undefined,
+            passportExpiry: t.passportExpiry || undefined,
+            issuingCountry: t.issuingCountry || undefined,
+          })),
+        primaryTraveller: { firstName, lastName, email, phone, panCard: panCard || undefined },
         specialRequests,
         contactPhone: phone,
         contactEmail: email,
@@ -397,9 +429,15 @@ function BookingContent() {
                   </div>
                 ))}
                 <div>
-                  <label className="syne" style={{ display: "block", fontSize: 9.5, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--ink4)", marginBottom: 6 }}>Phone</label>
+                  <label className="syne" style={{ display: "block", fontSize: 9.5, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--ink4)", marginBottom: 6 }}>Phone *</label>
                   <PhoneInput value={phone} onChange={setPhone} placeholder="98765 43210" style={{ padding: "4px 4px" }} />
                 </div>
+                {pkg.isInternational && (
+                  <div>
+                    <label className="syne" style={{ display: "block", fontSize: 9.5, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--ink4)", marginBottom: 6 }}>PAN Card * (Required)</label>
+                    <input type="text" required value={panCard} onChange={(e) => setPanCard(e.target.value.toUpperCase())} placeholder="ABCDE1234F" style={{ width: "100%", padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, fontSize: 14, color: "var(--ink)", outline: "none", textTransform: "uppercase" }} />
+                  </div>
+                )}
               </div>
             </div>
 
@@ -445,11 +483,22 @@ function BookingContent() {
                   {travellers.map((t, i) => (
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", background: "var(--iv)", borderRadius: 10, border: "1px solid var(--line)", flexWrap: "wrap" }}>
                       <span className="syne" style={{ fontSize: 9, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: t.type === "adult" ? "var(--gn)" : t.type === "child" ? "var(--cu-d)" : "var(--gn2)", padding: "3px 8px", background: t.type === "adult" ? "var(--gn-gl)" : t.type === "child" ? "rgba(245,166,35,.1)" : "rgba(0,174,204,.1)", borderRadius: 4, flexShrink: 0 }}>{t.type}</span>
-                      <input type="text" placeholder="Full name" value={t.name} onChange={(e) => updateTraveller(i, "name", e.target.value)} style={{ flex: "1 1 110px", padding: "7px 10px", background: "#fff", border: "1px solid var(--line2)", borderRadius: 8, fontSize: 13, outline: "none" }} />
+                      <input type="text" placeholder="Full name *" value={t.name} onChange={(e) => updateTraveller(i, "name", e.target.value)} style={{ flex: "1 1 110px", padding: "7px 10px", background: "#fff", border: "1px solid var(--line2)", borderRadius: 8, fontSize: 13, outline: "none" }} />
                       <input type="number" placeholder="Age" value={t.age} onChange={(e) => updateTraveller(i, "age", e.target.value)} style={{ width: 52, padding: "7px 6px", background: "#fff", border: "1px solid var(--line2)", borderRadius: 8, fontSize: 13, outline: "none", textAlign: "center" }} />
                       <button type="button" onClick={() => removeTraveller(i)} style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(220,53,69,.08)", border: "none", cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
                         <span className="material-symbols-rounded" style={{ fontSize: 15, color: "#dc3545" }}>close</span>
                       </button>
+                      
+                      {pkg.isInternational && (
+                        <div style={{ flexBasis: "100%", display: "flex", gap: 8, marginTop: 4 }}>
+                          <input type="text" placeholder="Passport No *" value={t.passportNumber || ""} onChange={(e) => updateTraveller(i, "passportNumber", e.target.value)} style={{ flex: "1", padding: "7px 10px", background: "#fff", border: "1px solid var(--line2)", borderRadius: 8, fontSize: 12, outline: "none" }} />
+                          <div style={{ flex: "1", position: "relative" }}>
+                            <input type="date" value={t.passportExpiry || ""} onChange={(e) => updateTraveller(i, "passportExpiry", e.target.value)} style={{ width: "100%", padding: "7px 10px", background: "#fff", border: "1px solid var(--line2)", borderRadius: 8, fontSize: 12, outline: "none", color: t.passportExpiry ? "inherit" : "transparent" }} />
+                            {!t.passportExpiry && <span style={{ position: "absolute", left: 10, top: 8, fontSize: 12, color: "#999", pointerEvents: "none" }}>Expiry *</span>}
+                          </div>
+                          <input type="text" placeholder="Country *" value={t.issuingCountry || ""} onChange={(e) => updateTraveller(i, "issuingCountry", e.target.value)} style={{ flex: "1", padding: "7px 10px", background: "#fff", border: "1px solid var(--line2)", borderRadius: 8, fontSize: 12, outline: "none" }} />
+                        </div>
+                      )}
                     </div>
                   ))}
                 </div>
@@ -514,6 +563,13 @@ function BookingContent() {
               {pkg.images?.[0] && <div style={{ height: 140, borderRadius: 12, overflow: "hidden", marginBottom: 14 }}><img src={pkg.images[0]} alt={pkg.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>}
               <h3 className="serif" style={{ fontSize: 16, fontWeight: 700, color: "var(--ink)", lineHeight: 1.3, marginBottom: 6 }}>{pkg.name}</h3>
               {pkg.destination && <p style={{ fontSize: 12, color: "var(--ink3)", display: "flex", alignItems: "center", gap: 4, marginBottom: 14 }}><span className="material-symbols-rounded" style={{ fontSize: 13, color: "var(--cu)" }}>location_on</span>{pkg.destination.name}</p>}
+              {pkg.isInternational && (
+                <div style={{ display: "inline-block", background: pkg.visaIncluded ? "var(--gn-gl)" : "rgba(245,166,35,.1)", padding: "4px 8px", borderRadius: 4, marginBottom: 14 }}>
+                  <span className="syne" style={{ fontSize: 10, fontWeight: 700, color: pkg.visaIncluded ? "var(--gn)" : "var(--cu-d)", textTransform: "uppercase", letterSpacing: 1 }}>
+                    {pkg.visaIncluded ? "✓ Visa Included" : "⚠ Visa Not Included"}
+                  </span>
+                </div>
+              )}
 
               <div style={{ borderTop: "1px solid var(--line)", paddingTop: 14, marginBottom: 14 }}>
                 <div className="syne" style={{ fontSize: 9, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--ink4)", marginBottom: 10 }}>Price Breakdown</div>

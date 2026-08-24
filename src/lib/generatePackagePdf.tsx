@@ -91,6 +91,8 @@ interface Flight {
 }
 interface PackageData {
   name: string; slug: string;
+  isInternational?: boolean;
+  visaIncluded?: boolean;
   destination?: { name: string; slug?: string; country?: string };
   description?: string; shortDescription?: string;
   duration: { nights: number; days: number };
@@ -1333,8 +1335,19 @@ const AccommodationSection = ({ pkg }: { pkg: PackageData }) => {
 
 // ─── Inclusions & Exclusions ──────────────────────────────────────────────────
 const InclusionsExclusionsSection = ({ pkg }: { pkg: PackageData }) => {
-  const hasInc = pkg.inclusions && pkg.inclusions.length > 0;
-  const hasExc = pkg.exclusions && pkg.exclusions.length > 0;
+  let inclusions = [...(pkg.inclusions || [])];
+  let exclusions = [...(pkg.exclusions || [])];
+
+  if (pkg.isInternational) {
+    if (pkg.visaIncluded) {
+      inclusions.unshift("Visa");
+    } else {
+      exclusions.unshift("Visa");
+    }
+  }
+
+  const hasInc = inclusions.length > 0;
+  const hasExc = exclusions.length > 0;
   if (!hasInc && !hasExc) return null;
   return (
     <View wrap={false} style={{ marginBottom: 20 }}>
@@ -1343,7 +1356,7 @@ const InclusionsExclusionsSection = ({ pkg }: { pkg: PackageData }) => {
         {hasInc && (
           <View style={s.incCol}>
             <Text style={[s.incExcHeader, { color: C.gn }]}>✓  Inclusions</Text>
-            {pkg.inclusions!.map((item, i) => (
+            {inclusions.map((item, i) => (
               <View key={i} style={{ flexDirection: "row", marginBottom: 5 }}>
                 <View style={[s.bulletTealDot, { marginTop: 3 }]} />
                 <Text style={s.incItem}>{item}</Text>
@@ -1354,7 +1367,7 @@ const InclusionsExclusionsSection = ({ pkg }: { pkg: PackageData }) => {
         {hasExc && (
           <View style={s.excCol}>
             <Text style={[s.incExcHeader, { color: C.ink2 }]}>✗  Exclusions</Text>
-            {pkg.exclusions!.map((item, i) => (
+            {exclusions.map((item, i) => (
               <View key={i} style={{ flexDirection: "row", marginBottom: 5 }}>
                 <View style={[s.bulletDot, { marginTop: 3 }]} />
                 <Text style={s.excItem}>{item}</Text>
