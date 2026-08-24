@@ -20,6 +20,7 @@ interface PackageData {
   isGroupTour: boolean;
   isInternational?: boolean;
   visaIncluded?: boolean;
+  flightsIncluded?: boolean;
   duration?: { nights: number; days: number };
   price: number;
   images: string[];
@@ -564,9 +565,16 @@ function BookingContent() {
               <h3 className="serif" style={{ fontSize: 16, fontWeight: 700, color: "var(--ink)", lineHeight: 1.3, marginBottom: 6 }}>{pkg.name}</h3>
               {pkg.destination && <p style={{ fontSize: 12, color: "var(--ink3)", display: "flex", alignItems: "center", gap: 4, marginBottom: 14 }}><span className="material-symbols-rounded" style={{ fontSize: 13, color: "var(--cu)" }}>location_on</span>{pkg.destination.name}</p>}
               {pkg.isInternational && (
-                <div style={{ display: "inline-block", background: pkg.visaIncluded ? "var(--gn-gl)" : "rgba(245,166,35,.1)", padding: "4px 8px", borderRadius: 4, marginBottom: 14 }}>
+                <div style={{ display: "inline-block", background: pkg.visaIncluded ? "var(--gn-gl)" : "rgba(245,166,35,.1)", padding: "4px 8px", borderRadius: 4, marginBottom: 14, marginRight: 8 }}>
                   <span className="syne" style={{ fontSize: 10, fontWeight: 700, color: pkg.visaIncluded ? "var(--gn)" : "var(--cu-d)", textTransform: "uppercase", letterSpacing: 1 }}>
                     {pkg.visaIncluded ? "✓ Visa Included" : "⚠ Visa Not Included"}
+                  </span>
+                </div>
+              )}
+              {pkg.flightsIncluded !== undefined && (
+                <div style={{ display: "inline-block", background: pkg.flightsIncluded ? "var(--gn-gl)" : "rgba(245,166,35,.1)", padding: "4px 8px", borderRadius: 4, marginBottom: 14 }}>
+                  <span className="syne" style={{ fontSize: 10, fontWeight: 700, color: pkg.flightsIncluded ? "var(--gn)" : "var(--cu-d)", textTransform: "uppercase", letterSpacing: 1 }}>
+                    {pkg.flightsIncluded ? "✈ Flights Included" : "⚠ Flights Not Included"}
                   </span>
                 </div>
               )}

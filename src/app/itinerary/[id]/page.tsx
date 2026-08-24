@@ -96,7 +96,7 @@ export default function CustomItineraryPage() {
             )}
 
             <PackageTabs pkg={pkg} />
-            <InclusionsExclusions inclusions={pkg.inclusions || []} exclusions={pkg.exclusions || []} isInternational={pkg.isInternational} visaIncluded={pkg.visaIncluded} />
+            <InclusionsExclusions inclusions={pkg.inclusions || []} exclusions={pkg.exclusions || []} isInternational={pkg.isInternational} visaIncluded={pkg.visaIncluded} flightsIncluded={pkg.flightsIncluded} />
             <KnowBeforeYouGo items={pkg.knowBeforeYouGo || []} />
             <ThingsToCarry items={pkg.thingsToCarry || []} />
           </div>

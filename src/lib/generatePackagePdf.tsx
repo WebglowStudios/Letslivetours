@@ -93,6 +93,7 @@ interface PackageData {
   name: string; slug: string;
   isInternational?: boolean;
   visaIncluded?: boolean;
+  flightsIncluded?: boolean;
   destination?: { name: string; slug?: string; country?: string };
   description?: string; shortDescription?: string;
   duration: { nights: number; days: number };
@@ -1343,6 +1344,14 @@ const InclusionsExclusionsSection = ({ pkg }: { pkg: PackageData }) => {
       inclusions.unshift("Visa");
     } else {
       exclusions.unshift("Visa");
+    }
+  }
+
+  if (pkg.flightsIncluded !== undefined) {
+    if (pkg.flightsIncluded) {
+      inclusions.unshift("Flights");
+    } else {
+      exclusions.unshift("Flights");
     }
   }
 

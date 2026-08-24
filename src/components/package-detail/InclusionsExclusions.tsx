@@ -5,9 +5,10 @@ interface InclusionsExclusionsProps {
   exclusions: string[];
   isInternational?: boolean;
   visaIncluded?: boolean;
+  flightsIncluded?: boolean;
 }
 
-export default function InclusionsExclusions({ inclusions: rawInclusions, exclusions: rawExclusions, isInternational, visaIncluded }: InclusionsExclusionsProps) {
+export default function InclusionsExclusions({ inclusions: rawInclusions, exclusions: rawExclusions, isInternational, visaIncluded, flightsIncluded }: InclusionsExclusionsProps) {
   let inclusions = [...(rawInclusions || [])];
   let exclusions = [...(rawExclusions || [])];
 
@@ -16,6 +17,14 @@ export default function InclusionsExclusions({ inclusions: rawInclusions, exclus
       inclusions.unshift("Visa");
     } else {
       exclusions.unshift("Visa");
+    }
+  }
+
+  if (flightsIncluded !== undefined) {
+    if (flightsIncluded) {
+      inclusions.unshift("Flights");
+    } else {
+      exclusions.unshift("Flights");
     }
   }
 
