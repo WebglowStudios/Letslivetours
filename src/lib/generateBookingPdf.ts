@@ -37,6 +37,7 @@ interface BookingData {
   specialRequests?: string;
   contactPhone?: string;
   contactEmail?: string;
+  dateChangeHistory?: { oldDate: string; newDate: string; reason: string; changedAt: string }[];
   createdAt: string;
 }
 
@@ -395,6 +396,29 @@ export function generateBookingPdf(booking: BookingData): void {
   }
 
   y += payBoxH + 10;
+
+  // ═══════════════════════════════════════════════════════
+  // DATE CHANGE HISTORY
+  // ═══════════════════════════════════════════════════════
+  if (booking.dateChangeHistory && booking.dateChangeHistory.length > 0) {
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(...C.amber);
+    doc.text("Date Change Notice", M, y);
+    y += 6;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    doc.setTextColor(...C.ink);
+    
+    for (const h of booking.dateChangeHistory) {
+      const txt = `Travel date changed from ${formatDate(h.oldDate)} to ${formatDate(h.newDate)}. Reason: ${s(h.reason)}`;
+      const lines = doc.splitTextToSize(txt, CW - 4);
+      doc.text(lines, M, y);
+      y += lines.length * 4.5 + 2;
+    }
+    y += 4;
+  }
 
   // ═══════════════════════════════════════════════════════
   // IMPORTANT NOTES

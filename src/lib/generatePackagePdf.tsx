@@ -110,6 +110,9 @@ interface PackageData {
   isCustom?: boolean; clientName?: string; clientEmail?: string; clientPhone?: string;
   travellerCount?: string; adultCount?: number; childCount?: number;
   transferSummary?: string;
+  bookingMeta?: {
+    dateChangeHistory?: { oldDate: string; newDate: string; reason: string; changedAt: string }[];
+  };
 }
 
 // ─── Helper: Dynamic Vehicle Icon ─────────────────────────────────────────────
@@ -1447,6 +1450,29 @@ const PoliciesLinkSection = ({ pkg }: { pkg: PackageData }) => {
   );
 };
 
+// ─── Date Change Notice ───────────────────────────────────────────────────────
+const DateChangeNoticeSection = ({ pkg }: { pkg: PackageData }) => {
+  const history = pkg.bookingMeta?.dateChangeHistory;
+  if (!history || history.length === 0) return null;
+
+  return (
+    <View style={{ marginBottom: 20 }}>
+      <View wrap={false}>
+        <SectionTitle title="Date Change Notice" />
+        {history.map((h, i) => (
+          <View key={i} style={{ flexDirection: "row", alignItems: "flex-start", marginBottom: 8 }}>
+            <View style={[s.carryDot, { backgroundColor: C.cu }]} />
+            <Text style={[s.carryText, { color: C.ink }]}>
+              Travel date changed from <Text style={{ fontFamily: "Helvetica-Bold" }}>{new Date(h.oldDate).toLocaleDateString("en-IN")}</Text> to <Text style={{ fontFamily: "Helvetica-Bold" }}>{new Date(h.newDate).toLocaleDateString("en-IN")}</Text>.
+              {"\n"}Reason: <Text style={{ fontStyle: "italic", color: C.ink3 }}>{h.reason}</Text>
+            </Text>
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+};
+
 // ─── Pricing & CTA ────────────────────────────────────────────────────────────
 const PricingSection = ({ pkg }: { pkg: PackageData }) => (
   <View wrap={false} style={{ marginBottom: 20 }}>
@@ -1509,6 +1535,7 @@ const PackagePdfDocument = ({ pkg }: { pkg: PackageData }) => (
       <InclusionsExclusionsSection pkg={pkg} />
       <KnowBeforeYouGoSection pkg={pkg} />
       <ThingsToCarrySection pkg={pkg} />
+      <DateChangeNoticeSection pkg={pkg} />
       <PoliciesLinkSection pkg={pkg} />
       <PricingSection pkg={pkg} />
       

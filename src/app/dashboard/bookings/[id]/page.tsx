@@ -35,6 +35,7 @@ interface BookingDetail {
       phone?: string;
     };
   };
+  dateChangeHistory?: { oldDate: string; newDate: string; reason: string; changedAt: string }[];
 }
 
 export default function BookingDetailPage() {
@@ -257,7 +258,10 @@ export default function BookingDetailPage() {
                 </Link>
                 <button
                   onClick={() => {
-                    import("@/lib/generatePackagePdf").then((m) => m.generatePackagePdf(booking.package as any));
+                    import("@/lib/generatePackagePdf").then((m) => m.generatePackagePdf({
+                      ...booking.package,
+                      bookingMeta: { dateChangeHistory: booking.dateChangeHistory }
+                    } as any));
                   }}
                   className="syne"
                   style={{
@@ -336,6 +340,23 @@ export default function BookingDetailPage() {
           <div>
             <p style={{ fontSize: 13, color: "var(--ink3)", marginBottom: 2 }}>Your Travel Expert ({booking.enquiry.assignedTo.firstName} {booking.enquiry.assignedTo.lastName})</p>
             <p className="syne" style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>{booking.enquiry.assignedTo.phone}</p>
+          </div>
+        </div>
+      )}
+
+      {booking.dateChangeHistory && booking.dateChangeHistory.length > 0 && (
+        <div style={{ padding: "16px 20px", background: "rgba(0,174,204,.05)", borderRadius: "var(--r)", border: "1px solid rgba(0,174,204,.2)", marginBottom: 24 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
+            <span className="material-symbols-rounded" style={{ color: "var(--cu)", fontSize: 24 }}>calendar_month</span>
+            <h4 className="syne" style={{ color: "var(--cu)", margin: 0, fontWeight: 700, fontSize: 15 }}>Travel Date Updated</h4>
+          </div>
+          <div style={{ paddingLeft: 36, display: "flex", flexDirection: "column", gap: 8 }}>
+            {booking.dateChangeHistory.map((h, i) => (
+              <p key={i} style={{ margin: 0, color: "var(--ink2)", fontSize: 14, lineHeight: 1.5 }}>
+                Your travel date was changed from <strong>{new Date(h.oldDate).toLocaleDateString()}</strong> to <strong>{new Date(h.newDate).toLocaleDateString()}</strong>.<br/>
+                Reason: <i>{h.reason}</i>
+              </p>
+            ))}
           </div>
         </div>
       )}
