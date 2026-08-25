@@ -12,6 +12,9 @@ interface BookingData {
     duration?: { nights?: number; days?: number } | number;
     images?: string[];
     hotelRating?: string;
+    isInternational?: boolean;
+    visaIncluded?: boolean;
+    flightsIncluded?: boolean;
   };
   user?: {
     firstName: string;
@@ -126,6 +129,15 @@ export function generateBookingPdf(booking: BookingData): void {
   const M = 16; // margin
   const CW = W - M * 2; // content width
 
+  let y = 38; // Will be initialized after header
+  
+  const checkPage = (neededSpace: number) => {
+    if (y + neededSpace > H - 25) {
+      doc.addPage();
+      y = 20;
+    }
+  };
+
   // ═══════════════════════════════════════════════════════
   // HEADER
   // ═══════════════════════════════════════════════════════
@@ -161,16 +173,19 @@ export function generateBookingPdf(booking: BookingData): void {
   doc.setTextColor(...statusColor);
   doc.text(statusText.toUpperCase(), W - M, 20, { align: "right" });
 
-  let y = 38;
+  // Set initial Y after header
+  y = 38;
 
   // ═══════════════════════════════════════════════════════
   // PACKAGE DETAILS CARD
   // ═══════════════════════════════════════════════════════
+  const hasBadges = booking.package?.isInternational || booking.package?.flightsIncluded !== undefined;
+  const rectHeight = hasBadges ? 44 : 32;
   doc.setFillColor(...C.bg);
-  doc.roundedRect(M, y, CW, 32, 3, 3, "F");
+  doc.roundedRect(M, y, CW, rectHeight, 3, 3, "F");
   doc.setDrawColor(220, 235, 240);
   doc.setLineWidth(0.3);
-  doc.roundedRect(M, y, CW, 32, 3, 3, "S");
+  doc.roundedRect(M, y, CW, rectHeight, 3, 3, "S");
 
   // Package name
   doc.setFont("helvetica", "bold");
@@ -197,7 +212,30 @@ export function generateBookingPdf(booking: BookingData): void {
   doc.setTextColor(...C.gray);
   doc.text(metaParts.join("   |   "), M + 8, y + 10 + nameLines.length * 5 + 4);
 
-  y += 40;
+  if (hasBadges) {
+    let badgeX = M + 8;
+    const badgeY = y + 10 + nameLines.length * 5 + 14;
+    
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(7.5);
+    
+    if (booking.package?.isInternational) {
+      const vInc = booking.package.visaIncluded;
+      const vText = vInc ? "VISA INCLUDED" : "VISA NOT INCLUDED";
+      doc.setTextColor(...(vInc ? C.green : C.amber));
+      doc.text(vText, badgeX, badgeY);
+      badgeX += doc.getTextWidth(vText) + 12;
+    }
+    
+    if (booking.package?.flightsIncluded !== undefined) {
+      const fInc = booking.package.flightsIncluded;
+      const fText = fInc ? "FLIGHTS INCLUDED" : "FLIGHTS NOT INCLUDED";
+      doc.setTextColor(...(fInc ? C.green : C.amber));
+      doc.text(fText, badgeX, badgeY);
+    }
+  }
+
+  y += rectHeight + 8;
 
   // ═══════════════════════════════════════════════════════
   // BOOKING INFO GRID
@@ -305,8 +343,9 @@ export function generateBookingPdf(booking: BookingData): void {
   }
 
   // ═══════════════════════════════════════════════════════
-  // ADDITIONAL TRAVELLERS
+  // GUEST DETAILS
   // ═══════════════════════════════════════════════════════
+  checkPage(30);
   if (booking.travellersDetails && booking.travellersDetails.length > 0) {
     doc.setFillColor(...C.amber);
     doc.rect(M, y, 20, 1.5, "F");
@@ -349,6 +388,7 @@ export function generateBookingPdf(booking: BookingData): void {
   // SPECIAL REQUESTS
   // ═══════════════════════════════════════════════════════
   if (booking.specialRequests) {
+    checkPage(40);
     doc.setFillColor(...C.amber);
     doc.rect(M, y, 20, 1.5, "F");
     y += 8;
@@ -376,6 +416,7 @@ export function generateBookingPdf(booking: BookingData): void {
   // ═══════════════════════════════════════════════════════
   y += 4;
   const payBoxH = 30;
+  checkPage(payBoxH + 10);
   doc.setFillColor(...C.teal);
   doc.roundedRect(M, y, CW, payBoxH, 4, 4, "F");
 
@@ -413,6 +454,7 @@ export function generateBookingPdf(booking: BookingData): void {
   // DATE CHANGE HISTORY
   // ═══════════════════════════════════════════════════════
   if (booking.dateChangeHistory && booking.dateChangeHistory.length > 0) {
+    checkPage(30);
     doc.setFont("helvetica", "bold");
     doc.setFontSize(9);
     doc.setTextColor(...C.amber);
@@ -435,6 +477,7 @@ export function generateBookingPdf(booking: BookingData): void {
   // ═══════════════════════════════════════════════════════
   // IMPORTANT NOTES
   // ═══════════════════════════════════════════════════════
+  checkPage(40);
   doc.setFont("helvetica", "bold");
   doc.setFontSize(9);
   doc.setTextColor(...C.teal);

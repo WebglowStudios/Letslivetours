@@ -111,7 +111,23 @@ export default function CustomItineraryPage() {
                 <div className="serif" style={{ fontSize: 28, fontWeight: 700, color: "var(--gn)", marginBottom: 4 }}>
                   ₹{(pkg.price || 0).toLocaleString("en-IN")}
                 </div>
-                <div style={{ fontSize: 12, color: "var(--ink3)", marginBottom: 20 }}>per {pkg.priceUnit || 'person'} (estimated)</div>
+                <div style={{ fontSize: 12, color: "var(--ink3)", marginBottom: 16 }}>per {pkg.priceUnit || 'person'} (estimated)</div>
+                <div style={{ marginBottom: 20 }}>
+                  {pkg.isInternational && (
+                    <div style={{ display: "inline-block", background: pkg.visaIncluded ? "var(--gn-gl)" : "rgba(245,166,35,.1)", padding: "4px 8px", borderRadius: 4, marginBottom: 8, marginRight: 8 }}>
+                      <span className="syne" style={{ fontSize: 10, fontWeight: 700, color: pkg.visaIncluded ? "var(--gn)" : "var(--cu-d)", textTransform: "uppercase", letterSpacing: 1 }}>
+                        {pkg.visaIncluded ? "✓ Visa Included" : "⚠ Visa Not Included"}
+                      </span>
+                    </div>
+                  )}
+                  {pkg.flightsIncluded !== undefined && (
+                    <div style={{ display: "inline-block", background: pkg.flightsIncluded ? "var(--gn-gl)" : "rgba(245,166,35,.1)", padding: "4px 8px", borderRadius: 4, marginBottom: 8 }}>
+                      <span className="syne" style={{ fontSize: 10, fontWeight: 700, color: pkg.flightsIncluded ? "var(--gn)" : "var(--cu-d)", textTransform: "uppercase", letterSpacing: 1 }}>
+                        {pkg.flightsIncluded ? "✈ Flights Included" : "⚠ Flights Not Included"}
+                      </span>
+                    </div>
+                  )}
+                </div>
                 {isBooked ? (
                   <button disabled className="syne" style={{ display: "block", width: "100%", textAlign: "center", padding: 14, background: "var(--line2)", color: "var(--ink3)", borderRadius: 50, fontSize: 14, fontWeight: 700, border: "none", cursor: "not-allowed" }}>
                     Your package is already booked

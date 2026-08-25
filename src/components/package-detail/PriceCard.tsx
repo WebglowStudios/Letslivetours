@@ -96,6 +96,7 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
     duration ? { icon: "calendar_today", label: "Duration:", value: `${duration.nights} Nights / ${duration.days} Days` } : null,
     hotelRating ? { icon: "hotel", label: "Stay:", value: hotelRating } : null,
     { icon: "flight_takeoff", label: "Flights:", value: flightsIncluded ? "Included" : "Not included" },
+    pkg?.isInternational ? { icon: "description", label: "Visa:", value: pkg?.visaIncluded ? "Included" : "Not included" } : null,
     travellerCount ? { icon: "groups", label: "Traveller count:", value: travellerCount } : null,
   ].filter(Boolean) as { icon: string; label: string; value: string }[];
 

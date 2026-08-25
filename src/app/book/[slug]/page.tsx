@@ -91,6 +91,11 @@ function BookingContent() {
   const [couponError, setCouponError] = useState("");
   const [couponLoading, setCouponLoading] = useState(false);
 
+  // Primary Traveller Passport
+  const [primaryPassport, setPrimaryPassport] = useState("");
+  const [primaryPassportExpiry, setPrimaryPassportExpiry] = useState("");
+  const [primaryIssuingCountry, setPrimaryIssuingCountry] = useState("");
+
   useEffect(() => {
     if (user) {
       setFirstName(user.firstName || "");
@@ -253,13 +258,17 @@ function BookingContent() {
         setSubmitError("PAN Card is required for international packages.");
         return;
       }
-      if (travellers.length !== totalPax) {
-        setSubmitError(`Please add details for all ${totalPax} travellers (currently ${travellers.length}).`);
+      if (travellers.length !== totalPax - 1) {
+        setSubmitError(`Please add details for all ${totalPax} travellers (currently ${travellers.length + 1}).`);
+        return;
+      }
+      if (!primaryPassport.trim() || !primaryPassportExpiry || !primaryIssuingCountry.trim()) {
+        setSubmitError("Passport details (Number, Expiry, Country) are required for the Primary Traveller.");
         return;
       }
       const missingPassports = travellers.some((t) => !t.passportNumber || !t.passportExpiry || !t.issuingCountry);
       if (missingPassports) {
-        setSubmitError("Passport details (Number, Expiry, Country) are required for ALL travellers.");
+        setSubmitError("Passport details (Number, Expiry, Country) are required for ALL other travellers.");
         return;
       }
     }
@@ -278,17 +287,26 @@ function BookingContent() {
           children: childrenCount,
           infants: travellers.filter((t) => t.type === "infant").length,
         },
-        travellersDetails: travellers
-          .filter((t) => t.name)
-          .map((t) => ({
+        travellersDetails: [
+          {
+            name: `${firstName} ${lastName}`.trim(),
+            age: 30, // Default adult age for primary
+            phone,
+            type: "adult",
+            passportNumber: pkg.isInternational ? primaryPassport : undefined,
+            passportExpiry: pkg.isInternational ? primaryPassportExpiry : undefined,
+            issuingCountry: pkg.isInternational ? primaryIssuingCountry : undefined,
+          },
+          ...travellers.map((t) => ({
             name: t.name,
-            age: t.age ? Number(t.age) : undefined,
-            phone: t.phone || undefined,
+            age: parseInt(t.age) || 0,
+            phone: t.phone,
             type: t.type,
-            passportNumber: t.passportNumber || undefined,
-            passportExpiry: t.passportExpiry || undefined,
-            issuingCountry: t.issuingCountry || undefined,
-          })),
+            passportNumber: t.passportNumber,
+            passportExpiry: t.passportExpiry,
+            issuingCountry: t.issuingCountry,
+          }))
+        ],
         primaryTraveller: { firstName, lastName, email, phone, panCard: panCard || undefined },
         specialRequests,
         contactPhone: phone,
@@ -434,10 +452,28 @@ function BookingContent() {
                   <PhoneInput value={phone} onChange={setPhone} placeholder="98765 43210" style={{ padding: "4px 4px" }} />
                 </div>
                 {pkg.isInternational && (
-                  <div>
-                    <label className="syne" style={{ display: "block", fontSize: 9.5, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--ink4)", marginBottom: 6 }}>PAN Card * (Required)</label>
-                    <input type="text" required value={panCard} onChange={(e) => setPanCard(e.target.value.toUpperCase())} placeholder="ABCDE1234F" style={{ width: "100%", padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, fontSize: 14, color: "var(--ink)", outline: "none", textTransform: "uppercase" }} />
-                  </div>
+                  <>
+                    <div>
+                      <label className="syne" style={{ display: "block", fontSize: 9.5, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--ink4)", marginBottom: 6 }}>PAN Card * (Required)</label>
+                      <input type="text" required value={panCard} onChange={(e) => setPanCard(e.target.value.toUpperCase())} placeholder="ABCDE1234F" style={{ width: "100%", padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, fontSize: 14, color: "var(--ink)", outline: "none", textTransform: "uppercase" }} />
+                    </div>
+                    <div style={{ gridColumn: "1 / -1", height: 1, background: "var(--line)", margin: "10px 0" }} />
+                    <div style={{ gridColumn: "1 / -1" }}>
+                      <p className="syne" style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", color: "var(--ink3)", marginBottom: 12 }}>Primary Traveller Passport</p>
+                    </div>
+                    <div>
+                      <label className="syne" style={{ display: "block", fontSize: 9.5, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--ink4)", marginBottom: 6 }}>Passport Number *</label>
+                      <input type="text" required={pkg.isInternational} value={primaryPassport} onChange={(e) => setPrimaryPassport(e.target.value)} placeholder="Z1234567" style={{ width: "100%", padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, fontSize: 14, color: "var(--ink)", outline: "none" }} />
+                    </div>
+                    <div>
+                      <label className="syne" style={{ display: "block", fontSize: 9.5, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--ink4)", marginBottom: 6 }}>Passport Expiry *</label>
+                      <input type="date" required={pkg.isInternational} value={primaryPassportExpiry} onChange={(e) => setPrimaryPassportExpiry(e.target.value)} style={{ width: "100%", padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, fontSize: 14, color: "var(--ink)", outline: "none" }} />
+                    </div>
+                    <div>
+                      <label className="syne" style={{ display: "block", fontSize: 9.5, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--ink4)", marginBottom: 6 }}>Issuing Country *</label>
+                      <input type="text" required={pkg.isInternational} value={primaryIssuingCountry} onChange={(e) => setPrimaryIssuingCountry(e.target.value)} placeholder="India" style={{ width: "100%", padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, fontSize: 14, color: "var(--ink)", outline: "none" }} />
+                    </div>
+                  </>
                 )}
               </div>
             </div>
