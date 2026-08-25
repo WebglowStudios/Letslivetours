@@ -31,7 +31,7 @@ export default function WhyDubai({ destinationName = "Dubai", whyVisit }: WhyDub
           {whyVisit.map((c, i) => (
             <div key={i} className="rv wd-card-item" style={{ background: "#fff", borderRadius: "var(--r-xl)", padding: "36px 28px", textAlign: "center", boxShadow: "var(--sh)", transition: "var(--tr)", border: "1.5px solid transparent" }}>
               <div className="wd-icon-wrap" style={{ width: 64, height: 64, borderRadius: 18, background: "var(--gn-gl)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", transition: "var(--tr)" }}>
-                <span className="material-symbols-rounded wd-icon-span" style={{ fontSize: 30, color: "var(--gn)", transition: "var(--tr)" }}>{c.icon}</span>
+                <span className="material-symbols-rounded wd-icon-span" style={{ fontSize: 30, color: "var(--gn)", transition: "var(--tr)", overflow: "hidden", whiteSpace: "nowrap", textOverflow: "ellipsis" }}>{c.icon?.toLowerCase().replace(/[\\s-]+/g, '_')}</span>
               </div>
               <div className="serif" style={{ fontSize: 17, fontWeight: 600, color: "var(--ink)", marginBottom: 10 }}>{c.title}</div>
               <p style={{ fontSize: 13.5, color: "var(--ink3)", lineHeight: 1.65 }}>{c.description}</p>
