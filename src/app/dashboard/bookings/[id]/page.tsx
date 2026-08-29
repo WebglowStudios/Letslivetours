@@ -445,10 +445,11 @@ export default function BookingDetailPage() {
             <div>
               <p style={{ fontSize: 12, color: "var(--ink3)" }}>Payment Status</p>
               <p className="syne" style={{ fontSize: 15, fontWeight: 600, color: "var(--ink)", marginTop: 4, textTransform: "capitalize" }}>
-                {booking.paymentStatus === "full" ? "Fully Paid" : booking.paymentStatus || "Pending"}
+                {['paid', 'full'].includes(booking.paymentStatus || '') ? "Fully Paid" : 
+                 booking.paymentStatus === 'partial' ? "Partially Paid" : "Pending"}
               </p>
             </div>
-            {(booking.paymentStatus === "partial" || booking.paymentStatus === "full") && (
+            {(booking.paymentStatus === "partial" || booking.paymentStatus === "full" || booking.paymentStatus === "paid") && (
               <div>
                 <p style={{ fontSize: 12, color: "var(--ink3)" }}>Paid Amount</p>
                 <p className="serif" style={{ fontSize: 22, fontWeight: 700, color: "var(--gn2)", marginTop: 4 }}>

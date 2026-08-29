@@ -215,10 +215,11 @@ export default function EnquiryDetailsPage() {
                       fontWeight: 700,
                       letterSpacing: 1,
                       textTransform: "uppercase",
-                      background: enquiry.bookingRef.paymentFinanceStatus === 'approved' ? "rgba(74,194,138,.12)" : "rgba(245,166,35,.12)",
-                      color: enquiry.bookingRef.paymentFinanceStatus === 'approved' ? "#388e3c" : "var(--cu-d)",
+                      background: ['paid', 'full', 'partial'].includes(enquiry.bookingRef.paymentStatus || '') ? "rgba(74,194,138,.12)" : "rgba(245,166,35,.12)",
+                      color: ['paid', 'full', 'partial'].includes(enquiry.bookingRef.paymentStatus || '') ? "#388e3c" : "var(--cu-d)",
                     }}>
-                      {enquiry.bookingRef.paymentFinanceStatus === 'approved' ? "Payment Received" : (enquiry.bookingRef.paymentFinanceStatus || "Pending")}
+                      {['paid', 'full'].includes(enquiry.bookingRef.paymentStatus || '') ? "Fully Paid" : 
+                       enquiry.bookingRef.paymentStatus === 'partial' ? "Partially Paid" : "Pending"}
                     </span>
                   </div>
                   <div>
