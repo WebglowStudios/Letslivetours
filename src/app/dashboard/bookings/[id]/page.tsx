@@ -358,8 +358,7 @@ export default function BookingDetailPage() {
           <div style={{ paddingLeft: 36, display: "flex", flexDirection: "column", gap: 8 }}>
             {booking.dateChangeHistory.map((h, i) => (
               <p key={i} style={{ margin: 0, color: "var(--ink2)", fontSize: 14, lineHeight: 1.5 }}>
-                Your travel date was changed from <strong>{new Date(h.oldDate).toLocaleDateString()}</strong> to <strong>{new Date(h.newDate).toLocaleDateString()}</strong>.<br/>
-                Reason: <i>{h.reason}</i>
+                Your travel date was changed from <strong>{new Date(h.oldDate).toLocaleDateString()}</strong> to <strong>{new Date(h.newDate).toLocaleDateString()}</strong>.
               </p>
             ))}
           </div>
