@@ -60,8 +60,17 @@ function BookingContent() {
   const params = useParams();
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { user } = useAuth();
+  const { user, loading: authLoading } = useAuth();
   const slug = params.slug as string;
+
+  // Gatekeeper: redirect to login if not authenticated and not continuing as guest
+  useEffect(() => {
+    if (!authLoading && !user && searchParams?.get("guest") !== "true") {
+      const currentQuery = searchParams?.toString();
+      const redirectUrl = `/book/${slug}${currentQuery ? `?${currentQuery}` : ""}`;
+      router.push(`/login?redirect=${encodeURIComponent(redirectUrl)}`);
+    }
+  }, [authLoading, user, searchParams, slug, router]);
 
   const [pkg, setPkg] = useState<PackageData | null>(null);
   const [paymentConfig, setPaymentConfig] = useState<PaymentConfig | null>(null);
@@ -104,6 +113,36 @@ function BookingContent() {
       setPhone(user.phone || "");
     }
   }, [user]);
+
+  // Restore state from sessionStorage if returning as guest
+  useEffect(() => {
+    if (searchParams?.get("guest") === "true") {
+      try {
+        const saved = sessionStorage.getItem("pendingBookingData");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          setFirstName(parsed.firstName || "");
+          setLastName(parsed.lastName || "");
+          setEmail(parsed.email || "");
+          setPhone(parsed.phone || "");
+          setPanCard(parsed.panCard || "");
+          setTravelDate(parsed.travelDate || "");
+          setDepartureId(parsed.departureId || "");
+          setSpecialRequests(parsed.specialRequests || "");
+          setTravellers(parsed.travellers || []);
+          setPrimaryPassport(parsed.primaryPassport || "");
+          setPrimaryPassportExpiry(parsed.primaryPassportExpiry || "");
+          setPrimaryIssuingCountry(parsed.primaryIssuingCountry || "");
+          setCouponInput(parsed.couponInput || "");
+          setChosenPayment(parsed.chosenPayment || "full");
+          // Optionally auto-submit if desired, but user can just review and click submit
+          sessionStorage.removeItem("pendingBookingData");
+        }
+      } catch (err) {
+        console.error("Failed to restore booking data", err);
+      }
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     async function load() {
@@ -234,10 +273,20 @@ function BookingContent() {
 
   const tomorrow = new Date(Date.now() + 86400000).toISOString().split("T")[0];
 
-  const handleSubmit = async (e?: React.FormEvent) => {
+  const handleSubmit = async (e?: React.FormEvent, skipUserCheck = false) => {
     if (e) e.preventDefault();
     if (!pkg) return;
-    if (!user) {
+    
+    const isGuest = searchParams?.get("guest") === "true";
+    if (!user && !isGuest && !skipUserCheck) {
+      // Save form state so it's not lost when they return
+      const formState = {
+        firstName, lastName, email, phone, panCard, travelDate, departureId,
+        specialRequests, travellers, primaryPassport, primaryPassportExpiry,
+        primaryIssuingCountry, couponInput, chosenPayment
+      };
+      sessionStorage.setItem("pendingBookingData", JSON.stringify(formState));
+
       const currentQuery = searchParams?.toString();
       const redirectUrl = `/book/${slug}${currentQuery ? `?${currentQuery}` : ""}`;
       router.push(`/login?redirect=${encodeURIComponent(redirectUrl)}`);
@@ -381,7 +430,7 @@ function BookingContent() {
     }
   };
 
-  if (loading) return (
+  if (loading || authLoading || (!user && searchParams?.get("guest") !== "true")) return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--iv)" }}>
       <span className="material-symbols-rounded" style={{ fontSize: 36, color: "var(--gn2)", animation: "spin 1s linear infinite" }}>progress_activity</span>
       <style jsx>{`@keyframes spin { from { transform: rotate(0deg); } to { transform: rotate(360deg); } }`}</style>

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 import PhoneInput from "@/components/ui/PhoneInput";
@@ -21,6 +21,9 @@ function getPasswordStrength(password: string): { label: string; color: string; 
 
 export default function RegisterPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams?.get("redirect");
+  
   const { register } = useAuth();
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
@@ -64,7 +67,11 @@ export default function RegisterPage() {
     setLoading(false);
 
     if (result.success) {
-      router.push("/");
+      if (redirectUrl) {
+        router.push(redirectUrl);
+      } else {
+        router.push("/dashboard");
+      }
     } else {
       setError(result.error || "Registration failed");
     }
@@ -363,9 +370,9 @@ export default function RegisterPage() {
             </button>
           </form>
 
-          <p style={{ textAlign: "center", marginTop: 24, fontSize: 14, color: "var(--ink3)" }}>
+          <p style={{ textAlign: "center", marginTop: 28, fontSize: 14, color: "var(--ink3)" }}>
             Already have an account?{" "}
-            <Link href="/login" style={{ color: "var(--gn2)", fontWeight: 600 }}>
+            <Link href={redirectUrl ? `/login?redirect=${encodeURIComponent(redirectUrl)}` : "/login"} style={{ color: "var(--gn2)", fontWeight: 600 }}>
               Sign In
             </Link>
           </p>

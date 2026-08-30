@@ -1,12 +1,15 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function LoginPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const redirectUrl = searchParams?.get("redirect");
+  
   const { login } = useAuth();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -23,7 +26,11 @@ export default function LoginPage() {
     setLoading(false);
 
     if (result.success) {
-      router.push("/dashboard");
+      if (redirectUrl) {
+        router.push(redirectUrl);
+      } else {
+        router.push("/dashboard");
+      }
     } else {
       setError(result.error || "Login failed");
     }
@@ -245,10 +252,46 @@ export default function LoginPage() {
 
           <p style={{ textAlign: "center", marginTop: 28, fontSize: 14, color: "var(--ink3)" }}>
             Don&apos;t have an account?{" "}
-            <Link href="/register" style={{ color: "var(--gn2)", fontWeight: 600 }}>
+            <Link href={redirectUrl ? `/register?redirect=${encodeURIComponent(redirectUrl)}` : "/register"} style={{ color: "var(--gn2)", fontWeight: 600 }}>
               Register
             </Link>
           </p>
+
+          {redirectUrl?.includes("/book/") && (
+            <div style={{ marginTop: 24, textAlign: "center", borderTop: "1px solid var(--line)", paddingTop: 24 }}>
+              <p style={{ fontSize: 14, color: "var(--ink3)", marginBottom: 16 }}>
+                Don&apos;t want to create an account right now?
+              </p>
+              <button
+                type="button"
+                onClick={() => {
+                  const guestUrl = redirectUrl.includes("?") ? `${redirectUrl}&guest=true` : `${redirectUrl}?guest=true`;
+                  router.push(guestUrl);
+                }}
+                className="syne"
+                style={{
+                  width: "100%",
+                  padding: 16,
+                  background: "#fff",
+                  border: "1.5px solid var(--gn2)",
+                  borderRadius: 12,
+                  color: "var(--gn2)",
+                  fontSize: 14,
+                  fontWeight: 700,
+                  letterSpacing: 0.5,
+                  cursor: "pointer",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  gap: 8,
+                  transition: "var(--tr)",
+                }}
+              >
+                <span className="material-symbols-rounded" style={{ fontSize: 18 }}>person_outline</span>
+                Continue as Guest
+              </button>
+            </div>
+          )}
         </div>
       </div>
 
