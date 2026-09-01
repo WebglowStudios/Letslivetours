@@ -19,7 +19,9 @@ function getPasswordStrength(password: string): { label: string; color: string; 
   return { label: "Strong", color: "#4AC28A", width: "100%" };
 }
 
-export default function RegisterPage() {
+import { Suspense } from "react";
+
+function RegisterContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const redirectUrl = searchParams?.get("redirect");
@@ -394,5 +396,13 @@ export default function RegisterPage() {
         }
       `}</style>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={<div style={{ display: "flex", minHeight: "100vh", alignItems: "center", justifyContent: "center" }}>Loading...</div>}>
+      <RegisterContent />
+    </Suspense>
   );
 }

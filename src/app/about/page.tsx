@@ -10,10 +10,12 @@ import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import ScrollReveal from "@/components/ScrollReveal";
 
+export const dynamic = "force-dynamic";
+
 export default async function AboutPage() {
   let aboutContent = null;
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/about`, { cache: 'no-store' });
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/about`, { cache: 'no-store' });
     const data = await res.json();
     if (data.status === 'success') {
       aboutContent = data.data;
