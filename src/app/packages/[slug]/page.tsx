@@ -237,6 +237,9 @@ export default function PackageDetailPage() {
             box-shadow: 0 -4px 24px rgba(0,77,94,.2);
             padding-bottom: max(14px, env(safe-area-inset-bottom));
           }
+          .content-grid {
+            grid-template-columns: 1fr !important;
+          }
         }
         @media (max-width: 900px) {
           /* Add bottom padding so content isn't hidden behind the sticky bar */
