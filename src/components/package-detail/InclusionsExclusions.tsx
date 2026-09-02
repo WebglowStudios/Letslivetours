@@ -12,21 +12,7 @@ export default function InclusionsExclusions({ inclusions: rawInclusions, exclus
   let inclusions = [...(rawInclusions || [])];
   let exclusions = [...(rawExclusions || [])];
 
-  if (isInternational) {
-    if (visaIncluded) {
-      inclusions.unshift("Visa");
-    } else {
-      exclusions.unshift("Visa");
-    }
-  }
 
-  if (flightsIncluded !== undefined) {
-    if (flightsIncluded) {
-      inclusions.unshift("Flights");
-    } else {
-      exclusions.unshift("Flights");
-    }
-  }
 
   if ((!inclusions || inclusions.length === 0) && (!exclusions || exclusions.length === 0)) {
     return null;
