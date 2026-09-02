@@ -143,7 +143,7 @@ export default function PackageDetailPage() {
           className="content-grid"
           style={{
             display: "grid",
-            gridTemplateColumns: pkg?.isGroupTour ? "1fr" : "1fr 380px",
+            gridTemplateColumns: pkg?.isGroupTour ? "minmax(0, 1fr)" : "minmax(0, 1fr) 380px",
             gap: 32,
             alignItems: "start",
           }}
@@ -238,7 +238,7 @@ export default function PackageDetailPage() {
             padding-bottom: max(14px, env(safe-area-inset-bottom));
           }
           .content-grid {
-            grid-template-columns: 1fr !important;
+            grid-template-columns: minmax(0, 1fr) !important;
           }
         }
         @media (max-width: 900px) {
