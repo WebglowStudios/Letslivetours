@@ -15,6 +15,9 @@ interface Booking {
   };
   travelDate: string;
   status: string;
+  bookingStatus?: string;
+  operationStatus?: string;
+  isVendorConfirmed?: boolean;
   totalAmount: number;
   travellers: number;
 }
@@ -46,7 +49,7 @@ export default function MyBookingsPage() {
     if (activeTab === "upcoming") {
       return (
         new Date(b.travelDate) > new Date() &&
-        (b.status === "confirmed" || b.status === "pending")
+        (b.status === "confirmed" || b.status === "pending" || b.status === "vendor-confirmed" || b.status === "staff-confirmed")
       );
     }
     return b.status === activeTab;
@@ -64,7 +67,12 @@ export default function MyBookingsPage() {
       case "pending":
         return { background: "rgba(245,166,35,.12)", color: "var(--cu-d)" };
       case "confirmed":
+      case "staff-confirmed":
         return { background: "rgba(0,174,204,.12)", color: "var(--gn2)" };
+      case "vendor-confirmed":
+        return { background: "rgba(0,174,204,.15)", color: "#007a96" };
+      case "in-progress":
+        return { background: "rgba(245,166,35,.15)", color: "#d97706" };
       case "completed":
         return { background: "rgba(74,194,138,.12)", color: "#388e3c" };
       case "cancelled":
@@ -231,7 +239,11 @@ export default function MyBookingsPage() {
                       textTransform: "capitalize",
                     }}
                   >
-                    {booking.status}
+                    {booking.status === "vendor-confirmed"
+                      ? "Vendor Confirmed"
+                      : booking.status === "staff-confirmed"
+                      ? "Confirmed"
+                      : booking.status}
                   </span>
                   <span style={{ fontSize: 13, color: "var(--ink3)" }}>
                     ₹{booking.totalAmount?.toLocaleString("en-IN")}
@@ -240,22 +252,43 @@ export default function MyBookingsPage() {
               </div>
 
               {/* Action */}
-              <Link
-                href={`/dashboard/bookings/${booking._id}`}
-                className="syne"
-                style={{
-                  padding: "10px 20px",
-                  background: "var(--gn-gl)",
-                  color: "var(--gn2)",
-                  borderRadius: "var(--r)",
-                  fontSize: 13,
-                  fontWeight: 600,
-                  whiteSpace: "nowrap",
-                  transition: "var(--tr)",
-                }}
-              >
-                View Details
-              </Link>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                {(booking.isVendorConfirmed || booking.status === "vendor-confirmed") && (
+                  <span
+                    title="Vendor Confirmed & Voucher Available"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 4,
+                      padding: "8px 12px",
+                      background: "rgba(0,174,204,0.12)",
+                      color: "#007a96",
+                      borderRadius: "var(--r)",
+                      fontSize: 12,
+                      fontWeight: 600,
+                    }}
+                  >
+                    <span className="material-symbols-rounded" style={{ fontSize: 16 }}>verified</span>
+                    Voucher Ready
+                  </span>
+                )}
+                <Link
+                  href={`/dashboard/bookings/${booking._id}`}
+                  className="syne"
+                  style={{
+                    padding: "10px 20px",
+                    background: "var(--gn-gl)",
+                    color: "var(--gn2)",
+                    borderRadius: "var(--r)",
+                    fontSize: 13,
+                    fontWeight: 600,
+                    whiteSpace: "nowrap",
+                    transition: "var(--tr)",
+                  }}
+                >
+                  View Details
+                </Link>
+              </div>
             </div>
           ))}
         </div>

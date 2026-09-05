@@ -22,6 +22,10 @@ interface BookingDetail {
   };
   travelDate: string;
   status: string;
+  bookingStatus?: string;
+  operationStatus?: string;
+  isVendorConfirmed?: boolean;
+  voucherAvailable?: boolean;
   cancellationReason?: string;
   totalAmount: number;
   paidAmount?: number;
@@ -51,6 +55,7 @@ export default function BookingDetailPage() {
   const [payingBalance, setPayingBalance] = useState(false);
   const [showPaymentModal, setShowPaymentModal] = useState(false);
   const [customAmountToPay, setCustomAmountToPay] = useState<number | "">("");
+  const [downloadingVoucher, setDownloadingVoucher] = useState(false);
 
   useEffect(() => {
     async function fetchBooking() {
@@ -132,12 +137,33 @@ export default function BookingDetailPage() {
     }
   };
 
+  const handleDownloadVoucher = async () => {
+    if (!booking) return;
+    setDownloadingVoucher(true);
+    try {
+      const res = await api.get(`/bookings/${booking._id}/voucher-data`);
+      const voucherData = res?.data?.data || res?.data;
+      const { generateVoucherPdf } = await import("@/lib/generateVoucherPdf");
+      await generateVoucherPdf(voucherData);
+    } catch (err: any) {
+      console.error("Failed to download voucher:", err);
+      alert(err?.response?.data?.message || err?.message || "Could not generate voucher at this time.");
+    } finally {
+      setDownloadingVoucher(false);
+    }
+  };
+
   const getStatusStyle = (status: string) => {
     switch (status) {
       case "pending":
         return { background: "rgba(245,166,35,.12)", color: "var(--cu-d)" };
       case "confirmed":
+      case "staff-confirmed":
         return { background: "rgba(0,174,204,.12)", color: "var(--gn2)" };
+      case "vendor-confirmed":
+        return { background: "rgba(0,174,204,.15)", color: "#007a96" };
+      case "in-progress":
+        return { background: "rgba(245,166,35,.15)", color: "#d97706" };
       case "completed":
         return { background: "rgba(74,194,138,.12)", color: "#388e3c" };
       case "cancelled":
@@ -188,7 +214,14 @@ export default function BookingDetailPage() {
     );
   }
 
-  const canCancel = booking.status === "pending" || booking.status === "confirmed";
+  const isVendorConfirmed = Boolean(
+    booking.isVendorConfirmed ||
+    booking.voucherAvailable ||
+    booking.status === "vendor-confirmed" ||
+    booking.bookingStatus === "vendor-confirmed" ||
+    booking.operationStatus === "vendor-confirmed"
+  );
+  const canCancel = (booking.status === "pending" || booking.status === "confirmed") && !isVendorConfirmed;
   const displayId = booking.bookingId || `LLT-${booking._id.slice(0, 4).toUpperCase()}-${booking._id.slice(-5).toUpperCase()}`;
 
   return (
@@ -310,6 +343,33 @@ export default function BookingDetailPage() {
               <span className="material-symbols-rounded" style={{ fontSize: 16 }}>download</span>
               Booking PDF
             </button>
+            {isVendorConfirmed && (
+              <button
+                onClick={handleDownloadVoucher}
+                disabled={downloadingVoucher}
+                className="syne"
+                style={{
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6,
+                  padding: "8px 16px",
+                  background: "linear-gradient(135deg, #007a96 0%, #00AECC 100%)",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: 20,
+                  fontSize: 12,
+                  fontWeight: 700,
+                  cursor: downloadingVoucher ? "wait" : "pointer",
+                  boxShadow: "0 2px 8px rgba(0,174,204,0.25)",
+                  transition: "var(--tr)",
+                }}
+              >
+                <span className="material-symbols-rounded" style={{ fontSize: 16 }}>
+                  {downloadingVoucher ? "progress_activity" : "verified"}
+                </span>
+                {downloadingVoucher ? "Generating..." : "Download Voucher"}
+              </button>
+            )}
             <span
               className="syne"
               style={{
@@ -321,11 +381,83 @@ export default function BookingDetailPage() {
                 textTransform: "capitalize",
               }}
             >
-              {booking.status === "cancelled" && booking.cancellationReason ? "Cancellation Processing" : booking.status}
+              {booking.status === "cancelled" && booking.cancellationReason
+                ? "Cancellation Processing"
+                : booking.status === "vendor-confirmed"
+                ? "Vendor Confirmed"
+                : booking.status === "staff-confirmed"
+                ? "Confirmed"
+                : booking.status}
             </span>
           </div>
         </div>
       </div>
+
+      {/* Vendor Confirmed Banner */}
+      {isVendorConfirmed && (
+        <div
+          style={{
+            background: "linear-gradient(135deg, rgba(0,174,204,0.08) 0%, rgba(0,77,94,0.04) 100%)",
+            border: "1px solid rgba(0,174,204,0.3)",
+            borderRadius: "var(--r)",
+            padding: "16px 20px",
+            marginBottom: 24,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            flexWrap: "wrap",
+            gap: 16,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
+            <div
+              style={{
+                width: 40,
+                height: 40,
+                borderRadius: "50%",
+                background: "rgba(0,174,204,0.15)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#007a96",
+                flexShrink: 0,
+              }}
+            >
+              <span className="material-symbols-rounded" style={{ fontSize: 22 }}>verified</span>
+            </div>
+            <div>
+              <p className="syne" style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", marginBottom: 2 }}>
+                Vendors Confirmed & Voucher Ready!
+              </p>
+              <p style={{ fontSize: 12, color: "var(--ink3)", margin: 0 }}>
+                All accommodations, transport, and itinerary arrangements have been verified with our local partners. Your official travel voucher is ready for download.
+              </p>
+            </div>
+          </div>
+          <button
+            onClick={handleDownloadVoucher}
+            disabled={downloadingVoucher}
+            className="syne"
+            style={{
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 6,
+              padding: "10px 18px",
+              background: "var(--gn)",
+              color: "#fff",
+              border: "none",
+              borderRadius: "var(--r)",
+              fontSize: 13,
+              fontWeight: 600,
+              cursor: downloadingVoucher ? "wait" : "pointer",
+              whiteSpace: "nowrap",
+            }}
+          >
+            <span className="material-symbols-rounded" style={{ fontSize: 18 }}>download</span>
+            {downloadingVoucher ? "Generating Voucher..." : "Download Voucher PDF"}
+          </button>
+        </div>
+      )}
 
       {booking.status === "cancelled" && (
         <div style={{ padding: "16px 20px", background: "rgba(220,53,69,.05)", borderRadius: "var(--r)", border: "1px solid rgba(220,53,69,.2)", marginBottom: 24 }}>

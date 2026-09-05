@@ -321,6 +321,11 @@ function buildStayContent(stay: any): string {
     html += sectionLabel("wifi", "Amenities");
     html += buildBulletList(stay.amenities, "var(--gn3)");
   }
+  if (stay.remark && stay.showRemarkToCustomer) {
+    html += `<div style="margin-top:12px;padding:10px 14px;background:#f0fdf4;border-left:3px solid #10b981;border-radius:6px;font-size:12.5px;color:#1e293b;line-height:1.5">
+      <span style="font-weight:700;color:#047857">Note: </span>${stay.remark}
+    </div>`;
+  }
   return html;
 }
 
