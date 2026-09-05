@@ -224,6 +224,73 @@ function buildActivitiesList(
     .join("")}</div>`;
 }
 
+/* ── Shared: styled recommendations in an orange thought bubble with mascot bird ── */
+function buildRecommendationsList(
+  recommendations: (string | any)[]
+): string {
+  if (!recommendations || recommendations.length === 0) return "";
+
+  const items = recommendations
+    .map((rec) => (typeof rec === "string" ? rec : (rec.title || rec.name || "")).trim())
+    .filter(Boolean);
+
+  if (items.length === 0) return "";
+
+  return `
+  <div class="recommendations-thought-wrap" style="margin: 20px 0 16px; position: relative;">
+    <!-- Orange Thought Bubble Box -->
+    <div style="background: #fffaf5; border: 2px solid #f97316; border-radius: 22px; padding: 18px 22px 14px; box-shadow: 0 4px 18px rgba(249, 115, 22, 0.08); position: relative;">
+      <!-- Title -->
+      <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
+        <span style="font-size: 16px; line-height: 1;">💭</span>
+        <span style="font-size: 13px; font-weight: 700; color: #ea580c; text-transform: uppercase; letter-spacing: 0.8px;">
+          Recommended for this Day
+        </span>
+      </div>
+
+      <!-- Bullet Points List -->
+      <ul style="margin: 0 0 14px 0; padding-left: 20px; list-style-type: disc;">
+        ${items
+          .map(
+            (item) =>
+              `<li style="font-size: 13.5px; color: var(--ink, #1e293b); line-height: 1.6; margin-bottom: 6px;">${item}</li>`
+          )
+          .join("")}
+      </ul>
+
+      <!-- Disclaimer at the bottom -->
+      <div style="font-size: 11px; color: #9a3412; border-top: 1px dashed #fed7aa; padding-top: 8px; line-height: 1.45; display: flex; align-items: flex-start; gap: 6px;">
+        <span class="material-symbols-rounded" style="font-size: 14px; color: #ea580c; flex-shrink: 0; margin-top: 1px;">info</span>
+        <span>These recommendations are not included in the package. We are just listing them for your free time.</span>
+      </div>
+    </div>
+
+    <!-- Bottom-Left Thought Trail & Mascot Bird (Thinking) -->
+    <div style="display: flex; align-items: flex-start; gap: 10px; margin-left: 24px; margin-top: -3px;">
+      <!-- Trailing Thought Circles from Bubble to Bird -->
+      <div style="display: flex; flex-direction: column; align-items: center; gap: 3px;">
+        <span style="width: 14px; height: 14px; border-radius: 50%; background: #fffaf5; border: 2px solid #f97316; display: block; box-shadow: 0 2px 4px rgba(249, 115, 22, 0.08);"></span>
+        <span style="width: 9px; height: 9px; border-radius: 50%; background: #fffaf5; border: 2px solid #f97316; display: block;"></span>
+        <span style="width: 5px; height: 5px; border-radius: 50%; background: #f97316; display: block; margin-bottom: 2px;"></span>
+
+        <!-- Mascot Bird Image -->
+        <img
+          src="/mascot-bird.svg"
+          alt="Company Mascot Bird"
+          class="mascot-bird"
+          style="width: 48px; height: 48px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.12)); display: block;"
+          onerror="this.onerror=null; this.src='/logo_blue.png';"
+        />
+      </div>
+      <div style="margin-top: 36px;">
+        <span style="font-size: 11px; font-weight: 700; color: #ea580c; letter-spacing: 0.3px; font-style: italic; opacity: 0.9;">
+          Mascot's Thoughts
+        </span>
+      </div>
+    </div>
+  </div>`;
+}
+
 /* ── Shared: section label ── */
 function sectionLabel(icon: string, text: string): string {
   return `<div style="display:flex;align-items:center;gap:7px;margin:14px 0 6px">
@@ -281,6 +348,9 @@ function buildItineraryContent(day: any, dayFlights: any[] = [], imageMap?: Reco
   if (day.activities && day.activities.length > 0) {
     html += sectionLabel("directions_walk", "Activities");
     html += buildActivitiesList(day.activities, "var(--cu)", imageMap);
+  }
+  if (day.recommendations && day.recommendations.length > 0) {
+    html += buildRecommendationsList(day.recommendations);
   }
   if (day.meals && day.meals.length > 0) {
     html += sectionLabel("restaurant", "Meals Included");
