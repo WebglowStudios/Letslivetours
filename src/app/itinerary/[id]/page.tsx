@@ -79,6 +79,7 @@ export default function CustomItineraryPage() {
           destinationImages={pkg.destinationImages || []}
           stayImages={pkg.stayImages || []}
           activityImages={pkg.activityImages || []}
+          imageMap={pkg?.imageMap}
         />
 
         <div className="content-grid" style={{ display: "grid", gridTemplateColumns: pkg?.isGroupTour ? "1fr" : "1fr 380px", gap: 32, alignItems: "start" }}>

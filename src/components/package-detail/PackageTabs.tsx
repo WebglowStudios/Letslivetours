@@ -40,11 +40,14 @@ function AccordionItem({
   const handleBodyClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     if (target.tagName === "IMG" && target.hasAttribute("data-lightbox")) {
-      const container = target.closest(".acc-images");
+      const container = target.closest(".acc-images") || target.closest(".act-images");
       if (container && onImageClick) {
         const imgs = Array.from(container.querySelectorAll("img")).map((img) => img.getAttribute("src") || "");
         const idx = imgs.indexOf(target.getAttribute("src") || "");
         onImageClick(imgs, idx >= 0 ? idx : 0);
+      } else if (onImageClick) {
+        const src = target.getAttribute("src") || "";
+        onImageClick([src], 0);
       }
     }
   };
@@ -169,6 +172,58 @@ function buildBulletList(items: string[], accentColor = "var(--cu)"): string {
     .join("")}</ul>`;
 }
 
+/* ── Shared: styled activities list with linked images ── */
+function buildActivitiesList(
+  activities: (string | any)[],
+  accentColor = "var(--cu)",
+  imageMap?: Record<string, string>
+): string {
+  if (!activities || activities.length === 0) return "";
+
+  return `<div class="act-list" style="display:flex;flex-direction:column;gap:10px;margin:10px 0 6px">${activities
+    .map((act) => {
+      const isString = typeof act === "string";
+      const title = isString ? act : (act.title || act.name || "");
+      const desc = !isString ? act.description : undefined;
+      const rawImages: string[] = !isString
+        ? (act.images && act.images.length > 0 ? act.images : (act.image ? [act.image] : []))
+        : [];
+      const images = rawImages.filter(Boolean);
+
+      if (images.length === 0) {
+        // Plain bullet style
+        return `<div style="display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:var(--ink2);line-height:1.65">
+          <span style="width:7px;height:7px;border-radius:50%;background:${accentColor};flex-shrink:0;margin-top:6px"></span>
+          <div>
+            <span style="font-weight:500;color:var(--ink)">${title}</span>
+            ${desc ? `<p style="font-size:12.5px;color:var(--ink3);margin-top:2px;line-height:1.5">${desc}</p>` : ""}
+          </div>
+        </div>`;
+      }
+
+      // Activity with linked image(s)
+      return `<div style="display:flex;flex-direction:column;gap:8px;padding:12px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;transition:all .2s ease">
+        <div style="display:flex;align-items:flex-start;gap:10px">
+          <span style="width:8px;height:8px;border-radius:50%;background:${accentColor};flex-shrink:0;margin-top:6px"></span>
+          <div style="flex:1">
+            <span style="font-size:14px;font-weight:700;color:var(--ink);letter-spacing:-0.1px">${title}</span>
+            ${desc ? `<p style="font-size:12.5px;color:var(--ink3);margin-top:3px;line-height:1.5">${desc}</p>` : ""}
+          </div>
+        </div>
+        <div class="act-images" style="display:flex;gap:12px;flex-wrap:wrap;margin-left:18px;margin-top:4px">
+          ${images
+            .map((img) => {
+              return `<div style="position:relative;display:inline-block;border-radius:10px;overflow:hidden;border:1.5px solid var(--line);box-shadow:0 1px 4px rgba(0,0,0,0.06);cursor:pointer;line-height:0">
+                <img src="${img}" alt="${title}" title="${title} (Click to expand)" class="act-thumb" data-lightbox />
+              </div>`;
+            })
+            .join("")}
+        </div>
+      </div>`;
+    })
+    .join("")}</div>`;
+}
+
 /* ── Shared: section label ── */
 function sectionLabel(icon: string, text: string): string {
   return `<div style="display:flex;align-items:center;gap:7px;margin:14px 0 6px">
@@ -208,7 +263,7 @@ function buildFlightContent(flight: any, hideHeader: boolean = false): string {
 }
 
 /* ── Helper: build HTML content for an itinerary day ── */
-function buildItineraryContent(day: any, dayFlights: any[] = []): string {
+function buildItineraryContent(day: any, dayFlights: any[] = [], imageMap?: Record<string, string>): string {
   let html = "";
   if (dayFlights.length > 0) {
     html += sectionLabel("flight", "Flights");
@@ -225,7 +280,7 @@ function buildItineraryContent(day: any, dayFlights: any[] = []): string {
   }
   if (day.activities && day.activities.length > 0) {
     html += sectionLabel("directions_walk", "Activities");
-    html += buildBulletList(day.activities, "var(--cu)");
+    html += buildActivitiesList(day.activities, "var(--cu)", imageMap);
   }
   if (day.meals && day.meals.length > 0) {
     html += sectionLabel("restaurant", "Meals Included");
@@ -428,9 +483,9 @@ function buildTransferContent(transfer: any): string {
 }
 
 /* ── Helper: build activities-from-itinerary content for a day ── */
-function buildDayActivitiesContent(day: any): string {
+function buildDayActivitiesContent(day: any, imageMap?: Record<string, string>): string {
   if (!day.activities || day.activities.length === 0) return "";
-  return buildBulletList(day.activities, "var(--cu)");
+  return buildActivitiesList(day.activities, "var(--cu)", imageMap);
 }
 
 // Tabs definition removed from here, moved inside the component to be dynamic
@@ -501,7 +556,7 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
             badge: `Day ${day.day}`,
             badgeType: "day",
             title: day.title,
-            content: buildItineraryContent(day, dayFlights),
+            content: buildItineraryContent(day, dayFlights, pkg?.imageMap),
           };
         });
       case "activities":
@@ -512,7 +567,7 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
             badge: `Day ${day.day}`,
             badgeType: "activity",
             title: day.title || `Day ${day.day}`,
-            content: buildDayActivitiesContent(day),
+            content: buildDayActivitiesContent(day, pkg?.imageMap),
           }));
       case "flights":
         return flights.map((f: any, i: number) => ({
@@ -806,9 +861,34 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
           border-color: var(--cu);
           transform: scale(1.05);
         }
+        :global(.act-images) {
+          display: flex;
+          gap: 12px;
+          flex-wrap: wrap;
+          margin-top: 6px;
+        }
+        :global(.act-thumb) {
+          width: 220px;
+          height: 145px;
+          object-fit: cover;
+          border-radius: 10px;
+          border: 1.5px solid var(--line);
+          cursor: pointer;
+          transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+          display: block;
+        }
+        :global(.act-thumb:hover) {
+          border-color: var(--cu);
+          transform: scale(1.03);
+          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        }
         @media (max-width: 600px) {
           .itin-hero {
             height: 200px !important;
+          }
+          :global(.act-thumb) {
+            width: 100%;
+            height: 160px;
           }
         }
       `}</style>
@@ -824,6 +904,12 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
               <span className="material-symbols-rounded" style={{ color: "#fff", fontSize: 20 }}>close</span>
             </button>
             <img src={lightboxImages[lightboxIdx]} alt="" style={{ width: "100%", maxHeight: "80vh", objectFit: "contain", borderRadius: "var(--r)" }} />
+            {pkg?.imageMap?.[lightboxImages[lightboxIdx]] && (
+              <div style={{ textAlign: "center", marginTop: 10, fontSize: 14, fontWeight: 600, color: "#fff", letterSpacing: 0.5, display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+                <span className="material-symbols-rounded" style={{ fontSize: 16, color: "var(--cu)" }}>location_on</span>
+                {pkg.imageMap[lightboxImages[lightboxIdx]]}
+              </div>
+            )}
             {lightboxImages.length > 1 && (
               <>
                 <button onClick={() => setLightboxIdx((lightboxIdx - 1 + lightboxImages.length) % lightboxImages.length)} style={{ position: "absolute", top: "50%", transform: "translateY(-50%)", left: -50, width: 44, height: 44, borderRadius: "50%", background: "rgba(255,255,255,.12)", display: "flex", alignItems: "center", justifyContent: "center", border: "none", cursor: "pointer" }}>

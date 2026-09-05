@@ -136,6 +136,7 @@ export default function PackageDetailPage() {
           destinationImages={pkg?.destinationImages || []}
           stayImages={pkg?.stayImages || []}
           activityImages={pkg?.activityImages || []}
+          imageMap={pkg?.imageMap}
         />
 
         {/* Content Grid */}

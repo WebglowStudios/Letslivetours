@@ -8,12 +8,18 @@ interface PackageGalleryProps {
   destinationImages?: string[];
   stayImages?: string[];
   activityImages?: string[];
+  imageMap?: Record<string, string>;
 }
 
-export default function PackageGallery({ images, heroImage, destinationImages, stayImages, activityImages }: PackageGalleryProps) {
+export default function PackageGallery({ images, heroImage, destinationImages, stayImages, activityImages, imageMap }: PackageGalleryProps) {
   const [modalOpen, setModalOpen] = useState(false);
   const [modalIdx, setModalIdx] = useState(0);
   const [modalFilter, setModalFilter] = useState("all");
+
+  const getImageName = (url?: string): string => {
+    if (!url) return "";
+    return imageMap?.[url] || "";
+  };
 
   // Build gallery: heroImage first, then category images, then general
   const allImages = [
@@ -159,9 +165,44 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
         >
           <img
             src={galleryImages[0]}
-            alt="Package Main"
+            alt={getImageName(galleryImages[0]) || "Package Main"}
             style={{ width: "100%", height: "100%", objectFit: "cover" }}
           />
+          {getImageName(galleryImages[0]) && (
+            <div
+              style={{
+                position: "absolute",
+                bottom: 16,
+                left: 16,
+                right: 16,
+                pointerEvents: "none",
+                display: "flex",
+                alignItems: "center",
+              }}
+            >
+              <div
+                style={{
+                  background: "rgba(0, 20, 28, 0.72)",
+                  backdropFilter: "blur(8px)",
+                  WebkitBackdropFilter: "blur(8px)",
+                  border: "1px solid rgba(255, 255, 255, 0.18)",
+                  borderRadius: 10,
+                  padding: "7px 14px",
+                  color: "#fff",
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 7,
+                  maxWidth: "90%",
+                  boxShadow: "0 4px 16px rgba(0,0,0,0.3)",
+                }}
+              >
+                <span className="material-symbols-rounded" style={{ fontSize: 16, color: "var(--cu)" }}>location_on</span>
+                <span style={{ fontSize: 13, fontWeight: 700, fontFamily: "var(--font-jakarta), sans-serif", letterSpacing: "0.01em", textOverflow: "ellipsis", overflow: "hidden", whiteSpace: "nowrap" }}>
+                  {getImageName(galleryImages[0])}
+                </span>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Right side: adaptive grid based on actual cell count */}
@@ -184,14 +225,22 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
                 style={{ position: "relative", overflow: "hidden", borderRadius: "var(--r)", cursor: "pointer" }}
                 onClick={() => openModal(1)}
               >
-                <img src={rightCells[0].img} alt={rightCells[0].label || "Photo 2"} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s ease" }} />
-                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,20,28,.5) 0%, transparent 55%)" }} />
-                {rightCells[0].label && (
-                  <div style={{ position: "absolute", bottom: 12, left: 14, fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif", fontSize: 12, fontWeight: 700, color: "#fff", textShadow: "0 1px 6px rgba(0,0,0,.5)", display: "flex", alignItems: "center", gap: 5 }}>
-                    <span className="material-symbols-rounded" style={{ fontSize: 15 }}>{rightCells[0].icon}</span>
-                    {rightCells[0].label}
-                  </div>
-                )}
+                <img src={rightCells[0].img} alt={getImageName(rightCells[0].img) || rightCells[0].label || "Photo 2"} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s ease" }} />
+                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,20,28,.65) 0%, transparent 55%)" }} />
+                <div style={{ position: "absolute", bottom: 12, left: 14, right: 14, pointerEvents: "none", display: "flex", flexDirection: "column", gap: 3 }}>
+                  {rightCells[0].label && (
+                    <div style={{ fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif", fontSize: 11, fontWeight: 700, color: "var(--cu)", textShadow: "0 1px 6px rgba(0,0,0,.6)", display: "flex", alignItems: "center", gap: 4 }}>
+                      <span className="material-symbols-rounded" style={{ fontSize: 14 }}>{rightCells[0].icon}</span>
+                      {rightCells[0].label}
+                    </div>
+                  )}
+                  {getImageName(rightCells[0].img) && (
+                    <div style={{ fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif", fontSize: 12, fontWeight: 700, color: "#fff", textShadow: "0 1px 6px rgba(0,0,0,.7)", display: "flex", alignItems: "center", gap: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      <span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--cu)" }}>location_on</span>
+                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{getImageName(rightCells[0].img)}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
@@ -202,14 +251,22 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
                 style={{ position: "relative", overflow: "hidden", borderRadius: "var(--r)", cursor: "pointer" }}
                 onClick={() => openModal(2)}
               >
-                <img src={rightCells[1].img} alt={rightCells[1].label || "Photo 3"} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s ease" }} />
-                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,20,28,.5) 0%, transparent 55%)" }} />
-                {rightCells[1].label && (
-                  <div style={{ position: "absolute", bottom: 12, left: 14, fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif", fontSize: 12, fontWeight: 700, color: "#fff", textShadow: "0 1px 6px rgba(0,0,0,.5)", display: "flex", alignItems: "center", gap: 5 }}>
-                    <span className="material-symbols-rounded" style={{ fontSize: 15 }}>{rightCells[1].icon}</span>
-                    {rightCells[1].label}
-                  </div>
-                )}
+                <img src={rightCells[1].img} alt={getImageName(rightCells[1].img) || rightCells[1].label || "Photo 3"} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s ease" }} />
+                <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,20,28,.65) 0%, transparent 55%)" }} />
+                <div style={{ position: "absolute", bottom: 12, left: 14, right: 14, pointerEvents: "none", display: "flex", flexDirection: "column", gap: 3 }}>
+                  {rightCells[1].label && (
+                    <div style={{ fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif", fontSize: 11, fontWeight: 700, color: "var(--cu)", textShadow: "0 1px 6px rgba(0,0,0,.6)", display: "flex", alignItems: "center", gap: 4 }}>
+                      <span className="material-symbols-rounded" style={{ fontSize: 14 }}>{rightCells[1].icon}</span>
+                      {rightCells[1].label}
+                    </div>
+                  )}
+                  {getImageName(rightCells[1].img) && (
+                    <div style={{ fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif", fontSize: 12, fontWeight: 700, color: "#fff", textShadow: "0 1px 6px rgba(0,0,0,.7)", display: "flex", alignItems: "center", gap: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                      <span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--cu)" }}>location_on</span>
+                      <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{getImageName(rightCells[1].img)}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 
@@ -229,18 +286,28 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
                       style={{ position: "relative", overflow: "hidden", borderRadius: "var(--r)", cursor: "pointer" }}
                       onClick={() => openModal(cellIdx + 1)}
                     >
-                      <img src={cell.img} alt={cell.label || `Photo ${cellIdx + 2}`} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s ease" }} />
-                      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,20,28,.5) 0%, transparent 55%)" }} />
-                      {!showViewAll && cell.label && (
-                        <div style={{ position: "absolute", bottom: 12, left: 14, fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif", fontSize: 12, fontWeight: 700, color: "#fff", textShadow: "0 1px 6px rgba(0,0,0,.5)", display: "flex", alignItems: "center", gap: 5 }}>
-                          <span className="material-symbols-rounded" style={{ fontSize: 15 }}>{cell.icon}</span>
-                          {cell.label}
+                      <img src={cell.img} alt={getImageName(cell.img) || cell.label || `Photo ${cellIdx + 2}`} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .5s ease" }} />
+                      <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,20,28,.65) 0%, transparent 55%)" }} />
+                      {!showViewAll && (
+                        <div style={{ position: "absolute", bottom: 12, left: 14, right: 14, pointerEvents: "none", display: "flex", flexDirection: "column", gap: 3 }}>
+                          {cell.label && (
+                            <div style={{ fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif", fontSize: 11, fontWeight: 700, color: "var(--cu)", textShadow: "0 1px 6px rgba(0,0,0,.6)", display: "flex", alignItems: "center", gap: 4 }}>
+                              <span className="material-symbols-rounded" style={{ fontSize: 14 }}>{cell.icon}</span>
+                              {cell.label}
+                            </div>
+                          )}
+                          {getImageName(cell.img) && (
+                            <div style={{ fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif", fontSize: 12, fontWeight: 700, color: "#fff", textShadow: "0 1px 6px rgba(0,0,0,.7)", display: "flex", alignItems: "center", gap: 4, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                              <span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--cu)" }}>location_on</span>
+                              <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{getImageName(cell.img)}</span>
+                            </div>
+                          )}
                         </div>
                       )}
                       {showViewAll && (
                         <button
                           onClick={(e) => { e.stopPropagation(); openModal(0); }}
-                          style={{ position: "absolute", bottom: 12, left: 14, fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif", fontSize: 12, fontWeight: 700, color: "#fff", background: "rgba(0,20,28,.55)", backdropFilter: "blur(6px)", border: "1px solid rgba(255,255,255,.2)", borderRadius: 8, padding: "6px 14px", transition: "var(--tr)", display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }}
+                          style={{ position: "absolute", bottom: 12, left: 14, fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif", fontSize: 12, fontWeight: 700, color: "#fff", background: "rgba(0,20,28,.65)", backdropFilter: "blur(6px)", border: "1px solid rgba(255,255,255,.2)", borderRadius: 8, padding: "6px 14px", transition: "var(--tr)", display: "flex", alignItems: "center", gap: 6, cursor: "pointer" }}
                         >
                           <span className="material-symbols-rounded" style={{ fontSize: 16 }}>photo_library</span>
                           View All Photos
@@ -352,17 +419,47 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
               <span className="material-symbols-rounded" style={{ color: "#fff", fontSize: 26 }}>chevron_right</span>
             </button>
 
+            {/* Location / Place Name & Counter */}
             <div
               style={{
                 textAlign: "center",
                 marginTop: 14,
-                fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif",
-                fontSize: 12,
-                fontWeight: 600,
-                color: "rgba(255,255,255,.5)",
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+                gap: 6,
               }}
             >
-              {modalIdx + 1} / {filteredImages.length}
+              {getImageName(filteredImages[modalIdx] || galleryImages[0]) && (
+                <div
+                  style={{
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    background: "rgba(255, 255, 255, 0.12)",
+                    backdropFilter: "blur(8px)",
+                    WebkitBackdropFilter: "blur(8px)",
+                    border: "1px solid rgba(255, 255, 255, 0.2)",
+                    borderRadius: 50,
+                    padding: "6px 18px",
+                  }}
+                >
+                  <span className="material-symbols-rounded" style={{ fontSize: 16, color: "var(--cu)" }}>location_on</span>
+                  <span style={{ fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif", fontSize: 13, fontWeight: 700, color: "#fff" }}>
+                    {getImageName(filteredImages[modalIdx] || galleryImages[0])}
+                  </span>
+                </div>
+              )}
+              <div
+                style={{
+                  fontFamily: "var(--font-jakarta), 'Plus Jakarta Sans', sans-serif",
+                  fontSize: 12,
+                  fontWeight: 600,
+                  color: "rgba(255,255,255,.5)",
+                }}
+              >
+                {modalIdx + 1} / {filteredImages.length}
+              </div>
             </div>
 
             {/* Filter buttons */}
@@ -407,6 +504,7 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
                 <div
                   key={i}
                   onClick={() => setModalIdx(i)}
+                  title={getImageName(src) || `Photo ${i + 1}`}
                   style={{
                     width: 60,
                     height: 44,
@@ -420,7 +518,7 @@ export default function PackageGallery({ images, heroImage, destinationImages, s
                 >
                   <img
                     src={src}
-                    alt=""
+                    alt={getImageName(src) || `Photo ${i + 1}`}
                     style={{ width: "100%", height: "100%", objectFit: "cover" }}
                   />
                 </div>
