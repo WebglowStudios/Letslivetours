@@ -346,18 +346,32 @@ const VoucherDocument = ({ data }: { data: VoucherData }) => {
 
   const transfersByDay: Record<number | string, any[]> = {};
   
-  // Transfers from transports (flights/trains)
+  // Transfers from transports (flights/trains/cabs)
   transports?.forEach((t: any) => {
     (t.legs || []).forEach((leg: any) => {
-      if (leg.tripDay) {
-        const str = String(leg.tripDay);
-        const dayMatch = str.match(/\d+/);
-        const dayNum = dayMatch ? parseInt(dayMatch[0], 10) : null;
+      const str = String(leg.tripDay || '').trim();
+      const dayMatch = str.match(/\d+/);
+      let dayNum = dayMatch ? parseInt(dayMatch[0], 10) : null;
 
-        if (dayNum !== null) {
-          if (!transfersByDay[dayNum]) transfersByDay[dayNum] = [];
-          transfersByDay[dayNum].push({ ...leg, type: t.type, title: t.title });
+      // Handle common textual days like "Arrival", "Pickup", "Departure", "Drop"
+      if (dayNum === null && str) {
+        if (/arrival|pickup/i.test(str)) {
+          dayNum = 1;
+        } else if (/departure|drop|return/i.test(str)) {
+          dayNum = itinerary?.length || 1;
         }
+      }
+
+      // If no tripDay specified but has driver or vehicle details, assign to Day 1 so driver details are visible
+      if (dayNum === null && !str && (leg.driverName || leg.driverContact || leg.vehicleNumber)) {
+        dayNum = 1;
+      }
+
+      if (dayNum !== null) {
+        if (!transfersByDay[dayNum]) transfersByDay[dayNum] = [];
+        transfersByDay[dayNum].push({ ...leg, type: t.type, title: t.title });
+      }
+      if (str) {
         if (!transfersByDay[str]) transfersByDay[str] = [];
         if (dayNum === null) {
           transfersByDay[str].push({ ...leg, type: t.type, title: t.title });
@@ -581,7 +595,7 @@ const VoucherDocument = ({ data }: { data: VoucherData }) => {
 
                       const addIfUnique = (leg: any) => {
                         if (!leg) return;
-                        const key = `${leg.title || ''}-${leg.from || ''}-${leg.to || ''}-${leg.departureTime || ''}-${leg.pnr || ''}-${leg.vehicleNumber || ''}`;
+                        const key = `${leg.title || ''}-${leg.from || ''}-${leg.to || ''}-${leg.departureTime || ''}-${leg.pnr || ''}-${leg.vehicleNumber || ''}-${leg.driverName || ''}-${leg.driverContact || ''}`;
                         if (!seen.has(key)) {
                           seen.add(key);
                           dayTransfers.push(leg);
