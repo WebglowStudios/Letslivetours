@@ -28,7 +28,7 @@ interface BookingData {
     email?: string;
     phone?: string;
   };
-  travellersDetails?: { name: string; age?: number; phone?: string; type: string }[];
+  travellersDetails?: { name: string; age?: number; dob?: string | Date; phone?: string; type: string }[];
   travelDate: string;
   returnDate?: string;
   status?: string;
@@ -362,7 +362,20 @@ export function generateBookingPdf(booking: BookingData): void {
     for (let i = 0; i < booking.travellersDetails.length; i++) {
       const t = booking.travellersDetails[i];
       const typeLabel = t.type ? t.type.charAt(0).toUpperCase() + t.type.slice(1) : "Adult";
-      const ageStr = t.age ? `, Age: ${t.age}` : "";
+      const dobFormatted = t.dob ? new Date(t.dob).toLocaleDateString("en-GB") : "";
+      const dobStr = dobFormatted ? `, DOB: ${dobFormatted}` : "";
+      let ageNum = t.age;
+      if (ageNum === undefined && t.dob) {
+        const birthDate = new Date(t.dob);
+        if (!isNaN(birthDate.getTime())) {
+          const today = new Date();
+          let a = today.getFullYear() - birthDate.getFullYear();
+          const m = today.getMonth() - birthDate.getMonth();
+          if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) a--;
+          if (a >= 0) ageNum = a;
+        }
+      }
+      const ageStr = ageNum !== undefined ? `, Age: ${ageNum}` : "";
       const phoneStr = t.phone ? ` | Ph: ${s(t.phone)}` : "";
 
       doc.setTextColor(...C.teal);
@@ -370,13 +383,14 @@ export function generateBookingPdf(booking: BookingData): void {
       doc.text(`${i + 1}.`, M, y);
       doc.setTextColor(...C.ink);
       doc.setFont("helvetica", "normal");
-      doc.text(`${s(t.name || "—")}${ageStr}${phoneStr}`, M + 8, y);
+      const infoText = `${s(t.name || "—")}${dobStr}${ageStr}${phoneStr}`;
+      doc.text(infoText, M + 8, y);
 
       // Type badge
       doc.setFont("helvetica", "bold");
       doc.setFontSize(7);
       doc.setTextColor(...C.gray);
-      doc.text(`[${typeLabel}]`, M + 8 + doc.getTextWidth(`${s(t.name || "—")}${ageStr}${phoneStr}`) + 4, y);
+      doc.text(`[${typeLabel}]`, M + 8 + doc.getTextWidth(infoText) + 4, y);
       doc.setFontSize(8.5);
 
       y += 6;

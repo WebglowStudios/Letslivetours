@@ -46,9 +46,23 @@ interface PaymentConfig {
   keyId: string;
 }
 
+export const calculateAgeFromDob = (dobStr?: string): number | undefined => {
+  if (!dobStr) return undefined;
+  const birthDate = new Date(dobStr);
+  if (isNaN(birthDate.getTime())) return undefined;
+  const today = new Date();
+  let age = today.getFullYear() - birthDate.getFullYear();
+  const m = today.getMonth() - birthDate.getMonth();
+  if (m < 0 || (m === 0 && today.getDate() < birthDate.getDate())) {
+    age--;
+  }
+  return age >= 0 ? age : undefined;
+};
+
 interface TravellerEntry {
   name: string;
   age: string;
+  dob?: string;
   phone: string;
   type: "adult" | "child" | "infant";
   passportNumber?: string;
@@ -189,7 +203,7 @@ function BookingContent() {
   }, [success, router]);
 
   const addTraveller = (type: "adult" | "child" | "infant") =>
-    setTravellers([...travellers, { name: "", age: "", phone: "", type }]);
+    setTravellers([...travellers, { name: "", age: "", dob: "", phone: "", type }]);
 
   const removeTraveller = (i: number) =>
     setTravellers(travellers.filter((_, idx) => idx !== i));
@@ -339,7 +353,7 @@ function BookingContent() {
         travellersDetails: [
           {
             name: `${firstName} ${lastName}`.trim(),
-            age: 30, // Default adult age for primary
+            age: undefined,
             phone,
             type: "adult",
             passportNumber: pkg.isInternational ? primaryPassport : undefined,
@@ -348,7 +362,8 @@ function BookingContent() {
           },
           ...travellers.map((t) => ({
             name: t.name,
-            age: parseInt(t.age) || 0,
+            dob: t.dob || undefined,
+            age: t.age ? parseInt(t.age) : undefined,
             phone: t.phone,
             type: t.type,
             passportNumber: t.passportNumber,
@@ -570,7 +585,56 @@ function BookingContent() {
                     <div key={i} style={{ display: "flex", alignItems: "center", gap: 8, padding: "8px 12px", background: "var(--iv)", borderRadius: 10, border: "1px solid var(--line)", flexWrap: "wrap" }}>
                       <span className="syne" style={{ fontSize: 9, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: t.type === "adult" ? "var(--gn)" : t.type === "child" ? "var(--cu-d)" : "var(--gn2)", padding: "3px 8px", background: t.type === "adult" ? "var(--gn-gl)" : t.type === "child" ? "rgba(245,166,35,.1)" : "rgba(0,174,204,.1)", borderRadius: 4, flexShrink: 0 }}>{t.type}</span>
                       <input type="text" placeholder="Full name *" value={t.name} onChange={(e) => updateTraveller(i, "name", e.target.value)} style={{ flex: "1 1 110px", padding: "7px 10px", background: "#fff", border: "1px solid var(--line2)", borderRadius: 8, fontSize: 13, outline: "none" }} />
-                      <input type="number" placeholder="Age" value={t.age} onChange={(e) => updateTraveller(i, "age", e.target.value)} style={{ width: 52, padding: "7px 6px", background: "#fff", border: "1px solid var(--line2)", borderRadius: 8, fontSize: 13, outline: "none", textAlign: "center" }} />
+                      <div style={{ display: "flex", alignItems: "center", gap: 6, background: "#fff", padding: "4px 8px", borderRadius: 8, border: "1px solid var(--line2)", flexShrink: 0 }}>
+                        <span className="syne" style={{ fontSize: 10.5, fontWeight: 700, color: "var(--ink3)", textTransform: "uppercase" }}>DOB:</span>
+                        <input
+                          type="date"
+                          max={new Date().toISOString().split("T")[0]}
+                          value={t.dob || ""}
+                          onChange={(e) => {
+                            const val = e.target.value;
+                            const calcAge = calculateAgeFromDob(val);
+                            const u = [...travellers];
+                            u[i] = {
+                              ...u[i],
+                              dob: val,
+                              age: calcAge !== undefined ? String(calcAge) : "",
+                            };
+                            setTravellers(u);
+                          }}
+                          title="Date of Birth (Optional)"
+                          aria-label="Date of Birth (Optional)"
+                          style={{
+                            padding: "3px 4px",
+                            background: "transparent",
+                            border: "none",
+                            fontSize: 12,
+                            outline: "none",
+                            color: t.dob ? "var(--ink)" : "var(--ink4)",
+                          }}
+                        />
+                        {t.age ? (
+                          <span
+                            title="Auto-calculated age"
+                            style={{
+                              fontSize: 11,
+                              fontWeight: 700,
+                              color: "var(--gn)",
+                              background: "var(--gn-gl)",
+                              padding: "2px 8px",
+                              borderRadius: 6,
+                              whiteSpace: "nowrap",
+                              border: "1px solid var(--line2)",
+                            }}
+                          >
+                            Age: {t.age} yrs
+                          </span>
+                        ) : (
+                          <span style={{ fontSize: 10, color: "var(--ink4)", whiteSpace: "nowrap" }}>
+                            (Optional)
+                          </span>
+                        )}
+                      </div>
                       <button type="button" onClick={() => removeTraveller(i)} style={{ width: 28, height: 28, borderRadius: "50%", background: "rgba(220,53,69,.08)", border: "none", cursor: "pointer", flexShrink: 0, display: "flex", alignItems: "center", justifyContent: "center" }}>
                         <span className="material-symbols-rounded" style={{ fontSize: 15, color: "#dc3545" }}>close</span>
                       </button>
