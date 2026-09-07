@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { api } from "@/lib/api";
 import ProgressBar from "@/components/ProgressBar";
 import Navbar from "@/components/Navbar";
@@ -149,9 +150,9 @@ export default function DestinationDetailPage() {
           <span className="material-symbols-rounded" style={{ fontSize: 64, color: "var(--ink4)" }}>explore_off</span>
           <h2 className="serif" style={{ fontSize: 28, color: "var(--ink)" }}>Destination not found</h2>
           <p style={{ fontSize: 15, color: "var(--ink3)" }}>The destination you&apos;re looking for doesn&apos;t exist or has been removed.</p>
-          <a href="/destinations" className="syne" style={{ fontSize: 14, fontWeight: 700, color: "#fff", background: "var(--gn)", padding: "12px 28px", borderRadius: 50, textDecoration: "none" }}>
+          <Link href="/destinations" className="syne" style={{ fontSize: 14, fontWeight: 700, color: "#fff", background: "var(--gn)", padding: "12px 28px", borderRadius: 50, textDecoration: "none" }}>
             ← Back to Destinations
-          </a>
+          </Link>
         </div>
         <Footer />
       </>

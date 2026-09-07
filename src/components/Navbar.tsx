@@ -78,6 +78,17 @@ export default function Navbar() {
     await logout();
   };
 
+  const handleExplorePackages = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    const pkgEl = document.getElementById("packages");
+    if (pkgEl) {
+      e.preventDefault();
+      const yOffset = -76;
+      const y = pkgEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
+      setMobileMenuOpen(false);
+    }
+  };
+
   return (
     <nav
       id="nav"
@@ -374,6 +385,7 @@ export default function Navbar() {
         )}
         <Link
           href="/destinations"
+          onClick={handleExplorePackages}
           className="syne nav-book-btn"
           style={{
             padding: "9px 22px",
@@ -541,7 +553,7 @@ export default function Navbar() {
           )}
           <Link
             href="/destinations"
-            onClick={() => setMobileMenuOpen(false)}
+            onClick={handleExplorePackages}
             className="syne"
             style={{ width: "100%", padding: "12px", background: "var(--cu)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center", display: "block" }}
           >

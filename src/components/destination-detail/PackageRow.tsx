@@ -59,7 +59,20 @@ export default function PackageRow({ eyebrow, title, titleEm, subtitle, cards, a
             </h2>
             <p style={{ fontSize: 15, color: "var(--ink3)", lineHeight: 1.7, maxWidth: 560 }}>{subtitle}</p>
           </div>
-          <a href="#" className="syne" style={{ fontSize: 13, fontWeight: 700, color: "var(--gn)", display: "flex", alignItems: "center", gap: 6 }}>
+          <a
+            href="#packages"
+            onClick={(e) => {
+              e.preventDefault();
+              const el = document.getElementById("packages");
+              if (el) {
+                const yOffset = -76;
+                const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+                window.scrollTo({ top: y, behavior: "smooth" });
+              }
+            }}
+            className="syne"
+            style={{ fontSize: 13, fontWeight: 700, color: "var(--gn)", display: "flex", alignItems: "center", gap: 6, textDecoration: "none", cursor: "pointer" }}
+          >
             View All <span className="material-symbols-rounded" style={{ fontSize: 18 }}>arrow_forward</span>
           </a>
         </div>
@@ -82,7 +95,9 @@ export default function PackageRow({ eyebrow, title, titleEm, subtitle, cards, a
                 </div>
                 <div style={{ padding: 20 }}>
                   <div className="syne" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--gn3)", marginBottom: 6 }}>{destinationName || ""}{country ? ` · ${country}` : ""}</div>
-                  <div className="serif" style={{ fontSize: 16, fontWeight: 600, color: "var(--ink)", lineHeight: 1.35, marginBottom: 12 }}>{c.name}</div>
+                  <Link href={`/packages/${c.slug || c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '')}`} style={{ textDecoration: "none", color: "inherit" }}>
+                    <div className="serif" style={{ fontSize: 16, fontWeight: 600, color: "var(--ink)", lineHeight: 1.35, marginBottom: 12, cursor: "pointer" }}>{c.name}</div>
+                  </Link>
                   <div style={{ display: "flex", gap: 14, marginBottom: 10 }}>
                     <span className="syne" style={{ fontSize: 12, fontWeight: 500, color: "var(--ink3)", display: "flex", alignItems: "center", gap: 4 }}><span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--gn3)" }}>calendar_today</span>{c.duration}</span>
                     <span className="syne" style={{ fontSize: 12, fontWeight: 500, color: "var(--ink3)", display: "flex", alignItems: "center", gap: 4 }}><span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--gn3)" }}>hotel</span>{c.hotel}</span>

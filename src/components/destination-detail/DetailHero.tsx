@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 interface DetailHeroProps {
   destinationName?: string;
@@ -31,6 +32,18 @@ export default function DetailHero({
   country,
 }: DetailHeroProps) {
   const [idx, setIdx] = useState(0);
+
+  const scrollToPackages = (e: React.MouseEvent<HTMLAnchorElement>) => {
+    e.preventDefault();
+    const el = document.getElementById("packages");
+    if (el) {
+      const yOffset = -76;
+      const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    } else {
+      window.location.href = "#packages";
+    }
+  };
 
   // Build slideshow: heroImage first, then images[], fallback if nothing
   const slides = (() => {
@@ -77,9 +90,9 @@ export default function DetailHero({
       <div className="detail-hero-content" style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", justifyContent: "center", padding: "0 80px", paddingTop: 72 }}>
         {/* Breadcrumb */}
         <div className="syne" style={{ fontSize: 12, fontWeight: 500, color: "rgba(255,255,255,.6)", display: "flex", alignItems: "center", gap: 8, marginBottom: 20 }}>
-          <a href="/" style={{ color: "rgba(255,255,255,.6)" }}>Home</a>
+          <Link href="/" style={{ color: "rgba(255,255,255,.6)", textDecoration: "none" }}>Home</Link>
           <span style={{ color: "rgba(255,255,255,.3)" }}>›</span>
-          <a href="/destinations" style={{ color: "rgba(255,255,255,.6)" }}>Destinations</a>
+          <Link href="/destinations" style={{ color: "rgba(255,255,255,.6)", textDecoration: "none" }}>Destinations</Link>
           <span style={{ color: "rgba(255,255,255,.3)" }}>›</span>
           <span style={{ color: "rgba(255,255,255,.9)" }}>{destinationName}</span>
         </div>
@@ -115,7 +128,24 @@ export default function DetailHero({
 
         {/* CTA buttons */}
         <div style={{ display: "flex", gap: 14, flexWrap: "wrap" }}>
-          <a href="#packages" className="syne" style={{ fontSize: 14, fontWeight: 700, color: "#fff", background: "var(--cu)", padding: "14px 32px", borderRadius: 50, border: "none", cursor: "pointer", boxShadow: "0 6px 24px rgba(245,166,35,.4)", transition: "var(--tr)", textDecoration: "none" }}>
+          <a
+            href="#packages"
+            onClick={scrollToPackages}
+            className="syne"
+            style={{
+              fontSize: 14,
+              fontWeight: 700,
+              color: "#fff",
+              background: "var(--cu)",
+              padding: "14px 32px",
+              borderRadius: 50,
+              border: "none",
+              cursor: "pointer",
+              boxShadow: "0 6px 24px rgba(245,166,35,.4)",
+              transition: "var(--tr)",
+              textDecoration: "none",
+            }}
+          >
             Explore Packages
           </a>
         </div>
