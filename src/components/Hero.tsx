@@ -222,10 +222,22 @@ export default function Hero() {
             </div>
           </div>
         ))}
-        <div className="syne hero-scroll-text" style={{
-          display: "flex", alignItems: "center", gap: 8, marginLeft: "auto", padding: "0 32px",
-          color: "rgba(249,246,240,.35)", fontSize: 10, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase",
-        }}>
+        <div
+          className="syne hero-scroll-text"
+          onClick={() => {
+            const el = document.getElementById("destinations");
+            if (el) {
+              const yOffset = -72;
+              const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+              window.scrollTo({ top: y, behavior: "smooth" });
+            }
+          }}
+          style={{
+            display: "flex", alignItems: "center", gap: 8, marginLeft: "auto", padding: "0 32px",
+            color: "rgba(249,246,240,.35)", fontSize: 10, fontWeight: 600, letterSpacing: 2, textTransform: "uppercase",
+            cursor: "pointer",
+          }}
+        >
           <div style={{
             width: 36, height: 36, borderRadius: "50%", border: "1px solid rgba(249,246,240,.2)",
             display: "flex", alignItems: "center", justifyContent: "center",

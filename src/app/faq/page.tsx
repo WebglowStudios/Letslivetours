@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 
@@ -205,9 +206,9 @@ export default function FaqPage() {
             <h3 className="serif" style={{ fontSize: 28, fontWeight: 700, color: "var(--iv)", marginBottom: 10 }}>Still have questions?</h3>
             <p style={{ fontSize: 14, color: "rgba(249,246,240,.5)", marginBottom: 24 }}>Our travel experts are just a call or message away.</p>
             <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-              <a href="/contact" className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 28px", background: "var(--cu)", color: "#fff", borderRadius: 50, fontSize: 12, fontWeight: 700, textDecoration: "none", boxShadow: "0 6px 20px rgba(245,166,35,.3)" }}>
+              <Link href="/contact" className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 28px", background: "var(--cu)", color: "#fff", borderRadius: 50, fontSize: 12, fontWeight: 700, textDecoration: "none", boxShadow: "0 6px 20px rgba(245,166,35,.3)" }}>
                 <span className="material-symbols-rounded" style={{ fontSize: 16 }}>mail</span>Contact Us
-              </a>
+              </Link>
               <a href="tel:+917770088299" className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 26px", background: "transparent", color: "rgba(249,246,240,.8)", border: "1.5px solid rgba(249,246,240,.25)", borderRadius: 50, fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
                 <span className="material-symbols-rounded" style={{ fontSize: 16 }}>phone</span>+91 77700 88299
               </a>

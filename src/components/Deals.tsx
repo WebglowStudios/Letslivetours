@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 export default function Deals() {
   const [time, setTime] = useState({ d: "03", h: "14", m: "22", s: "45" });
@@ -23,6 +24,18 @@ export default function Deals() {
     return () => clearInterval(iv);
   }, []);
 
+  const handleGrabDeal = (e: React.MouseEvent) => {
+    e.preventDefault();
+    const el = document.getElementById("packages");
+    if (el) {
+      const yOffset = -76;
+      const y = el.getBoundingClientRect().top + window.pageYOffset + yOffset;
+      window.scrollTo({ top: y, behavior: "smooth" });
+    } else {
+      window.location.href = "/destinations";
+    }
+  };
+
   return (
     <section id="deals" className="deals-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", minHeight: 560, overflow: "hidden" }}>
       {/* Left */}
@@ -38,12 +51,21 @@ export default function Deals() {
           Don&apos;t miss our hottest summer sale. Packages to your dream destinations at unbeatable prices. Offer valid till seats last — grab yours today.
         </p>
         <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-          <button className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 32px", background: "var(--cu)", color: "#fff", border: "none", borderRadius: 50, fontSize: 13, fontWeight: 700, letterSpacing: 0.5, cursor: "pointer", boxShadow: "0 8px 28px rgba(0,174,204,.35)", transition: "var(--tr)" }}>
+          <a
+            href="#packages"
+            onClick={handleGrabDeal}
+            className="syne"
+            style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "14px 32px", background: "var(--cu)", color: "#fff", border: "none", borderRadius: 50, fontSize: 13, fontWeight: 700, letterSpacing: 0.5, cursor: "pointer", boxShadow: "0 8px 28px rgba(0,174,204,.35)", transition: "var(--tr)", textDecoration: "none" }}
+          >
             <span className="material-symbols-rounded">flight_takeoff</span>Grab the Deal
-          </button>
-          <button className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "13px 30px", background: "transparent", color: "var(--gn)", border: "1.5px solid var(--line2)", borderRadius: 50, fontSize: 13, fontWeight: 700, letterSpacing: 0.5, cursor: "pointer", transition: "var(--tr)" }}>
+          </a>
+          <Link
+            href="/destinations"
+            className="syne"
+            style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "13px 30px", background: "transparent", color: "var(--gn)", border: "1.5px solid var(--line2)", borderRadius: 50, fontSize: 13, fontWeight: 700, letterSpacing: 0.5, cursor: "pointer", transition: "var(--tr)", textDecoration: "none" }}
+          >
             <span className="material-symbols-rounded">explore</span>Browse All Deals
-          </button>
+          </Link>
         </div>
         <div style={{ display: "flex", gap: 20, marginTop: 24, flexWrap: "wrap" }}>
           {[{ icon: "verified", t: "Best price guaranteed" }, { icon: "cached", t: "Free cancellation" }, { icon: "lock", t: "Secure booking" }].map((x, i) => (

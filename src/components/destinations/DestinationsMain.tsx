@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useMemo, useEffect } from "react";
+import { useSearchParams } from "next/navigation";
 import DestinationsHeader from "./DestinationsHeader";
 import Sidebar from "./Sidebar";
 import DestinationCard from "./DestinationCard";
@@ -26,8 +27,11 @@ function formatPrice(price: number): string {
 }
 
 export default function DestinationsMain() {
+  const searchParams = useSearchParams();
+  const initialSearch = searchParams?.get("search") || "";
+
   const [activeCat, setActiveCat] = useState("all");
-  const [search, setSearch] = useState("");
+  const [search, setSearch] = useState(initialSearch);
   const [checkedCats, setCheckedCats] = useState<string[]>([]);
   const [maxPrice, setMaxPrice] = useState(300000);
   const [sort, setSort] = useState("popular");
@@ -35,6 +39,13 @@ export default function DestinationsMain() {
   const [destinations, setDestinations] = useState<Destination[]>(staticDestinations);
   const [apiLoading, setApiLoading] = useState(true);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+
+  useEffect(() => {
+    const urlQuery = searchParams?.get("search");
+    if (urlQuery !== null && urlQuery !== undefined) {
+      setSearch(urlQuery);
+    }
+  }, [searchParams]);
 
   useEffect(() => {
     async function fetchDestinations() {

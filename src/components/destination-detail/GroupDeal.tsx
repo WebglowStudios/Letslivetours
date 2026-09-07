@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 interface GroupDealData {
   title: string;
   description: string;
@@ -36,7 +38,7 @@ export default function GroupDeal({ groupDeal }: GroupDealProps) {
           </p>
         )}
         <div>
-          <a href="/contact" className="syne" style={{ fontSize: 14, fontWeight: 800, color: "var(--cu-d)", background: "#fff", padding: "15px 38px", borderRadius: 50, display: "inline-block", boxShadow: "0 8px 28px rgba(0,0,0,.15)", transition: "var(--tr)" }}>Get a Group Quote</a>
+          <Link href="/contact" className="syne" style={{ fontSize: 14, fontWeight: 800, color: "var(--cu-d)", background: "#fff", padding: "15px 38px", borderRadius: 50, display: "inline-block", boxShadow: "0 8px 28px rgba(0,0,0,.15)", transition: "var(--tr)", textDecoration: "none" }}>Get a Group Quote</Link>
         </div>
       </div>
       <style jsx>{`

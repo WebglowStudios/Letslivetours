@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import ProgressBar from "@/components/ProgressBar";
 import Navbar from "@/components/Navbar";
 import DestinationsMain from "@/components/destinations/DestinationsMain";
@@ -10,7 +11,9 @@ export default function DestinationsPage() {
     <>
       <ProgressBar />
       <Navbar />
-      <DestinationsMain />
+      <Suspense fallback={null}>
+        <DestinationsMain />
+      </Suspense>
       <Footer />
       <ScrollToTop />
       <ScrollReveal />

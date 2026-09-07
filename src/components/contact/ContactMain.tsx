@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, FormEvent } from "react";
+import Link from "next/link";
 import { api } from "@/lib/api";
 import PhoneInput from "@/components/ui/PhoneInput";
 
@@ -228,7 +229,7 @@ export default function ContactMain() {
                     {loading ? "Sending..." : "Send Message"}
                   </button>
                   <div style={{ fontSize: 11.5, color: "var(--ink4)", textAlign: "center", marginTop: 14, lineHeight: 1.6 }}>
-                    By submitting, you agree to our <a href="#" style={{ color: "var(--gn2)", textDecoration: "underline" }}>Privacy Policy</a>. No spam, ever.
+                    By submitting, you agree to our <Link href="/privacy" target="_blank" style={{ color: "var(--gn2)", textDecoration: "underline" }}>Privacy Policy</Link>. No spam, ever.
                   </div>
                 </form>
               ) : (

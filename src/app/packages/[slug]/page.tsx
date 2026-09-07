@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { api } from "@/lib/api";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
@@ -76,9 +77,9 @@ export default function PackageDetailPage() {
           <span className="material-symbols-rounded" style={{ fontSize: 64, color: "var(--ink4)" }}>package_2</span>
           <h2 className="serif" style={{ fontSize: 28, color: "var(--ink)" }}>Package not found</h2>
           <p style={{ fontSize: 15, color: "var(--ink3)" }}>The package you&apos;re looking for doesn&apos;t exist or has been removed.</p>
-          <a href="/destinations" className="syne" style={{ fontSize: 14, fontWeight: 700, color: "#fff", background: "var(--gn)", padding: "12px 28px", borderRadius: 50, textDecoration: "none" }}>
+          <Link href="/destinations" className="syne" style={{ fontSize: 14, fontWeight: 700, color: "#fff", background: "var(--gn)", padding: "12px 28px", borderRadius: 50, textDecoration: "none" }}>
             ← Back to Destinations
-          </a>
+          </Link>
         </div>
         <Footer />
       </>
@@ -120,11 +121,11 @@ export default function PackageDetailPage() {
             flexWrap: "wrap",
           }}
         >
-          <a href="/" style={{ color: "var(--ink3)", transition: "var(--tr)" }}>Home</a>
+          <Link href="/" style={{ color: "var(--ink3)", textDecoration: "none", transition: "var(--tr)" }}>Home</Link>
           <span style={{ color: "var(--line2)" }}>›</span>
-          <a href="/destinations" style={{ color: "var(--ink3)", transition: "var(--tr)" }}>Destinations</a>
+          <Link href="/destinations" style={{ color: "var(--ink3)", textDecoration: "none", transition: "var(--tr)" }}>Destinations</Link>
           <span style={{ color: "var(--line2)" }}>›</span>
-          <a href={`/destinations/${destinationSlug}`} style={{ color: "var(--ink3)", transition: "var(--tr)" }}>{destinationName}</a>
+          <Link href={`/destinations/${destinationSlug}`} style={{ color: "var(--ink3)", textDecoration: "none", transition: "var(--tr)" }}>{destinationName}</Link>
           <span style={{ color: "var(--line2)" }}>›</span>
           <span style={{ color: "var(--gn)", fontWeight: 600 }}>{packageName}</span>
         </div>

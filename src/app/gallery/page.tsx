@@ -20,7 +20,8 @@ export default function GalleryPage() {
   useEffect(() => {
     const fetchImages = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/gallery?activeOnly=true`);
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+        const res = await fetch(`${baseUrl}/gallery?activeOnly=true`);
         const data = await res.json();
         if (data.status === 'success') {
           setImages(data.data);

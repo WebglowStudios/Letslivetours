@@ -15,18 +15,19 @@ interface ArticleData {
 }
 
 const fallbackArticles = [
-  { img: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80", cat: "Destination", title: "10 Things You Must Do in Dubai", excerpt: "From the Burj Khalifa to hidden gold souks — everything you need.", date: "6 min", slug: "", featured: true },
-  { img: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80", cat: "Culture", title: "How to Experience Japan in Cherry Blossom Season", excerpt: "A complete guide to timing, temples, and Tokyo street food.", date: "8 min", slug: "", featured: false },
-  { img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80", cat: "Honeymoon", title: "The Most Romantic Spots in Bali for Couples", excerpt: "Cliffside restaurants, hidden waterfalls, and overwater suites.", date: "5 min", slug: "", featured: false },
-  { img: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800&q=80", cat: "Travel Tips", title: "Thailand on a Budget: Island Hopping Guide", excerpt: "Phuket, Koh Samui, and Krabi — the smart traveller's guide.", date: "6 min", slug: "", featured: false },
-  { img: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80", cat: "Luxury", title: "Maldives Overwater Bungalows: Everything You Need", excerpt: "From choosing the right atoll to what's worth the splurge.", date: "7 min", slug: "", featured: false },
+  { img: "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80", cat: "Destination", title: "10 Things You Must Do in Dubai", excerpt: "From the Burj Khalifa to hidden gold souks — everything you need.", date: "6 min", slug: "10-things-you-must-do-in-dubai", featured: true },
+  { img: "https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80", cat: "Culture", title: "How to Experience Japan in Cherry Blossom Season", excerpt: "A complete guide to timing, temples, and Tokyo street food.", date: "8 min", slug: "how-to-experience-japan-in-cherry-blossom-season", featured: false },
+  { img: "https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80", cat: "Honeymoon", title: "The Most Romantic Spots in Bali for Couples", excerpt: "Cliffside restaurants, hidden waterfalls, and overwater suites.", date: "5 min", slug: "the-most-romantic-spots-in-bali-for-couples", featured: false },
+  { img: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800&q=80", cat: "Travel Tips", title: "Thailand on a Budget: Island Hopping Guide", excerpt: "Phuket, Koh Samui, and Krabi — the smart traveller's guide.", date: "6 min", slug: "thailand-on-a-budget-island-hopping-guide", featured: false },
+  { img: "https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80", cat: "Luxury", title: "Maldives Overwater Bungalows: Everything You Need", excerpt: "From choosing the right atoll to what's worth the splurge.", date: "7 min", slug: "maldives-overwater-bungalows-everything-you-need", featured: false },
 ];
 
 export default function Articles() {
   const [articles, setArticles] = useState(fallbackArticles);
 
   useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_API_URL}/articles?limit=5`)
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+    fetch(`${baseUrl}/articles?limit=5`)
       .then((r) => r.json())
       .then((res) => {
         if (res.data && res.data.length > 0) {
