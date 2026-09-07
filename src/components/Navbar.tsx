@@ -505,7 +505,7 @@ export default function Navbar() {
               }}
             >
               <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink3)" }}>
-                {link.label === "Destinations" ? "explore" : link.label === "Packages" ? "inventory_2" : link.label === "About" ? "info" : link.label === "Careers" ? "work" : "mail"}
+                {link.label === "Destinations" ? "explore" : link.label === "Articles" ? "article" : link.label === "Gallery" ? "photo_library" : link.label === "About" ? "info" : link.label === "FAQs" ? "quiz" : link.label === "Careers" ? "work" : "mail"}
               </span>
               {link.label}
             </Link>
@@ -514,6 +514,12 @@ export default function Navbar() {
           {user && (
             <>
               <div style={{ height: 1, background: "var(--line)", margin: "8px 24px" }} />
+              {user.role === "admin" && (
+                <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="syne" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 24px", fontSize: 14, fontWeight: 600, color: "var(--cu)", textDecoration: "none" }}>
+                  <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--cu)" }}>admin_panel_settings</span>
+                  Admin Panel
+                </Link>
+              )}
               <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="syne" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 24px", fontSize: 14, fontWeight: 600, color: "var(--ink2)", textDecoration: "none" }}>
                 <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink3)" }}>dashboard</span>
                 Dashboard
@@ -521,6 +527,10 @@ export default function Navbar() {
               <Link href="/dashboard/bookings" onClick={() => setMobileMenuOpen(false)} className="syne" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 24px", fontSize: 14, fontWeight: 600, color: "var(--ink2)", textDecoration: "none" }}>
                 <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink3)" }}>confirmation_number</span>
                 My Bookings
+              </Link>
+              <Link href="/dashboard/wishlist" onClick={() => setMobileMenuOpen(false)} className="syne" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 24px", fontSize: 14, fontWeight: 600, color: "var(--ink2)", textDecoration: "none" }}>
+                <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink3)" }}>favorite</span>
+                Wishlist
               </Link>
               <Link href="/dashboard/profile" onClick={() => setMobileMenuOpen(false)} className="syne" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 24px", fontSize: 14, fontWeight: 600, color: "var(--ink2)", textDecoration: "none" }}>
                 <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink3)" }}>person</span>

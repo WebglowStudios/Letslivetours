@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function AboutHero({ data }: { data?: any }) {
   return (
     <section style={{ width: "100%", position: "relative", overflow: "hidden", minHeight: "75vh", display: "flex", alignItems: "center" }}>
@@ -28,10 +30,10 @@ export default function AboutHero({ data }: { data?: any }) {
               <span className="material-symbols-rounded" style={{ fontSize: 16 }}>explore</span>
               Our Story
             </a>
-            <a href="/contact" className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 26px", background: "transparent", color: "rgba(249,246,240,.8)", border: "1.5px solid rgba(249,246,240,.25)", borderRadius: 50, fontSize: 12, fontWeight: 700, letterSpacing: 0.5, textDecoration: "none", transition: "var(--tr)" }}>
+            <Link href="/contact" className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 26px", background: "transparent", color: "rgba(249,246,240,.8)", border: "1.5px solid rgba(249,246,240,.25)", borderRadius: 50, fontSize: 12, fontWeight: 700, letterSpacing: 0.5, textDecoration: "none", transition: "var(--tr)" }}>
               <span className="material-symbols-rounded" style={{ fontSize: 16 }}>support_agent</span>
               Talk to Us
-            </a>
+            </Link>
           </div>
         </div>
       </div>

@@ -38,7 +38,8 @@ export default function Packages() {
   useEffect(() => {
     const fetchPackages = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/packages/featured`);
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+        const res = await fetch(`${baseUrl}/packages/featured`);
         if (res.ok) {
           const json = await res.json();
           if (json.data && json.data.length > 0) {

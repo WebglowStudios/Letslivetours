@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, Suspense } from "react";
 import { useParams, useRouter, useSearchParams } from "next/navigation";
 import { api } from "@/lib/api";
 import { useAuth } from "@/hooks/useAuth";
@@ -852,5 +852,9 @@ function BookingContent() {
 }
 
 export default function BookPage() {
-  return <BookingContent />;
+  return (
+    <Suspense fallback={<div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "var(--iv)" }}><span className="material-symbols-rounded" style={{ fontSize: 36, color: "var(--gn2)", animation: "spin 1s linear infinite" }}>progress_activity</span></div>}>
+      <BookingContent />
+    </Suspense>
+  );
 }

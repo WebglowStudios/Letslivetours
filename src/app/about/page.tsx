@@ -15,10 +15,13 @@ export const dynamic = "force-dynamic";
 export default async function AboutPage() {
   let aboutContent = null;
   try {
-    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/about`, { cache: 'no-store' });
-    const data = await res.json();
-    if (data.status === 'success') {
-      aboutContent = data.data;
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+    const res = await fetch(`${baseUrl}/about`, { cache: 'no-store' });
+    if (res.ok) {
+      const data = await res.json();
+      if (data.status === 'success') {
+        aboutContent = data.data;
+      }
     }
   } catch (error) {
     console.error("Failed to fetch about content:", error);

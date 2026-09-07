@@ -7,6 +7,7 @@ import Link from "next/link";
 interface WishlistPackage {
   _id: string;
   name: string;
+  slug?: string;
   destination?: { name: string };
   images?: string[];
   price: number;
@@ -199,10 +200,10 @@ export default function WishlistPage() {
                 {/* Price + Link */}
                 <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center" }}>
                   <p className="serif" style={{ fontSize: 18, fontWeight: 700, color: "var(--gn)" }}>
-                    ${pkg.price?.toLocaleString()}
+                    ₹{pkg.price?.toLocaleString("en-IN")}
                   </p>
                   <Link
-                    href={`/packages/${pkg._id}`}
+                    href={`/packages/${pkg.slug || pkg._id}`}
                     className="syne"
                     style={{
                       fontSize: 12,

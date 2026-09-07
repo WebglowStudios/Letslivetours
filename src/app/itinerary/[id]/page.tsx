@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
+import Link from "next/link";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import PackageGallery from "@/components/package-detail/PackageGallery";
@@ -16,6 +17,7 @@ import DepartureGrid from "@/components/package-detail/DepartureGrid";
 const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
 
 export default function CustomItineraryPage() {
+  const router = useRouter();
   const params = useParams();
   const id = params?.id as string;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -91,7 +93,7 @@ export default function CustomItineraryPage() {
                 departures={pkg?.departures || []}
                 originalPrice={pkg?.originalPrice || pkg?.price}
                 onSelectSlot={(depId) => {
-                  window.location.href = `/book/${id}?departureId=${depId}`;
+                  router.push(`/book/${id}?departureId=${depId}`);
                 }}
               />
             )}
@@ -135,9 +137,9 @@ export default function CustomItineraryPage() {
                   </button>
                 ) : (
                   <>
-                    <a href={`/book/${id}`} className="syne" style={{ display: "block", width: "100%", textAlign: "center", padding: 14, background: "var(--cu)", color: "#fff", borderRadius: 50, fontSize: 14, fontWeight: 700, textDecoration: "none" }}>
+                    <Link href={`/book/${id}`} className="syne" style={{ display: "block", width: "100%", textAlign: "center", padding: 14, background: "var(--cu)", color: "#fff", borderRadius: 50, fontSize: 14, fontWeight: 700, textDecoration: "none" }}>
                       Confirm This Itinerary
-                    </a>
+                    </Link>
                     <p style={{ fontSize: 11, color: "var(--ink4)", textAlign: "center", marginTop: 12 }}>
                       Clicking confirm will start the booking process for this custom itinerary.
                     </p>

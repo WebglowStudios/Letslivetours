@@ -40,7 +40,8 @@ export default function Testimonials() {
   useEffect(() => {
     const fetchReviews = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reviews/featured`);
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+        const res = await fetch(`${baseUrl}/reviews/featured`);
         if (res.ok) {
           const json = await res.json();
           if (json.data && json.data.length > 0) {

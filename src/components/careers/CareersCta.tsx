@@ -1,5 +1,7 @@
 "use client";
 
+import Link from "next/link";
+
 export default function CareersCta() {
   return (
     <section id="cta-banner" style={{ padding: "96px 48px", background: "linear-gradient(135deg, var(--gn) 0%, var(--gn2) 60%, var(--gn3) 100%)", position: "relative", overflow: "hidden", textAlign: "center" }}>
@@ -15,7 +17,7 @@ export default function CareersCta() {
           We&apos;re always looking for exceptional people. Send us your CV and tell us how you&apos;d make LetsLive better — we read every message.
         </p>
         <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
-          <a href="/contact" className="cta-btn-primary syne">Send Your CV</a>
+          <Link href="/contact" className="cta-btn-primary syne">Send Your CV</Link>
           <a href="#open-roles" className="cta-btn-ghost syne">Browse Open Roles</a>
         </div>
       </div>

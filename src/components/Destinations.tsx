@@ -41,7 +41,8 @@ export default function Destinations() {
   useEffect(() => {
     const fetchDestinations = async () => {
       try {
-        const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/destinations/featured`);
+        const baseUrl = process.env.NEXT_PUBLIC_API_URL || "http://localhost:5000/api";
+        const res = await fetch(`${baseUrl}/destinations/featured`);
         if (res.ok) {
           const json = await res.json();
           if (json.data && json.data.length > 0) {

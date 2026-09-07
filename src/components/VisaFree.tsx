@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import Link from "next/link";
 
 const visas = [
   { name: "Thailand", slug: "thailand", img: "https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800&q=80", badge: "Visa Free", icon: "check_circle", info: "30-day stamp on arrival · Packages from Rs. 39,999", main: true },
@@ -37,15 +38,15 @@ export default function VisaFree() {
               Indian passport holders can visit these stunning places without a prior visa.
             </p>
           </div>
-          <a href="/destinations" className="syne visa-all-link" style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 13, fontWeight: 600, color: "var(--gd)", borderBottom: "1.5px solid rgba(212,168,83,.25)", paddingBottom: 2, textDecoration: "none" }}>
+          <Link href="/destinations" className="syne visa-all-link" style={{ display: "inline-flex", alignItems: "center", gap: 5, fontSize: 13, fontWeight: 600, color: "var(--gd)", borderBottom: "1.5px solid rgba(212,168,83,.25)", paddingBottom: 2, textDecoration: "none" }}>
             View all <span className="material-symbols-rounded" style={{ fontSize: 16 }}>arrow_forward</span>
-          </a>
+          </Link>
         </div>
 
         {/* Desktop Grid */}
         <div className="rv visa-grid visa-desktop" style={{ display: "grid", gridTemplateColumns: "2fr 1fr 1fr", gridTemplateRows: "1fr 1fr", gap: 14, height: 560 }}>
           {visas.map((v, i) => (
-            <a key={i} href={`/destinations/${v.slug}`} className="vc-card" style={{
+            <Link key={i} href={`/destinations/${v.slug}`} className="vc-card" style={{
               position: "relative", overflow: "hidden", borderRadius: "var(--r-xl)", cursor: "pointer",
               border: "1px solid rgba(249,246,240,.08)", transition: "var(--tr)", textDecoration: "none",
               ...(v.main ? { gridRow: "1 / 3" } : {}),
@@ -62,7 +63,7 @@ export default function VisaFree() {
                   <span className="material-symbols-rounded" style={{ fontSize: 13 }}>arrow_forward</span>Explore
                 </div>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
 
@@ -87,7 +88,7 @@ export default function VisaFree() {
                     boxSizing: "border-box",
                   }}
                 >
-                  <a
+                  <Link
                     href={`/destinations/${v.slug}`}
                     style={{
                       display: "block",
@@ -116,7 +117,7 @@ export default function VisaFree() {
                         <span className="material-symbols-rounded" style={{ fontSize: 14 }}>arrow_forward</span>
                       </div>
                     </div>
-                  </a>
+                  </Link>
                 </div>
               ))}
             </div>

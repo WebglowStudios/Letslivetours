@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useParams } from "next/navigation";
+import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
 import Navbar from "@/components/Navbar";
@@ -21,6 +21,7 @@ import Reviews from "@/components/package-detail/Reviews";
 import DepartureGrid from "@/components/package-detail/DepartureGrid";
 
 export default function PackageDetailPage() {
+  const router = useRouter();
   const params = useParams();
   const slug = params?.slug as string;
 
@@ -159,7 +160,7 @@ export default function PackageDetailPage() {
                 departures={pkg?.departures || []}
                 originalPrice={pkg?.originalPrice || pkg?.price}
                 onSelectSlot={(depId) => {
-                  window.location.href = `/book/${slug}?departureId=${depId}`;
+                  router.push(`/book/${slug}?departureId=${depId}`);
                 }}
               />
             )}

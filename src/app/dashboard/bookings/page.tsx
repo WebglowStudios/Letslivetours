@@ -145,7 +145,7 @@ export default function MyBookingsPage() {
             Start planning your next adventure!
           </p>
           <Link
-            href="/packages"
+            href="/destinations"
             className="syne"
             style={{
               display: "inline-flex",
@@ -158,9 +158,10 @@ export default function MyBookingsPage() {
               borderRadius: "var(--r)",
               fontSize: 14,
               fontWeight: 600,
+              textDecoration: "none",
             }}
           >
-            Browse Packages
+            Browse Destinations
           </Link>
         </div>
       ) : (
