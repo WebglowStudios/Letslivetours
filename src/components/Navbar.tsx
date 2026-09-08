@@ -578,21 +578,20 @@ export default function Navbar() {
         }
         @media (max-width: 1024px) {
           #nav {
-            padding: 0 28px !important;
+            padding: 0 24px !important;
           }
           .nav-links-list {
-            gap: 20px !important;
-          }
-        }
-        @media (max-width: 768px) {
-          .nav-links-list,
-          .nav-sign-btn,
-          .nav-user-btn,
-          .nav-book-btn {
             display: none !important;
           }
           .nav-hamburger {
             display: flex !important;
+          }
+        }
+        @media (max-width: 768px) {
+          .nav-sign-btn,
+          .nav-user-btn,
+          .nav-book-btn {
+            display: none !important;
           }
           #nav {
             padding: 0 16px !important;

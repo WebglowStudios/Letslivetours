@@ -75,11 +75,11 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
   const priceUnit = pkg?.priceUnit || "person";
   const unitLabels = {
     group: { top: "Total Group", bottom: "total group price" },
-    couple: { top: "Per Couple", bottom: "per couple price" },
-    person: { top: "Per Adult", bottom: "per person (twin sharing)" },
+    couple: { top: "Per Couple", bottom: "per couple" },
+    person: { top: "Per Adult", bottom: "per person" },
   };
   const unitTopLabel = unitLabels[priceUnit as keyof typeof unitLabels]?.top || "Per Adult";
-  const unitBottomLabel = unitLabels[priceUnit as keyof typeof unitLabels]?.bottom || "per person (twin sharing)";
+  const unitBottomLabel = unitLabels[priceUnit as keyof typeof unitLabels]?.bottom || "per person";
 
   // Generate star string
   const fullStars = Math.floor(rating);
