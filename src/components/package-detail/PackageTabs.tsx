@@ -136,24 +136,25 @@ function AccordionItem({
       </button>
       <div
         style={{
-          maxHeight: isOpen ? 1200 : 0,
-          overflow: "hidden",
-          transition: "max-height .4s ease",
+          display: "grid",
+          gridTemplateRows: isOpen ? "1fr" : "0fr",
+          transition: "grid-template-rows .35s ease",
         }}
       >
-        <div
-          style={{
-            padding: "0 18px 18px",
-            borderTop: "1px solid var(--line)",
-            paddingTop: 14,
-            fontFamily: "var(--font-inter), 'Inter', sans-serif",
-            fontSize: 13.5,
-            color: "var(--ink3)",
-            lineHeight: 1.75,
-          }}
-          onClick={handleBodyClick}
-          dangerouslySetInnerHTML={{ __html: item.content }}
-        />
+        <div style={{ overflow: "hidden", minHeight: 0 }}>
+          <div
+            style={{
+              padding: "0 18px 18px",
+              fontSize: 13,
+              lineHeight: 1.6,
+              color: "var(--ink2)",
+              borderTop: "1px solid var(--line2)",
+              paddingTop: 14,
+            }}
+            onClick={handleBodyClick}
+            dangerouslySetInnerHTML={{ __html: item.content }}
+          />
+        </div>
       </div>
     </div>
   );

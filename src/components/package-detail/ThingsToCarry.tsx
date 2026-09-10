@@ -78,27 +78,29 @@ export default function ThingsToCarry({ items }: ThingsToCarryProps) {
         </button>
         <div
           style={{
-            maxHeight: isOpen ? 1200 : 0,
-            overflow: "hidden",
-            transition: "max-height .4s ease",
+            display: "grid",
+            gridTemplateRows: isOpen ? "1fr" : "0fr",
+            transition: "grid-template-rows .35s ease",
           }}
         >
-          <div
-            style={{
-              padding: "0 18px 18px",
-              borderTop: "1px solid var(--line)",
-              paddingTop: 14,
-              fontFamily: "var(--font-inter), 'Inter', sans-serif",
-              fontSize: 13.5,
-              color: "var(--ink3)",
-              lineHeight: 1.75,
-            }}
-          >
-            <ul style={{ paddingLeft: 18, listStyle: "disc", display: "flex", flexDirection: "column", gap: 6 }}>
-              {items.map((item, i) => (
-                <li key={i}>{item}</li>
-              ))}
-            </ul>
+          <div style={{ overflow: "hidden", minHeight: 0 }}>
+            <div
+              style={{
+                padding: "0 18px 18px",
+                borderTop: "1px solid var(--line)",
+                paddingTop: 14,
+                fontFamily: "var(--font-inter), 'Inter', sans-serif",
+                fontSize: 13.5,
+                color: "var(--ink3)",
+                lineHeight: 1.75,
+              }}
+            >
+              <ul style={{ paddingLeft: 18, listStyle: "disc", display: "flex", flexDirection: "column", gap: 6 }}>
+                {items.map((item, i) => (
+                  <li key={i}>{item}</li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </div>
