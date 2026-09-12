@@ -9,6 +9,7 @@ import PackageGallery from "@/components/package-detail/PackageGallery";
 import PackageInfo from "@/components/package-detail/PackageInfo";
 import PackageTabs from "@/components/package-detail/PackageTabs";
 import InclusionsExclusions from "@/components/package-detail/InclusionsExclusions";
+import PackageTrustPillars from "@/components/package-detail/PackageTrustPillars";
 import KnowBeforeYouGo from "@/components/package-detail/KnowBeforeYouGo";
 import ThingsToCarry from "@/components/package-detail/ThingsToCarry";
 import EnquiryForm from "@/components/package-detail/EnquiryForm";
@@ -100,6 +101,7 @@ export default function CustomItineraryPage() {
 
             <PackageTabs pkg={pkg} />
             <InclusionsExclusions inclusions={pkg.inclusions || []} exclusions={pkg.exclusions || []} isInternational={pkg.isInternational} visaIncluded={pkg.visaIncluded} flightsIncluded={pkg.flightsIncluded} />
+            <PackageTrustPillars destinationName={pkg?.destination?.name} destinationSlug={pkg?.destination?.slug} />
             <KnowBeforeYouGo items={pkg.knowBeforeYouGo || []} />
             <ThingsToCarry items={pkg.thingsToCarry || []} />
           </div>

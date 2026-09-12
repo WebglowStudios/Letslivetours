@@ -300,19 +300,22 @@ function sectionLabel(icon: string, text: string): string {
   </div>`;
 }
 
-/* ── Helper: build HTML content for a flight ── */
+/* ── Helper: build HTML content for a flight or train ── */
 function buildFlightContent(flight: any, hideHeader: boolean = false): string {
+  const isTrain = (flight.type ?? "flight") === "train";
+  const icon = isTrain ? "train" : "flight_takeoff";
+  const iconColor = isTrain ? "#c2410c" : "#4338ca";
   let html = `<div style="display:flex;gap:12px;align-items:flex-start;margin-bottom:16px">`;
   
   if (!hideHeader) {
-    html += `<span class="material-symbols-rounded" style="font-size:24px;color:#4338ca">flight_takeoff</span>`;
+    html += `<span class="material-symbols-rounded" style="font-size:24px;color:${iconColor}">${icon}</span>`;
     html += `<div style="flex:1">`;
     html += `<p style="font-size:15px;font-weight:700;color:var(--ink)">${flight.airline} <span style="color:var(--ink3);font-weight:500">${flight.flightNumber}</span></p>`;
   } else {
     html += `<div style="flex:1">`;
   }
   
-  if (flight.class) html += `<p style="font-size:12px;color:var(--ink4)">Class: ${flight.class}</p>`;
+  if (flight.class) html += `<p style="font-size:12px;color:var(--ink4)">${isTrain ? "Class" : "Class"}: ${flight.class}</p>`;
 
   html += `<div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;background:var(--iv);border-radius:10px;padding:12px;border:1px solid var(--line)">`;
   html += `<div><p style="font-size:11px;color:var(--ink4);text-transform:uppercase;letter-spacing:1px;font-weight:600">Departure</p><p style="font-size:14px;font-weight:700;color:var(--ink)">${flight.departure}</p><p style="font-size:12px;color:var(--ink3)">${flight.from}</p></div>`;
@@ -333,12 +336,24 @@ function buildFlightContent(flight: any, hideHeader: boolean = false): string {
 /* ── Helper: build HTML content for an itinerary day ── */
 function buildItineraryContent(day: any, dayFlights: any[] = [], imageMap?: Record<string, string>): string {
   let html = "";
-  if (dayFlights.length > 0) {
-    html += sectionLabel("flight", "Flights");
+  const dayActualFlights = dayFlights.filter((f: any) => (f.type ?? "flight") === "flight");
+  const dayTrains = dayFlights.filter((f: any) => f.type === "train");
+  if (dayActualFlights.length > 0) {
+    html += sectionLabel("flight_takeoff", "Flights");
     html += `<div style="margin-bottom:16px">`;
-    dayFlights.forEach((flight) => {
+    dayActualFlights.forEach((flight) => {
       html += `<div style="border:1px solid #e0e7ff;border-radius:10px;padding:12px;margin-bottom:8px">`;
       html += buildFlightContent(flight);
+      html += `</div>`;
+    });
+    html += `</div>`;
+  }
+  if (dayTrains.length > 0) {
+    html += sectionLabel("train", "Trains");
+    html += `<div style="margin-bottom:16px">`;
+    dayTrains.forEach((train) => {
+      html += `<div style="border:1px solid #fed7aa;border-radius:10px;padding:12px;margin-bottom:8px">`;
+      html += buildFlightContent(train);
       html += `</div>`;
     });
     html += `</div>`;
@@ -598,14 +613,19 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
   const hasActivities = itinerary.some((day: any) => day.activities && day.activities.length > 0);
   const hasStays = stays.length > 0;
   const flights = pkg?.flights || [];
-  const hasFlights = flights.length > 0;
+  const hasFlights = flights.some((f: any) => (f.type ?? "flight") === "flight");
+  const hasTrains = flights.some((f: any) => f.type === "train");
+  const hasAnyFlightOrTrain = flights.length > 0;
   const hasTransfers = transfers.length > 0 || !!pkg?.transferSummary;
   const hasPolicies = (pkg?.paymentPolicy?.length > 0) || (pkg?.cancellationPolicy?.length > 0) || (pkg?.flightCancellationPolicy?.length > 0);
+
+  // Build contextual tab label
+  const flightTrainLabel = hasFlights && hasTrains ? "Flights & Trains" : hasTrains ? "Trains" : "Flights";
 
   const availableTabs = [
     ...(hasItinerary ? [{ id: "itinerary", label: "Itinerary" }] : []),
     ...(hasActivities ? [{ id: "activities", label: "Activities" }] : []),
-    ...(hasFlights ? [{ id: "flights", label: "Flights" }] : []),
+    ...(hasAnyFlightOrTrain ? [{ id: "flights", label: flightTrainLabel }] : []),
     ...(hasStays ? [{ id: "stay", label: "Stay" }] : []),
     ...(hasTransfers ? [{ id: "transfers", label: "Transfers" }] : []),
     ...(hasPolicies ? [{ id: "policies", label: "Policies" }] : []),
@@ -645,13 +665,29 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
             title: day.title || `Day ${day.day}`,
             content: buildDayActivitiesContent(day, pkg?.imageMap),
           }));
-      case "flights":
-        return flights.map((f: any, i: number) => ({
-          badge: f.day ? `Day ${f.day}` : `Flight ${i + 1}`,
-          badgeType: "flight",
-          title: `${f.airline} ${f.flightNumber} (${f.from} → ${f.to})`,
-          content: buildFlightContent(f, true),
-        }));
+      case "flights": {
+        // Separate flights and trains into two groups
+        const flightEntries = flights.filter((f: any) => (f.type ?? "flight") === "flight");
+        const trainEntries = flights.filter((f: any) => f.type === "train");
+        const result: any[] = [];
+        flightEntries.forEach((f: any, i: number) => {
+          result.push({
+            badge: f.day ? `Day ${f.day}` : `Flight ${i + 1}`,
+            badgeType: "flight",
+            title: `${f.airline} ${f.flightNumber} (${f.from} → ${f.to})`,
+            content: buildFlightContent(f, true),
+          });
+        });
+        trainEntries.forEach((f: any, i: number) => {
+          result.push({
+            badge: f.day ? `Day ${f.day}` : `Train ${i + 1}`,
+            badgeType: "train",
+            title: `${f.airline} ${f.flightNumber} (${f.from} → ${f.to})`,
+            content: buildFlightContent(f, true),
+          });
+        });
+        return result;
+      }
       case "stay":
         return stays.map((s: any, i: number) => ({
           badge: `Stay ${i + 1}`,

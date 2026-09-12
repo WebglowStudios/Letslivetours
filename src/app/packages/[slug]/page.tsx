@@ -13,6 +13,7 @@ import PackageGallery from "@/components/package-detail/PackageGallery";
 import PackageInfo from "@/components/package-detail/PackageInfo";
 import PackageTabs from "@/components/package-detail/PackageTabs";
 import InclusionsExclusions from "@/components/package-detail/InclusionsExclusions";
+import PackageTrustPillars from "@/components/package-detail/PackageTrustPillars";
 import KnowBeforeYouGo from "@/components/package-detail/KnowBeforeYouGo";
 import ThingsToCarry from "@/components/package-detail/ThingsToCarry";
 import PriceCard from "@/components/package-detail/PriceCard";
@@ -88,9 +89,9 @@ export default function PackageDetailPage() {
   }
 
   /* ─── Derive display values from fetched data ─── */
-  const packageName = pkg?.name || "Dubai Luxury Escape";
-  const destinationName = pkg?.destination?.name || "Dubai";
-  const destinationSlug = pkg?.destination?.slug || "dubai";
+  const packageName = pkg?.name || "Tour Package";
+  const destinationName = pkg?.destination?.name || pkg?.customDestinationText || (typeof pkg?.destination === "string" ? pkg?.destination : "") || "";
+  const destinationSlug = pkg?.destination?.slug || (destinationName ? destinationName.toLowerCase().replace(/[^a-z0-9]+/g, "-") : "");
 
   return (
     <>
@@ -167,6 +168,7 @@ export default function PackageDetailPage() {
             
             <PackageTabs pkg={pkg} />
             <InclusionsExclusions inclusions={pkg?.inclusions || []} exclusions={pkg?.exclusions || []} isInternational={pkg?.isInternational} visaIncluded={pkg?.visaIncluded} flightsIncluded={pkg?.flightsIncluded} />
+            <PackageTrustPillars destinationName={destinationName} destinationSlug={destinationSlug} />
             <KnowBeforeYouGo items={pkg?.knowBeforeYouGo || []} />
             <ThingsToCarry items={pkg?.thingsToCarry || []} />
           </div>
