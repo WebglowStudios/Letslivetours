@@ -877,6 +877,34 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
                 onImageClick={(imgs, i) => { setLightboxImages(imgs); setLightboxIdx(i); setLightboxOpen(true); }}
               />
             ))}
+
+            {/* End Of Trip tagline — itinerary tab only */}
+            {activeTab === "itinerary" && (
+              <div
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 18,
+                  margin: "28px 0 8px",
+                }}
+              >
+                <div style={{ flex: 1, height: 1, background: "linear-gradient(to right, transparent, #f59e0b55)" }} />
+                <span
+                  style={{
+                    fontFamily: "var(--font-dancing), 'Dancing Script', cursive",
+                    fontSize: 36,
+                    fontWeight: 700,
+                    color: "#f59e0b",
+                    whiteSpace: "nowrap",
+                    lineHeight: 1,
+                    letterSpacing: 1,
+                  }}
+                >
+                  End Of Trip
+                </span>
+                <div style={{ flex: 1, height: 1, background: "linear-gradient(to left, transparent, #f59e0b55)" }} />
+              </div>
+            )}
           </div>
         ) : (
           /* Transfers tab: show summary card if no day-wise entries but summary text exists */

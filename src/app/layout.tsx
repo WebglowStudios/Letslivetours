@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Sora, Plus_Jakarta_Sans, Inter } from "next/font/google";
+import { Sora, Plus_Jakarta_Sans, Inter, Dancing_Script } from "next/font/google";
 import AuthProvider from "@/context/AuthProvider";
 import "./globals.css";
 
@@ -21,6 +21,12 @@ const inter = Inter({
   display: "swap",
 });
 
+const dancing = Dancing_Script({
+  subsets: ["latin"],
+  variable: "--font-dancing",
+  display: "swap",
+});
+
 export const metadata: Metadata = {
   title: "LetsLive Tours — Journeys Beyond the Ordinary",
   description:
@@ -33,7 +39,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${sora.variable} ${jakarta.variable} ${inter.variable}`}>
+    <html lang="en" className={`${sora.variable} ${jakarta.variable} ${inter.variable} ${dancing.variable}`}>
       <head>
         <link
           rel="stylesheet"
