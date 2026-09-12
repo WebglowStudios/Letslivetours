@@ -40,6 +40,16 @@ function AccordionItem({
   const handleBodyClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     if (target.tagName === "IMG" && target.hasAttribute("data-lightbox")) {
+      // New carousel images: collect all sibling .act-car-img from the carousel container
+      const carouselContainer = target.closest("[id^='act-car-']");
+      if (carouselContainer && onImageClick) {
+        const imgs = Array.from(carouselContainer.querySelectorAll(".act-car-img")).map((img) => img.getAttribute("src") || "");
+        const src = target.getAttribute("src") || "";
+        const idx = imgs.indexOf(src);
+        onImageClick(imgs, idx >= 0 ? idx : 0);
+        return;
+      }
+      // Legacy image containers
       const container = target.closest(".acc-images") || target.closest(".act-images");
       if (container && onImageClick) {
         const imgs = Array.from(container.querySelectorAll("img")).map((img) => img.getAttribute("src") || "");
@@ -189,37 +199,21 @@ function buildActivitiesList(
       const rawImages: string[] = !isString
         ? (act.images && act.images.length > 0 ? act.images : (act.image ? [act.image] : []))
         : [];
-      const images = rawImages.filter(Boolean);
+      const img = rawImages.filter(Boolean)[0] || "";
 
-      if (images.length === 0) {
-        // Plain bullet style
-        return `<div style="display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:var(--ink2);line-height:1.65">
-          <span style="width:7px;height:7px;border-radius:50%;background:${accentColor};flex-shrink:0;margin-top:6px"></span>
-          <div>
-            <span style="font-weight:500;color:var(--ink)">${title}</span>
-            ${desc ? `<p style="font-size:12.5px;color:var(--ink3);margin-top:2px;line-height:1.5">${desc}</p>` : ""}
-          </div>
-        </div>`;
-      }
-
-      // Activity with linked image(s)
-      return `<div style="display:flex;flex-direction:column;gap:8px;padding:12px 14px;background:#f8fafc;border:1px solid #e2e8f0;border-radius:12px;transition:all .2s ease">
-        <div style="display:flex;align-items:flex-start;gap:10px">
-          <span style="width:8px;height:8px;border-radius:50%;background:${accentColor};flex-shrink:0;margin-top:6px"></span>
-          <div style="flex:1">
-            <span style="font-size:14px;font-weight:700;color:var(--ink);letter-spacing:-0.1px">${title}</span>
-            ${desc ? `<p style="font-size:12.5px;color:var(--ink3);margin-top:3px;line-height:1.5">${desc}</p>` : ""}
+      // Shared card shell for both variants
+      return `<div style="border-radius:12px;border:1.5px solid var(--line);background:#fff;overflow:hidden">
+        <div style="padding:12px 14px${img ? " 10px" : ""}">
+          <div style="display:flex;align-items:flex-start;gap:8px">
+            <span style="width:7px;height:7px;border-radius:50%;background:${accentColor};flex-shrink:0;margin-top:5px"></span>
+            <div>
+              <div style="font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.4">${title}</div>
+              ${desc ? `<p style="font-size:12.5px;color:var(--ink3);margin-top:3px;line-height:1.5">${desc}</p>` : ""}
+            </div>
           </div>
         </div>
-        <div class="act-images" style="display:flex;gap:12px;flex-wrap:wrap;margin-left:18px;margin-top:4px">
-          ${images
-            .map((img) => {
-              return `<div style="position:relative;display:inline-block;border-radius:10px;overflow:hidden;border:1.5px solid var(--line);box-shadow:0 1px 4px rgba(0,0,0,0.06);cursor:pointer;line-height:0">
-                <img src="${img}" alt="${title}" title="${title} (Click to expand)" class="act-thumb" data-lightbox />
-              </div>`;
-            })
-            .join("")}
-        </div>
+        ${img ? `<img src="${img}" alt="${title}" class="act-car-img" data-lightbox
+          style="width:100%;height:220px;object-fit:cover;display:block;cursor:pointer;border-top:1px solid var(--line)" />` : ""}
       </div>`;
     })
     .join("")}</div>`;
@@ -973,34 +967,32 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
           border-color: var(--cu);
           transform: scale(1.05);
         }
-        :global(.act-images) {
-          display: flex;
-          gap: 12px;
-          flex-wrap: wrap;
-          margin-top: 6px;
-        }
-        :global(.act-thumb) {
-          width: 220px;
-          height: 145px;
+        /* ── Activity carousel styles ── */
+        :global(.act-car-img) {
+          width: 100%;
+          height: 240px;
           object-fit: cover;
-          border-radius: 10px;
-          border: 1.5px solid var(--line);
-          cursor: pointer;
-          transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
           display: block;
+          cursor: pointer;
         }
-        :global(.act-thumb:hover) {
-          border-color: var(--cu);
-          transform: scale(1.03);
-          box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+        :global(.act-car-btn) {
+          opacity: 0.85;
+          transition: opacity 0.2s ease, background 0.2s ease;
+        }
+        :global(.act-car-btn:hover) {
+          opacity: 1;
+          background: rgba(0,0,0,0.75) !important;
+        }
+        :global(.act-car-thumb:hover) {
+          transform: scale(1.12);
+          z-index: 10 !important;
         }
         @media (max-width: 600px) {
           .itin-hero {
             height: 200px !important;
           }
-          :global(.act-thumb) {
-            width: 100%;
-            height: 160px;
+          :global(.act-car-img) {
+            height: 200px;
           }
         }
       `}</style>
