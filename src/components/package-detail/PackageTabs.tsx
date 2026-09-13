@@ -40,10 +40,10 @@ function AccordionItem({
   const handleBodyClick = (e: React.MouseEvent) => {
     const target = e.target as HTMLElement;
     if (target.tagName === "IMG" && target.hasAttribute("data-lightbox")) {
-      // New carousel images: collect all sibling .act-car-img from the carousel container
-      const carouselContainer = target.closest("[id^='act-car-']");
-      if (carouselContainer && onImageClick) {
-        const imgs = Array.from(carouselContainer.querySelectorAll(".act-car-img")).map((img) => img.getAttribute("src") || "");
+      // Day-level slider images
+      const daySlider = target.closest("[id^='day-sl-']");
+      if (daySlider && onImageClick) {
+        const imgs = Array.from(daySlider.querySelectorAll(".day-sl-img")).map((img) => img.getAttribute("src") || "");
         const src = target.getAttribute("src") || "";
         const idx = imgs.indexOf(src);
         onImageClick(imgs, idx >= 0 ? idx : 0);
@@ -201,19 +201,13 @@ function buildActivitiesList(
         : [];
       const img = rawImages.filter(Boolean)[0] || "";
 
-      // Shared card shell for both variants
-      return `<div style="border-radius:12px;border:1.5px solid var(--line);background:#fff;overflow:hidden">
-        <div style="padding:12px 14px${img ? " 10px" : ""}">
-          <div style="display:flex;align-items:flex-start;gap:8px">
-            <span style="width:7px;height:7px;border-radius:50%;background:${accentColor};flex-shrink:0;margin-top:5px"></span>
-            <div>
-              <div style="font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.4">${title}</div>
-              ${desc ? `<p style="font-size:12.5px;color:var(--ink3);margin-top:3px;line-height:1.5">${desc}</p>` : ""}
-            </div>
-          </div>
+      // Shared card shell — no image (images are in the day slider)
+      return `<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 2px">
+        <span style="width:7px;height:7px;border-radius:50%;background:${accentColor};flex-shrink:0;margin-top:5px"></span>
+        <div>
+          <div style="font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.4">${title}</div>
+          ${desc ? `<p style="font-size:12.5px;color:var(--ink3);margin-top:3px;line-height:1.5">${desc}</p>` : ""}
         </div>
-        ${img ? `<img src="${img}" alt="${title}" class="act-car-img" data-lightbox
-          style="width:100%;height:220px;object-fit:cover;display:block;cursor:pointer;border-top:1px solid var(--line)" />` : ""}
       </div>`;
     })
     .join("")}</div>`;
@@ -294,6 +288,64 @@ function sectionLabel(icon: string, text: string): string {
   </div>`;
 }
 
+/* ── Day-level horizontal image slider ── */
+let _daySliderIdx = 0;
+function buildDayImageSlider(images: { src: string; label?: string }[]): string {
+  if (!images || images.length === 0) return "";
+  const id = `day-sl-${_daySliderIdx++}`;
+  const trackId = `${id}-track`;
+  const total = images.length;
+
+  const nav = (dir: 1 | -1) =>
+    `(function(){
+      var wrap=document.getElementById('${id}');
+      var track=document.getElementById('${trackId}');
+      if(!wrap||!track)return;
+      var total=${total};
+      var cur=parseInt(wrap.getAttribute('data-cur')||'0');
+      var next=Math.min(Math.max(cur+${dir},0),total-1);
+      wrap.setAttribute('data-cur',next);
+      var slideW=track.children[0]?track.children[0].offsetWidth+10:150;
+      track.style.transform='translateX(-'+(next*slideW)+'px)';
+      var ctr=wrap.querySelector('.day-sl-ctr');
+      if(ctr)ctr.textContent=(next+1)+'/${total}';
+    })()`;
+
+  return `<div id="${id}" data-cur="0" style="position:relative;margin:10px 0 16px;overflow:hidden;border-radius:12px">
+    <div id="${trackId}" style="display:flex;gap:10px;padding:0 4px;transition:transform .35s ease;will-change:transform">
+      ${images.map(({ src, label }, i) =>
+        `<div style="position:relative;min-width:calc(45% - 6px);max-width:calc(45% - 6px);flex-shrink:0;border-radius:12px;overflow:hidden">
+          <img src="${src}" alt="${label || 'Day photo'}" class="day-sl-img" data-lightbox data-idx="${i}"
+            style="width:100%;height:180px;object-fit:cover;display:block;cursor:pointer;" />
+          ${label ? `<div style="position:absolute;bottom:0;left:0;right:0;
+            background:linear-gradient(to top,rgba(0,0,0,.72) 0%,transparent 100%);
+            padding:20px 10px 8px;pointer-events:none">
+            <span style="color:#fff;font-size:11.5px;font-weight:600;line-height:1.3;display:block;
+              text-shadow:0 1px 3px rgba(0,0,0,.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${label}</span>
+          </div>` : ""}
+        </div>`
+      ).join("")}
+    </div>
+    ${total > 1 ? `
+    <button style="position:absolute;left:8px;top:50%;transform:translateY(-50%);width:30px;height:30px;
+      border-radius:50%;background:rgba(0,0,0,.6);border:none;cursor:pointer;display:flex;
+      align-items:center;justify-content:center;color:#fff;backdrop-filter:blur(4px);z-index:2;"
+      onclick="${nav(-1)}">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+    </button>
+    <button style="position:absolute;right:8px;top:50%;transform:translateY(-50%);width:30px;height:30px;
+      border-radius:50%;background:rgba(0,0,0,.6);border:none;cursor:pointer;display:flex;
+      align-items:center;justify-content:center;color:#fff;backdrop-filter:blur(4px);z-index:2;"
+      onclick="${nav(1)}">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+    </button>
+    <span style="position:absolute;top:8px;right:10px;background:rgba(0,0,0,.6);color:#fff;font-size:10px;
+      font-weight:600;padding:2px 8px;border-radius:20px;backdrop-filter:blur(4px);pointer-events:none;z-index:2">
+      <span class="day-sl-ctr">1/${total}</span>
+    </span>` : ""}
+  </div>`;
+}
+
 /* ── Helper: build HTML content for a flight or train ── */
 function buildFlightContent(flight: any, hideHeader: boolean = false): string {
   const isTrain = (flight.type ?? "flight") === "train";
@@ -355,8 +407,29 @@ function buildItineraryContent(day: any, dayFlights: any[] = [], imageMap?: Reco
   if (day.description) {
     html += `<p style="margin-bottom:10px">${day.description}</p>`;
   }
+  // Collect all activity images + day.images for the slider (with labels)
+  const allDayImages: { src: string; label?: string }[] = [];
+  if (day.activities && day.activities.length > 0) {
+    day.activities.forEach((act: any) => {
+      if (typeof act !== "string") {
+        const label = act.title || act.name || undefined;
+        if (act.images && act.images.length > 0) {
+          act.images.filter(Boolean).forEach((src: string) => allDayImages.push({ src, label }));
+        } else if (act.image) {
+          allDayImages.push({ src: act.image, label });
+        }
+      }
+    });
+  }
+  if (day.images && day.images.length > 0) {
+    day.images.filter(Boolean).forEach((src: string) => allDayImages.push({ src }));
+  }
+
   if (day.activities && day.activities.length > 0) {
     html += sectionLabel("directions_walk", "Activities");
+    if (allDayImages.length > 0) {
+      html += buildDayImageSlider(allDayImages);
+    }
     html += buildActivitiesList(day.activities, "var(--cu)", imageMap);
   }
   if (day.recommendations && day.recommendations.length > 0) {
@@ -374,9 +447,6 @@ function buildItineraryContent(day: any, dayFlights: any[] = [], imageMap?: Reco
   if (day.accommodation) {
     html += sectionLabel("hotel", "Accommodation");
     html += `<p style="font-size:13.5px;color:var(--ink2);margin-bottom:4px">${day.accommodation}</p>`;
-  }
-  if (day.images && day.images.length > 0) {
-    html += `<div class="acc-images">${day.images.map((img: string) => `<img src="${img}" alt="" class="acc-thumb" data-lightbox />`).join("")}</div>`;
   }
   return html;
 }
