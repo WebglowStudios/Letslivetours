@@ -225,17 +225,32 @@ function buildRecommendationsList(
 
   if (items.length === 0) return "";
 
+  // Collect images with labels for the carousel
+  const recImages: { src: string; label?: string }[] = [];
+  recommendations.forEach((rec) => {
+    if (typeof rec !== "string") {
+      const label = (rec.title || rec.name || "").trim() || undefined;
+      if (rec.images && rec.images.length > 0) {
+        rec.images.filter(Boolean).forEach((src: string) => recImages.push({ src, label }));
+      } else if (rec.image) {
+        recImages.push({ src: rec.image, label });
+      }
+    }
+  });
+
   return `
   <div class="recommendations-thought-wrap" style="margin: 20px 0 16px; position: relative;">
     <!-- Orange Thought Bubble Box -->
     <div style="background: #fffaf5; border: 2px solid #f97316; border-radius: 22px; padding: 18px 22px 14px; box-shadow: 0 4px 18px rgba(249, 115, 22, 0.08); position: relative;">
       <!-- Title -->
       <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 12px;">
-        <span style="font-size: 16px; line-height: 1;">💭</span>
+        <span style="font-size: 16px; line-height: 1;">&#x1F4AD;</span>
         <span style="font-size: 13px; font-weight: 700; color: #ea580c; text-transform: uppercase; letter-spacing: 0.8px;">
           Recommended for this Day
         </span>
       </div>
+
+      ${recImages.length > 0 ? buildDayImageSlider(recImages) : ""}
 
       <!-- Bullet Points List -->
       <ul style="margin: 0 0 14px 0; padding-left: 20px; list-style-type: disc;">
