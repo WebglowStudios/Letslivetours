@@ -654,8 +654,40 @@ function buildTransferContent(transfer: any): string {
 
 /* ── Helper: build activities-from-itinerary content for a day ── */
 function buildDayActivitiesContent(day: any, imageMap?: Record<string, string>): string {
-  if (!day.activities || day.activities.length === 0) return "";
-  return buildActivitiesList(day.activities, "var(--cu)", imageMap);
+  if ((!day.activities || day.activities.length === 0) && (!day.recommendations || day.recommendations.length === 0)) return "";
+
+  let html = "";
+
+  // Collect all activity images + day.images for the slider (with labels)
+  const allDayImages: { src: string; label?: string }[] = [];
+  if (day.activities && day.activities.length > 0) {
+    day.activities.forEach((act: any) => {
+      if (typeof act !== "string") {
+        const label = act.title || act.name || undefined;
+        if (act.images && act.images.length > 0) {
+          act.images.filter(Boolean).forEach((src: string) => allDayImages.push({ src, label }));
+        } else if (act.image) {
+          allDayImages.push({ src: act.image, label });
+        }
+      }
+    });
+  }
+  if (day.images && day.images.length > 0) {
+    day.images.filter(Boolean).forEach((src: string) => allDayImages.push({ src }));
+  }
+
+  if (day.activities && day.activities.length > 0) {
+    if (allDayImages.length > 0) {
+      html += buildDayImageSlider(allDayImages);
+    }
+    html += buildActivitiesList(day.activities, "var(--cu)", imageMap);
+  }
+
+  if (day.recommendations && day.recommendations.length > 0) {
+    html += buildRecommendationsList(day.recommendations);
+  }
+
+  return html;
 }
 
 // Tabs definition removed from here, moved inside the component to be dynamic
@@ -689,7 +721,9 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
   const destinationName = pkg?.destination?.name || pkg?.customDestinationText;
 
   const hasItinerary = itinerary.length > 0;
-  const hasActivities = itinerary.some((day: any) => day.activities && day.activities.length > 0);
+  const hasActivities = itinerary.some(
+    (day: any) => (day.activities && day.activities.length > 0) || (day.recommendations && day.recommendations.length > 0)
+  );
   const hasStays = stays.length > 0;
   const flights = pkg?.flights || [];
   const hasFlights = flights.some((f: any) => (f.type ?? "flight") === "flight");
@@ -735,9 +769,9 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
           };
         });
       case "activities":
-        // Show activity strings from each itinerary day
+        // Show activity and recommendation entries from each itinerary day
         return itinerary
-          .filter((day: any) => day.activities && day.activities.length > 0)
+          .filter((day: any) => (day.activities && day.activities.length > 0) || (day.recommendations && day.recommendations.length > 0))
           .map((day: any) => ({
             badge: `Day ${day.day}`,
             badgeType: "activity",
