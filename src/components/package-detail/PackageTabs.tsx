@@ -279,11 +279,11 @@ function buildRecommendationsList(
 
         <!-- Mascot Bird Image -->
         <img
-          src="/mascot-bird.svg"
+          src="/bird.png"
           alt="Company Mascot Bird"
           class="mascot-bird"
-          style="width: 48px; height: 48px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.12)); display: block;"
-          onerror="this.onerror=null; this.src='/logo_blue.png';"
+          style="width: 52px; height: 52px; object-fit: contain; filter: drop-shadow(0 2px 6px rgba(0,0,0,0.12)); display: block;"
+          onerror="this.onerror=null; this.src='/bird.png';"
         />
       </div>
       <div style="margin-top: 36px;">
