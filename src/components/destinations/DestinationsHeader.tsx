@@ -1,5 +1,8 @@
 "use client";
 
+import { useState } from "react";
+import SearchModal from "@/components/search/SearchModal";
+
 interface Props {
   activeCat: string;
   setActiveCat: (cat: string) => void;
@@ -19,6 +22,8 @@ const cats = [
 ];
 
 export default function DestinationsHeader({ activeCat, setActiveCat, search, setSearch }: Props) {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+
   return (
     <section
       id="page-header"
@@ -93,11 +98,11 @@ export default function DestinationsHeader({ activeCat, setActiveCat, search, se
             margin: "0 auto 28px",
           }}
         >
-          Search from our handpicked collection of destinations worldwide.
+          Search from our handpicked collection of destinations and tour packages worldwide.
         </p>
 
         {/* Search */}
-        <div style={{ maxWidth: 580, margin: "0 auto", position: "relative" }}>
+        <div style={{ maxWidth: 620, margin: "0 auto", position: "relative" }}>
           <span
             className="material-symbols-rounded"
             style={{
@@ -115,10 +120,15 @@ export default function DestinationsHeader({ activeCat, setActiveCat, search, se
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search destinations, activities..."
+            onKeyDown={(e) => {
+              if (e.key === "Enter") {
+                setIsModalOpen(true);
+              }
+            }}
+            placeholder="Search destinations, packages, themes..."
             style={{
               width: "100%",
-              padding: "15px 120px 15px 50px",
+              padding: "15px 140px 15px 50px",
               background: "#fff",
               border: "none",
               borderRadius: 50,
@@ -130,13 +140,14 @@ export default function DestinationsHeader({ activeCat, setActiveCat, search, se
             }}
           />
           <button
+            onClick={() => setIsModalOpen(true)}
             className="syne"
             style={{
               position: "absolute",
-              right: 5,
+              right: 6,
               top: "50%",
               transform: "translateY(-50%)",
-              padding: "10px 22px",
+              padding: "10px 20px",
               background: "var(--cu)",
               border: "none",
               borderRadius: 50,
@@ -145,9 +156,37 @@ export default function DestinationsHeader({ activeCat, setActiveCat, search, se
               fontWeight: 700,
               cursor: "pointer",
               transition: "var(--tr)",
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
             }}
           >
-            Search
+            <span className="material-symbols-rounded" style={{ fontSize: 16 }}>manage_search</span>
+            Search All
+          </button>
+        </div>
+
+        {/* Quick pill to open dual search */}
+        <div style={{ marginTop: 12, display: "flex", justifyContent: "center", gap: 10, alignItems: "center" }}>
+          <button
+            type="button"
+            onClick={() => setIsModalOpen(true)}
+            style={{
+              background: "rgba(249,246,240,.1)",
+              border: "1px solid rgba(249,246,240,.2)",
+              borderRadius: 20,
+              padding: "5px 14px",
+              color: "rgba(249,246,240,.85)",
+              fontSize: 12,
+              display: "flex",
+              alignItems: "center",
+              gap: 6,
+              cursor: "pointer",
+              transition: "var(--tr)",
+            }}
+          >
+            <span className="material-symbols-rounded" style={{ fontSize: 15, color: "var(--cu)" }}>travel_explore</span>
+            Looking for tour packages? <span style={{ color: "var(--cu)", fontWeight: 600 }}>Open Dual Search</span>
           </button>
         </div>
 
@@ -199,6 +238,12 @@ export default function DestinationsHeader({ activeCat, setActiveCat, search, se
           ))}
         </div>
       </div>
+
+      <SearchModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        initialQuery={search}
+      />
     </section>
   );
 }

@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import SearchModal from "@/components/search/SearchModal";
 
 const slides = [
   { src: "https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=1600&q=80", label: "Tropical" },
@@ -15,6 +16,7 @@ const slides = [
 export default function Hero() {
   const [idx, setIdx] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -22,12 +24,8 @@ export default function Hero() {
     return () => clearInterval(interval);
   }, []);
 
-  const handleSearch = () => {
-    if (searchQuery.trim()) {
-      router.push(`/destinations?search=${encodeURIComponent(searchQuery.trim())}`);
-    } else {
-      router.push("/destinations");
-    }
+  const handleOpenSearch = () => {
+    setIsSearchOpen(true);
   };
 
   return (
@@ -138,11 +136,16 @@ export default function Hero() {
         </h1>
 
         {/* Search */}
-        <div style={{
-          marginTop: 48, background: "rgba(249,246,240,.07)", backdropFilter: "blur(24px)",
-          border: "1px solid rgba(249,246,240,.15)", borderRadius: "var(--r-xl)",
-          padding: "12px 12px 12px 24px", display: "flex", alignItems: "center", maxWidth: 700,
-        }} className="hero-search-bar">
+        <div
+          style={{
+            marginTop: 48, background: "rgba(249,246,240,.07)", backdropFilter: "blur(24px)",
+            border: "1px solid rgba(249,246,240,.15)", borderRadius: "var(--r-xl)",
+            padding: "12px 12px 12px 24px", display: "flex", alignItems: "center", maxWidth: 700,
+            cursor: "pointer",
+          }}
+          className="hero-search-bar"
+          onClick={handleOpenSearch}
+        >
           <div style={{
             flex: 1, display: "flex", flexDirection: "column", gap: 3, paddingRight: 20,
             borderRight: "1px solid rgba(249,246,240,.12)",
@@ -153,25 +156,31 @@ export default function Hero() {
             }}>Where to?</div>
             <input
               type="text"
-              placeholder="Dubai, Bali, Japan..."
+              placeholder="Dubai, Bali, Japan, Honeymoon..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+              onFocus={handleOpenSearch}
+              onClick={(e) => { e.stopPropagation(); handleOpenSearch(); }}
               style={{
                 background: "transparent", border: "none", outline: "none",
                 fontFamily: "var(--font-inter),'Inter',sans-serif", fontSize: 14,
-                color: "#fff", fontWeight: 500, width: "100%",
+                color: "#fff", fontWeight: 500, width: "100%", cursor: "pointer",
               }}
             />
           </div>
           {[
-            { label: "Travel Date", type: "date", placeholder: "" },
+            { label: "Travel Date", type: "text", placeholder: "Anytime" },
             { label: "Travellers", type: "text", placeholder: "2 Adults" },
           ].map((f, i) => (
-            <div key={i} style={{
-              flex: 1, display: "flex", flexDirection: "column", gap: 3, padding: "0 20px",
-              borderRight: i < 1 ? "1px solid rgba(249,246,240,.12)" : "none",
-            }} className="hs-field">
+            <div
+              key={i}
+              style={{
+                flex: 1, display: "flex", flexDirection: "column", gap: 3, padding: "0 20px",
+                borderRight: i < 1 ? "1px solid rgba(249,246,240,.12)" : "none",
+              }}
+              className="hs-field"
+              onClick={(e) => { e.stopPropagation(); handleOpenSearch(); }}
+            >
               <div className="syne" style={{
                 fontSize: 9, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase",
                 color: "rgba(249,246,240,.5)",
@@ -179,20 +188,26 @@ export default function Hero() {
               <input
                 type={f.type}
                 placeholder={f.placeholder}
+                readOnly
+                onFocus={handleOpenSearch}
                 style={{
                   background: "transparent", border: "none", outline: "none",
                   fontFamily: "var(--font-inter),'Inter',sans-serif", fontSize: 14,
-                  color: "#fff", fontWeight: 500, width: "100%",
+                  color: "#fff", fontWeight: 500, width: "100%", cursor: "pointer",
                 }}
               />
             </div>
           ))}
-          <button onClick={handleSearch} className="syne hero-search-btn" style={{
-            flexShrink: 0, padding: "14px 24px", background: "var(--cu)", border: "none",
-            borderRadius: 14, color: "#fff", fontSize: 13, fontWeight: 700, letterSpacing: 0.5,
-            cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
-            transition: "var(--tr)", marginLeft: 12, width: "auto",
-          }}>
+          <button
+            onClick={(e) => { e.stopPropagation(); handleOpenSearch(); }}
+            className="syne hero-search-btn"
+            style={{
+              flexShrink: 0, padding: "14px 24px", background: "var(--cu)", border: "none",
+              borderRadius: 14, color: "#fff", fontSize: 13, fontWeight: 700, letterSpacing: 0.5,
+              cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 7,
+              transition: "var(--tr)", marginLeft: 12, width: "auto",
+            }}
+          >
             <span className="material-symbols-rounded" style={{ fontSize: 18 }}>search</span>Search
           </button>
         </div>
@@ -248,6 +263,12 @@ export default function Hero() {
           Scroll to explore
         </div>
       </div>
+
+      <SearchModal
+        isOpen={isSearchOpen}
+        onClose={() => setIsSearchOpen(false)}
+        initialQuery={searchQuery}
+      />
 
       <style jsx>{`
         @media (max-width: 1100px) {

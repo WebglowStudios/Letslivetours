@@ -15,6 +15,7 @@ import WhyDubai from "@/components/destination-detail/WhyDubai";
 import TravelTips from "@/components/destination-detail/TravelTips";
 import DestinationArticles from "@/components/destination-detail/DestinationArticles";
 import DetailPartners from "@/components/destination-detail/DetailPartners";
+import SearchModal from "@/components/search/SearchModal";
 import Footer from "@/components/Footer";
 import ScrollToTop from "@/components/ScrollToTop";
 import ScrollReveal from "@/components/ScrollReveal";
@@ -85,6 +86,8 @@ export default function DestinationDetailPage() {
   const slug = params?.slug as string;
 
   const [activeFilter, setActiveFilter] = useState("all");
+  const [packageSearch, setPackageSearch] = useState("");
+  const [isGlobalSearchOpen, setIsGlobalSearchOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [destination, setDestination] = useState<any>(null);
@@ -172,8 +175,22 @@ export default function DestinationDetailPage() {
     : fallbackFamilyCards;
 
   const filterCards = (cards: typeof handpickedCards) => {
-    if (activeFilter === "all") return cards;
-    return cards.filter((c) => c.type === activeFilter);
+    let result = cards;
+    if (activeFilter !== "all") {
+      result = result.filter((c) => c.type === activeFilter);
+    }
+    if (packageSearch.trim()) {
+      const q = packageSearch.toLowerCase().trim();
+      result = result.filter((c) =>
+        c.name.toLowerCase().includes(q) ||
+        c.hotel.toLowerCase().includes(q) ||
+        c.duration.toLowerCase().includes(q) ||
+        c.badge.toLowerCase().includes(q) ||
+        c.type.toLowerCase().includes(q) ||
+        c.price.toLowerCase().includes(q)
+      );
+    }
+    return result;
   };
 
   const destinationName = destination?.name || "Dubai";
@@ -208,7 +225,14 @@ export default function DestinationDetailPage() {
       </div>
       )}
 
-      <FilterBar activeFilter={activeFilter} setActiveFilter={setActiveFilter} />
+      <FilterBar
+        activeFilter={activeFilter}
+        setActiveFilter={setActiveFilter}
+        searchQuery={packageSearch}
+        setSearchQuery={setPackageSearch}
+        destinationName={destinationName}
+        onOpenGlobalSearch={() => setIsGlobalSearchOpen(true)}
+      />
 
       <PackageRow
         eyebrow="Staff Picks"
@@ -249,6 +273,11 @@ export default function DestinationDetailPage() {
       <TravelTips tips={destination?.travelTips || []} />
       <DestinationArticles destinationName={destinationName} destinationId={destination?._id} />
       <DetailPartners partners={destination?.partners || []} />
+      <SearchModal
+        isOpen={isGlobalSearchOpen}
+        onClose={() => setIsGlobalSearchOpen(false)}
+        initialQuery={destinationName || ""}
+      />
       <Footer />
       <ScrollToTop />
       <ScrollReveal />
