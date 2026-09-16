@@ -44,6 +44,8 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
         email: cbEmail.trim() || "not-provided@callback.local",
         phone: cbPhone.trim(),
         packageName: pkg?.name || "",
+        package: pkg?._id || undefined,
+        destination: pkg?.destination?.name || pkg?.customDestinationText || (typeof pkg?.destination === "string" ? pkg?.destination : undefined),
         message: `Callback requested for package: ${pkg?.name || slug}`,
         source: "website",
       });

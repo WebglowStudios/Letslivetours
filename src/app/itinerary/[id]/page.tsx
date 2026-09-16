@@ -150,7 +150,7 @@ export default function CustomItineraryPage() {
               </div>
               {/* Enquiry form for questions/modifications */}
               <div style={{ marginTop: 20 }}>
-                <EnquiryForm packageName={pkg.name} packageId={pkg._id} isGroupTour={pkg?.isGroupTour} departures={pkg?.departures} />
+                <EnquiryForm packageName={pkg.name} packageId={pkg._id} destinationName={pkg?.destination?.name || pkg?.customDestinationText || (typeof pkg?.destination === 'string' ? pkg.destination : '')} isGroupTour={pkg?.isGroupTour} departures={pkg?.departures} />
               </div>
             </div>
           )}

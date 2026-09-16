@@ -8,13 +8,14 @@ import { useAuth } from "@/hooks/useAuth";
 interface EnquiryFormProps {
   packageName: string;
   packageId?: string;
+  destinationName?: string;
   isGroupTour?: boolean;
   departures?: any[];
   selectedDepartureId?: string;
   onSuccess?: () => void;
 }
 
-export default function EnquiryForm({ packageName, packageId, isGroupTour, departures = [], selectedDepartureId, onSuccess }: EnquiryFormProps) {
+export default function EnquiryForm({ packageName, packageId, destinationName, isGroupTour, departures = [], selectedDepartureId, onSuccess }: EnquiryFormProps) {
   const [submitted, setSubmitted] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
@@ -62,6 +63,7 @@ export default function EnquiryForm({ packageName, packageId, isGroupTour, depar
         message: message || undefined,
         packageName: packageName || undefined,
         package: packageId || undefined,
+        destination: destinationName || undefined,
         source: "website",
       });
 

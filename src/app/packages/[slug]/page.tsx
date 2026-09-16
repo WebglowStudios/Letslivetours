@@ -177,7 +177,7 @@ export default function PackageDetailPage() {
           {!pkg?.isGroupTour && (
             <div style={{ position: "sticky", top: 84 }}>
               <PriceCard pkg={pkg} slug={slug} />
-              <EnquiryForm packageName={packageName} packageId={pkg?._id} isGroupTour={pkg?.isGroupTour} departures={pkg?.departures} />
+              <EnquiryForm packageName={packageName} packageId={pkg?._id} destinationName={destinationName} isGroupTour={pkg?.isGroupTour} departures={pkg?.departures} />
             </div>
           )}
         </div>
