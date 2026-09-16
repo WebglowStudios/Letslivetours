@@ -5,6 +5,7 @@ import { api } from "@/lib/api";
 
 interface Review {
   _id: string;
+  reviewerName?: string;
   user?: { firstName: string; lastName: string };
   package?: { name: string };
   rating: number;
@@ -124,7 +125,7 @@ export default function AdminReviews() {
               <div className="review-top">
                 <div>
                   <div style={{ fontWeight: 600, fontSize: 15 }}>
-                    {review.user ? `${review.user.firstName} ${review.user.lastName}` : "Anonymous"}
+                    {review.reviewerName || (review.user ? `${review.user.firstName} ${review.user.lastName}` : "Anonymous")}
                   </div>
                   <div style={{ fontSize: 13, color: "var(--ink3)", marginTop: 2 }}>
                     on <strong>{review.package?.name || "Unknown Package"}</strong>

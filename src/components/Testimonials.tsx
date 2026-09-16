@@ -7,6 +7,7 @@ interface ReviewData {
   rating: number;
   title?: string;
   text: string;
+  reviewerName?: string;
   user?: { firstName: string; lastName: string; avatar?: string };
   package?: { name: string; slug: string };
   destination?: { name: string; slug: string };
@@ -48,7 +49,7 @@ export default function Testimonials() {
             const mapped = json.data.slice(0, 6).map((r: ReviewData) => {
               const destSlug = r.destination?.slug || r.destination?.name?.toLowerCase() || "";
               const img = destImages[destSlug] || "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80";
-              const name = r.user ? `${r.user.firstName} ${r.user.lastName}` : "Traveller";
+              const name = r.reviewerName?.trim() || (r.user ? `${r.user.firstName || ""} ${r.user.lastName || ""}`.trim() : "") || "Traveller";
               const trip = r.package?.name || r.destination?.name || "Package";
               const displayText = r.text.length > 120 ? r.text.slice(0, 120) + "..." : r.text;
               return { img, text: displayText, name, trip };

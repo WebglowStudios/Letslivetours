@@ -9,6 +9,7 @@ interface ReviewsProps {
 
 interface Review {
   _id: string;
+  reviewerName?: string;
   userName?: string;
   user?: { firstName: string; lastName: string; avatar?: string };
   rating: number;
@@ -145,8 +146,12 @@ export default function Reviews({ packageId }: ReviewsProps) {
   };
 
   const getReviewName = (review: Review) => {
-    if (review.user) return `${review.user.firstName} ${review.user.lastName}`;
-    if (review.userName) return review.userName;
+    if (review.reviewerName?.trim()) return review.reviewerName.trim();
+    if (review.user) {
+      const full = `${review.user.firstName || ""} ${review.user.lastName || ""}`.trim();
+      if (full) return full;
+    }
+    if (review.userName?.trim()) return review.userName.trim();
     return "Anonymous";
   };
 
