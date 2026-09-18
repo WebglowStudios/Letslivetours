@@ -167,7 +167,7 @@ export default function PackageDetailPage() {
             )}
             
             <PackageTabs pkg={pkg} />
-            <InclusionsExclusions inclusions={pkg?.inclusions || []} exclusions={pkg?.exclusions || []} isInternational={pkg?.isInternational} visaIncluded={pkg?.visaIncluded} flightsIncluded={pkg?.flightsIncluded} />
+            <InclusionsExclusions inclusions={pkg?.inclusions || []} exclusions={pkg?.exclusions || []} isInternational={pkg?.isInternational} visaIncluded={pkg?.visaIncluded} flightsIncluded={pkg?.flightsIncluded} trainsIncluded={pkg?.trainsIncluded} />
             <PackageTrustPillars destinationName={destinationName} destinationSlug={destinationSlug} />
             <KnowBeforeYouGo items={pkg?.knowBeforeYouGo || []} />
             <ThingsToCarry items={pkg?.thingsToCarry || []} />

@@ -15,6 +15,7 @@ interface BookingData {
     isInternational?: boolean;
     visaIncluded?: boolean;
     flightsIncluded?: boolean;
+    trainsIncluded?: boolean;
   };
   user?: {
     firstName: string;
@@ -179,7 +180,7 @@ export function generateBookingPdf(booking: BookingData): void {
   // ═══════════════════════════════════════════════════════
   // PACKAGE DETAILS CARD
   // ═══════════════════════════════════════════════════════
-  const hasBadges = booking.package?.isInternational || booking.package?.flightsIncluded !== undefined;
+  const hasBadges = booking.package?.isInternational || booking.package?.flightsIncluded !== undefined || booking.package?.trainsIncluded !== undefined;
   const rectHeight = hasBadges ? 44 : 32;
   doc.setFillColor(...C.bg);
   doc.roundedRect(M, y, CW, rectHeight, 3, 3, "F");
@@ -232,6 +233,14 @@ export function generateBookingPdf(booking: BookingData): void {
       const fText = fInc ? "FLIGHTS INCLUDED" : "FLIGHTS NOT INCLUDED";
       doc.setTextColor(...(fInc ? C.green : C.amber));
       doc.text(fText, badgeX, badgeY);
+      badgeX += doc.getTextWidth(fText) + 12;
+    }
+
+    if (booking.package?.trainsIncluded !== undefined) {
+      const tInc = booking.package.trainsIncluded;
+      const tText = tInc ? "TRAINS INCLUDED" : "TRAINS NOT INCLUDED";
+      doc.setTextColor(...(tInc ? C.green : C.amber));
+      doc.text(tText, badgeX, badgeY);
     }
   }
 

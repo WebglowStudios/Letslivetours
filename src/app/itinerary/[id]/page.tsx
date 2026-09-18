@@ -100,7 +100,7 @@ export default function CustomItineraryPage() {
             )}
 
             <PackageTabs pkg={pkg} />
-            <InclusionsExclusions inclusions={pkg.inclusions || []} exclusions={pkg.exclusions || []} isInternational={pkg.isInternational} visaIncluded={pkg.visaIncluded} flightsIncluded={pkg.flightsIncluded} />
+            <InclusionsExclusions inclusions={pkg.inclusions || []} exclusions={pkg.exclusions || []} isInternational={pkg.isInternational} visaIncluded={pkg.visaIncluded} flightsIncluded={pkg.flightsIncluded} trainsIncluded={pkg.trainsIncluded} />
             <PackageTrustPillars destinationName={pkg?.destination?.name} destinationSlug={pkg?.destination?.slug} />
             <KnowBeforeYouGo items={pkg.knowBeforeYouGo || []} />
             <ThingsToCarry items={pkg.thingsToCarry || []} />
@@ -126,9 +126,16 @@ export default function CustomItineraryPage() {
                     </div>
                   )}
                   {pkg.flightsIncluded !== undefined && (
-                    <div style={{ display: "inline-block", background: pkg.flightsIncluded ? "var(--gn-gl)" : "rgba(245,166,35,.1)", padding: "4px 8px", borderRadius: 4, marginBottom: 8 }}>
+                    <div style={{ display: "inline-block", background: pkg.flightsIncluded ? "var(--gn-gl)" : "rgba(245,166,35,.1)", padding: "4px 8px", borderRadius: 4, marginBottom: 8, marginRight: 8 }}>
                       <span className="syne" style={{ fontSize: 10, fontWeight: 700, color: pkg.flightsIncluded ? "var(--gn)" : "var(--cu-d)", textTransform: "uppercase", letterSpacing: 1 }}>
                         {pkg.flightsIncluded ? "✈ Flights Included" : "⚠ Flights Not Included"}
+                      </span>
+                    </div>
+                  )}
+                  {pkg.trainsIncluded !== undefined && (
+                    <div style={{ display: "inline-block", background: pkg.trainsIncluded ? "var(--gn-gl)" : "rgba(245,166,35,.1)", padding: "4px 8px", borderRadius: 4, marginBottom: 8 }}>
+                      <span className="syne" style={{ fontSize: 10, fontWeight: 700, color: pkg.trainsIncluded ? "var(--gn)" : "var(--cu-d)", textTransform: "uppercase", letterSpacing: 1 }}>
+                        {pkg.trainsIncluded ? "🚆 Trains Included" : "⚠ Trains Not Included"}
                       </span>
                     </div>
                   )}

@@ -6,9 +6,10 @@ interface InclusionsExclusionsProps {
   isInternational?: boolean;
   visaIncluded?: boolean;
   flightsIncluded?: boolean;
+  trainsIncluded?: boolean;
 }
 
-export default function InclusionsExclusions({ inclusions: rawInclusions, exclusions: rawExclusions, isInternational, visaIncluded, flightsIncluded }: InclusionsExclusionsProps) {
+export default function InclusionsExclusions({ inclusions: rawInclusions, exclusions: rawExclusions, isInternational, visaIncluded, flightsIncluded, trainsIncluded }: InclusionsExclusionsProps) {
   let inclusions = [...(rawInclusions || [])];
   let exclusions = [...(rawExclusions || [])];
 
