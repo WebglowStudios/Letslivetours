@@ -1,17 +1,27 @@
 "use client";
 
 import { useEffect, useState, useRef } from "react";
+import { createPortal } from "react-dom";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useAuth } from "@/hooks/useAuth";
 
 export default function Navbar() {
+  const [mounted, setMounted] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { user, logout } = useAuth();
   const dropdownRef = useRef<HTMLDivElement>(null);
   const pathname = usePathname();
+
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
+  useEffect(() => {
+    setMobileMenuOpen(false);
+  }, [pathname]);
 
   // Pages that should always show the "scrolled" (solid) navbar style
   const solidNavPages = [
@@ -85,54 +95,58 @@ export default function Navbar() {
       const yOffset = -76;
       const y = pkgEl.getBoundingClientRect().top + window.pageYOffset + yOffset;
       window.scrollTo({ top: y, behavior: "smooth" });
-      setMobileMenuOpen(false);
     }
+    setMobileMenuOpen(false);
   };
 
   return (
-    <nav
-      id="nav"
-      style={{
-        position: "fixed",
-        top: 0,
-        left: 0,
-        right: 0,
-        zIndex: 1000,
-        height: 72,
-        display: "flex",
-        alignItems: "center",
-        justifyContent: "space-between",
-        padding: "0 52px",
-        transition: "var(--tr)",
-        ...(scrolled
-          ? {
-              background: "rgba(249,246,240,.92)",
-              backdropFilter: "blur(22px)",
-              borderBottom: "1px solid var(--line)",
-              boxShadow: "0 2px 20px rgba(0,77,94,.06)",
-            }
-          : {}),
-      }}
-    >
-      <Link
-        href="/"
+    <>
+      <nav
+        id="nav"
         style={{
+          position: "fixed",
+          top: 0,
+          left: 0,
+          right: 0,
+          zIndex: 1000,
+          height: 72,
           display: "flex",
           alignItems: "center",
-          textDecoration: "none",
-          flexShrink: 0,
+          justifyContent: "space-between",
+          flexWrap: "nowrap",
+          padding: "0 52px",
+          transition: "var(--tr)",
+          boxSizing: "border-box",
+          ...(scrolled
+            ? {
+                background: "rgba(249,246,240,.92)",
+                backdropFilter: "blur(22px)",
+                borderBottom: "1px solid var(--line)",
+                boxShadow: "0 2px 20px rgba(0,77,94,.06)",
+              }
+            : {}),
         }}
       >
-        <img
-          src={scrolled ? "/logo_blue.png" : "/logo_white.png"}
-          alt="LetsLive Tours"
+        <Link
+          href="/"
           style={{
-            height: 60,
-            width: "auto",
-            transition: "opacity .3s",
+            display: "flex",
+            alignItems: "center",
+            textDecoration: "none",
+            flexShrink: 0,
           }}
-        />
-      </Link>
+        >
+          <img
+            src={scrolled ? "/logo_blue.png" : "/logo_white.png"}
+            alt="LetsLive Tours"
+            className="nav-logo-img"
+            style={{
+              height: 56,
+              width: "auto",
+              transition: "opacity .3s, height .2s",
+            }}
+          />
+        </Link>
 
       <ul
         style={{
@@ -165,17 +179,26 @@ export default function Navbar() {
         ))}
       </ul>
 
-      <div style={{ display: "flex", gap: 12, alignItems: "center" }}>
+      <div
+        className="nav-actions-wrap"
+        style={{
+          display: "flex",
+          gap: 10,
+          alignItems: "center",
+          flexShrink: 0,
+          flexWrap: "nowrap",
+        }}
+      >
         {user ? (
-          <div ref={dropdownRef} style={{ position: "relative" }}>
+          <div ref={dropdownRef} style={{ position: "relative", flexShrink: 0 }}>
             <button
               onClick={() => setDropdownOpen(!dropdownOpen)}
               className="syne nav-user-btn"
               style={{
                 display: "flex",
                 alignItems: "center",
-                gap: 10,
-                padding: "6px 16px 6px 8px",
+                gap: 8,
+                padding: "6px 14px 6px 8px",
                 background: "transparent",
                 border: scrolled
                   ? "1px solid var(--line2)"
@@ -183,21 +206,24 @@ export default function Navbar() {
                 borderRadius: 50,
                 cursor: "pointer",
                 transition: "var(--tr)",
+                flexShrink: 0,
+                whiteSpace: "nowrap",
               }}
             >
               <div
                 style={{
-                  width: 32,
-                  height: 32,
+                  width: 30,
+                  height: 30,
                   borderRadius: "50%",
                   background: "var(--gn)",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
                   color: "#fff",
-                  fontSize: 13,
+                  fontSize: 12,
                   fontWeight: 700,
                   overflow: "hidden",
+                  flexShrink: 0,
                 }}
               >
                 {user.avatar ? (
@@ -211,11 +237,16 @@ export default function Navbar() {
                 )}
               </div>
               <span
+                className="nav-user-name"
                 style={{
-                  fontSize: 12.5,
+                  fontSize: 12,
                   fontWeight: 600,
                   color: scrolled ? "var(--ink2)" : "rgba(249,246,240,.8)",
                   letterSpacing: 0.3,
+                  maxWidth: 85,
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  whiteSpace: "nowrap",
                 }}
               >
                 {user.firstName}
@@ -365,7 +396,7 @@ export default function Navbar() {
             href="/login"
             className="syne nav-sign-btn"
             style={{
-              padding: "8px 20px",
+              padding: "8px 18px",
               background: "transparent",
               border: scrolled
                 ? "1px solid var(--line2)"
@@ -378,6 +409,11 @@ export default function Navbar() {
               cursor: "pointer",
               transition: "var(--tr)",
               textDecoration: "none",
+              flexShrink: 0,
+              whiteSpace: "nowrap",
+              display: "inline-flex",
+              alignItems: "center",
+              justifyContent: "center",
             }}
           >
             Sign In
@@ -399,6 +435,8 @@ export default function Navbar() {
             cursor: "pointer",
             transition: "var(--tr)",
             textDecoration: "none",
+            flexShrink: 0,
+            whiteSpace: "nowrap",
           }}
         >
           Explore Packages
@@ -408,6 +446,7 @@ export default function Navbar() {
         <button
           className="nav-hamburger"
           onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+          aria-label="Toggle navigation menu"
           style={{
             display: "none",
             alignItems: "center",
@@ -417,8 +456,9 @@ export default function Navbar() {
             background: "transparent",
             border: "none",
             cursor: "pointer",
-            zIndex: 1100,
             position: "relative",
+            flexShrink: 0,
+            padding: 0,
           }}
         >
           <span className="material-symbols-rounded" style={{ fontSize: 28, color: scrolled ? "var(--ink)" : "var(--iv)" }}>
@@ -426,194 +466,239 @@ export default function Navbar() {
           </span>
         </button>
       </div>
+    </nav>
 
-      {/* Mobile sidebar drawer */}
-      <div
-        className="nav-mobile-backdrop"
-        onClick={() => setMobileMenuOpen(false)}
-        style={{
-          position: "fixed",
-          inset: 0,
-          background: "rgba(0,20,28,.5)",
-          zIndex: 1050,
-          opacity: mobileMenuOpen ? 1 : 0,
-          pointerEvents: mobileMenuOpen ? "auto" : "none",
-          transition: "opacity .3s ease",
-        }}
-      />
-      <div
-        className="nav-mobile-drawer"
-        style={{
-          position: "fixed",
-          top: 0,
-          right: 0,
-          bottom: 0,
-          width: "min(300px, 82vw)",
-          background: "#fff",
-          zIndex: 1060,
-          transform: mobileMenuOpen ? "translateX(0)" : "translateX(100%)",
-          transition: "transform .35s cubic-bezier(.4,0,.2,1)",
-          display: "flex",
-          flexDirection: "column",
-          boxShadow: mobileMenuOpen ? "-8px 0 40px rgba(0,20,28,.15)" : "none",
-        }}
-      >
-        {/* Drawer header */}
-        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "20px 24px", borderBottom: "1px solid var(--line)" }}>
-          <img src="/logo_blue.png" alt="LetsLive Tours" style={{ height: 32, width: "auto" }} />
-          <button
+    {/* Mobile sidebar drawer — portalled to document.body to ensure it is always on top of every page */}
+    {mounted &&
+      createPortal(
+        <>
+          <div
+            className="nav-mobile-backdrop"
             onClick={() => setMobileMenuOpen(false)}
-            style={{ width: 36, height: 36, borderRadius: "50%", background: "var(--iv)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+            style={{
+              position: "fixed",
+              inset: 0,
+              background: "rgba(0,20,28,.55)",
+              backdropFilter: "blur(4px)",
+              WebkitBackdropFilter: "blur(4px)",
+              zIndex: 99998,
+              opacity: mobileMenuOpen ? 1 : 0,
+              pointerEvents: mobileMenuOpen ? "auto" : "none",
+              transition: "opacity .3s ease",
+            }}
+          />
+          <div
+            className="nav-mobile-drawer"
+            style={{
+              position: "fixed",
+              top: 0,
+              right: 0,
+              bottom: 0,
+              width: "min(320px, 85vw)",
+              height: "100dvh",
+              background: "#fff",
+              zIndex: 99999,
+              transform: mobileMenuOpen ? "translateX(0)" : "translateX(100%)",
+              transition: "transform .35s cubic-bezier(.4,0,.2,1)",
+              display: "flex",
+              flexDirection: "column",
+              boxShadow: mobileMenuOpen ? "-8px 0 40px rgba(0,20,28,.25)" : "none",
+              overflow: "hidden",
+            }}
           >
-            <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink2)" }}>close</span>
-          </button>
-        </div>
-
-        {/* User greeting */}
-        {user && (
-          <div style={{ padding: "20px 24px", background: "var(--iv)", borderBottom: "1px solid var(--line)" }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
-              <div style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--gn)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 15, fontWeight: 700 }}>
-                {getInitials()}
-              </div>
-              <div>
-                <div className="syne" style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)" }}>{user.firstName} {user.lastName}</div>
-                <div style={{ fontSize: 11, color: "var(--ink3)" }}>{user.email}</div>
-              </div>
+            {/* Drawer header */}
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "18px 20px", borderBottom: "1px solid var(--line)", flexShrink: 0 }}>
+              <img src="/logo_blue.png" alt="LetsLive Tours" style={{ height: 32, width: "auto" }} />
+              <button
+                onClick={() => setMobileMenuOpen(false)}
+                aria-label="Close menu"
+                style={{ width: 36, height: 36, borderRadius: "50%", background: "var(--iv)", border: "none", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer" }}
+              >
+                <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink2)" }}>close</span>
+              </button>
             </div>
-          </div>
-        )}
 
-        {/* Navigation links */}
-        <div style={{ flex: 1, padding: "12px 0", overflowY: "auto", minHeight: 0 }}>
-          {links.map((link, i) => (
-            <Link
-              key={i}
-              href={link.href}
-              className="syne"
-              onClick={() => setMobileMenuOpen(false)}
-              style={{
-                display: "flex",
-                alignItems: "center",
-                gap: 12,
-                padding: "14px 24px",
-                fontSize: 14,
-                fontWeight: 600,
-                color: "var(--ink2)",
-                textDecoration: "none",
-                transition: "background .2s",
-              }}
-            >
-              <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink3)" }}>
-                {link.label === "Destinations" ? "explore" : link.label === "Articles" ? "article" : link.label === "Gallery" ? "photo_library" : link.label === "About" ? "info" : link.label === "FAQs" ? "quiz" : link.label === "Careers" ? "work" : "mail"}
-              </span>
-              {link.label}
-            </Link>
-          ))}
+            {/* User greeting */}
+            {user && (
+              <div style={{ padding: "16px 20px", background: "var(--iv)", borderBottom: "1px solid var(--line)", flexShrink: 0 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                  <div style={{ width: 40, height: 40, borderRadius: "50%", background: "var(--gn)", display: "flex", alignItems: "center", justifyContent: "center", color: "#fff", fontSize: 15, fontWeight: 700, overflow: "hidden", flexShrink: 0 }}>
+                    {user.avatar ? (
+                      <img
+                        src={user.avatar}
+                        alt={user.firstName}
+                        style={{ width: "100%", height: "100%", objectFit: "cover" }}
+                      />
+                    ) : (
+                      getInitials()
+                    )}
+                  </div>
+                  <div style={{ minWidth: 0, overflow: "hidden" }}>
+                    <div className="syne" style={{ fontSize: 13, fontWeight: 700, color: "var(--ink)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.firstName} {user.lastName}</div>
+                    <div style={{ fontSize: 11, color: "var(--ink3)", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.email}</div>
+                  </div>
+                </div>
+              </div>
+            )}
 
-          {user && (
-            <>
-              <div style={{ height: 1, background: "var(--line)", margin: "8px 24px" }} />
-              {user.role === "admin" && (
-                <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="syne" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 24px", fontSize: 14, fontWeight: 600, color: "var(--cu)", textDecoration: "none" }}>
-                  <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--cu)" }}>admin_panel_settings</span>
-                  Admin Panel
+            {/* Navigation links */}
+            <div style={{ flex: 1, padding: "12px 0", overflowY: "auto", minHeight: 0 }}>
+              {links.map((link, i) => (
+                <Link
+                  key={i}
+                  href={link.href}
+                  className="syne"
+                  onClick={() => setMobileMenuOpen(false)}
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    padding: "14px 24px",
+                    fontSize: 14,
+                    fontWeight: 600,
+                    color: "var(--ink2)",
+                    textDecoration: "none",
+                    transition: "background .2s",
+                  }}
+                >
+                  <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink3)" }}>
+                    {link.label === "Destinations" ? "explore" : link.label === "Articles" ? "article" : link.label === "Gallery" ? "photo_library" : link.label === "About" ? "info" : link.label === "FAQs" ? "quiz" : link.label === "Careers" ? "work" : "mail"}
+                  </span>
+                  {link.label}
+                </Link>
+              ))}
+
+              {user && (
+                <>
+                  <div style={{ height: 1, background: "var(--line)", margin: "8px 24px" }} />
+                  {user.role === "admin" && (
+                    <Link href="/admin" onClick={() => setMobileMenuOpen(false)} className="syne" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 24px", fontSize: 14, fontWeight: 600, color: "var(--cu)", textDecoration: "none" }}>
+                      <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--cu)" }}>admin_panel_settings</span>
+                      Admin Panel
+                    </Link>
+                  )}
+                  <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="syne" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 24px", fontSize: 14, fontWeight: 600, color: "var(--ink2)", textDecoration: "none" }}>
+                    <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink3)" }}>dashboard</span>
+                    Dashboard
+                  </Link>
+                  <Link href="/dashboard/bookings" onClick={() => setMobileMenuOpen(false)} className="syne" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 24px", fontSize: 14, fontWeight: 600, color: "var(--ink2)", textDecoration: "none" }}>
+                    <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink3)" }}>confirmation_number</span>
+                    My Bookings
+                  </Link>
+                  <Link href="/dashboard/wishlist" onClick={() => setMobileMenuOpen(false)} className="syne" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 24px", fontSize: 14, fontWeight: 600, color: "var(--ink2)", textDecoration: "none" }}>
+                    <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink3)" }}>favorite</span>
+                    Wishlist
+                  </Link>
+                  <Link href="/dashboard/profile" onClick={() => setMobileMenuOpen(false)} className="syne" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 24px", fontSize: 14, fontWeight: 600, color: "var(--ink2)", textDecoration: "none" }}>
+                    <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink3)" }}>person</span>
+                    Profile
+                  </Link>
+                </>
+              )}
+            </div>
+
+            {/* Bottom actions */}
+            <div style={{ padding: "14px 20px 20px", borderTop: "1px solid var(--line)", display: "flex", flexDirection: "column", gap: 8, flexShrink: 0 }}>
+              {user ? (
+                <button
+                  onClick={handleLogout}
+                  className="syne"
+                  style={{ width: "100%", padding: "12px", background: "rgba(229,57,53,.06)", border: "1px solid rgba(229,57,53,.15)", borderRadius: 12, fontSize: 13, fontWeight: 600, color: "#e53935", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
+                >
+                  <span className="material-symbols-rounded" style={{ fontSize: 18 }}>logout</span>
+                  Logout
+                </button>
+              ) : (
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="syne"
+                  style={{ width: "100%", padding: "12px", background: "transparent", border: "1.5px solid var(--line2)", borderRadius: 12, fontSize: 13, fontWeight: 600, color: "var(--ink2)", textDecoration: "none", textAlign: "center", display: "block" }}
+                >
+                  Sign In
                 </Link>
               )}
-              <Link href="/dashboard" onClick={() => setMobileMenuOpen(false)} className="syne" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 24px", fontSize: 14, fontWeight: 600, color: "var(--ink2)", textDecoration: "none" }}>
-                <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink3)" }}>dashboard</span>
-                Dashboard
+              <Link
+                href="/destinations"
+                onClick={handleExplorePackages}
+                className="syne"
+                style={{ width: "100%", padding: "12px", background: "var(--cu)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center", display: "block" }}
+              >
+                Explore Packages
               </Link>
-              <Link href="/dashboard/bookings" onClick={() => setMobileMenuOpen(false)} className="syne" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 24px", fontSize: 14, fontWeight: 600, color: "var(--ink2)", textDecoration: "none" }}>
-                <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink3)" }}>confirmation_number</span>
-                My Bookings
-              </Link>
-              <Link href="/dashboard/wishlist" onClick={() => setMobileMenuOpen(false)} className="syne" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 24px", fontSize: 14, fontWeight: 600, color: "var(--ink2)", textDecoration: "none" }}>
-                <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink3)" }}>favorite</span>
-                Wishlist
-              </Link>
-              <Link href="/dashboard/profile" onClick={() => setMobileMenuOpen(false)} className="syne" style={{ display: "flex", alignItems: "center", gap: 12, padding: "14px 24px", fontSize: 14, fontWeight: 600, color: "var(--ink2)", textDecoration: "none" }}>
-                <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--ink3)" }}>person</span>
-                Profile
-              </Link>
-            </>
-          )}
-        </div>
+            </div>
+          </div>
+        </>,
+        document.body
+      )}
 
-        {/* Bottom actions */}
-        <div style={{ padding: "14px 20px 20px", borderTop: "1px solid var(--line)", display: "flex", flexDirection: "column", gap: 8, flexShrink: 0 }}>
-          {user ? (
-            <button
-              onClick={handleLogout}
-              className="syne"
-              style={{ width: "100%", padding: "12px", background: "rgba(229,57,53,.06)", border: "1px solid rgba(229,57,53,.15)", borderRadius: 12, fontSize: 13, fontWeight: 600, color: "#e53935", cursor: "pointer", display: "flex", alignItems: "center", justifyContent: "center", gap: 8 }}
-            >
-              <span className="material-symbols-rounded" style={{ fontSize: 18 }}>logout</span>
-              Logout
-            </button>
-          ) : (
-            <Link
-              href="/login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="syne"
-              style={{ width: "100%", padding: "12px", background: "transparent", border: "1.5px solid var(--line2)", borderRadius: 12, fontSize: 13, fontWeight: 600, color: "var(--ink2)", textDecoration: "none", textAlign: "center", display: "block" }}
-            >
-              Sign In
-            </Link>
-          )}
-          <Link
-            href="/destinations"
-            onClick={handleExplorePackages}
-            className="syne"
-            style={{ width: "100%", padding: "12px", background: "var(--cu)", border: "none", borderRadius: 12, fontSize: 13, fontWeight: 700, color: "#fff", textDecoration: "none", textAlign: "center", display: "block" }}
-          >
-            Explore Packages
-          </Link>
-        </div>
-      </div>
-
-      <style jsx>{`
+    <style>{`
+      .nav-links-list {
+        display: flex;
+      }
+      @media (max-width: 1024px) {
+        #nav {
+          padding: 0 20px !important;
+        }
         .nav-links-list {
-          display: flex;
+          display: none !important;
         }
-        @media (max-width: 1024px) {
-          #nav {
-            padding: 0 24px !important;
-          }
-          .nav-links-list {
-            display: none !important;
-          }
-          .nav-hamburger {
-            display: flex !important;
-          }
+        .nav-hamburger {
+          display: flex !important;
         }
-        @media (max-width: 768px) {
-          .nav-sign-btn,
-          .nav-user-btn,
-          .nav-book-btn {
-            display: none !important;
-          }
-          #nav {
-            padding: 0 16px !important;
-          }
+        .nav-book-btn {
+          display: none !important;
         }
-        .nav-link-item::after {
-          content: '';
-          position: absolute;
-          bottom: -4px;
-          left: 0;
-          width: 0;
-          height: 1.5px;
-          background: var(--cu);
-          transition: width .25s;
+        .nav-sign-btn {
+          display: inline-flex !important;
         }
-        .nav-link-item:hover::after {
-          width: 100%;
+      }
+      @media (max-width: 768px) {
+        #nav {
+          padding: 0 16px !important;
+          height: 64px !important;
         }
-        .nav-dropdown-item:hover {
-          background: var(--iv) !important;
+        .nav-logo-img {
+          height: 44px !important;
         }
-      `}</style>
-    </nav>
-  );
+        .nav-book-btn {
+          display: none !important;
+        }
+        .nav-sign-btn {
+          display: inline-flex !important;
+          padding: 6px 14px !important;
+          font-size: 11.5px !important;
+          white-space: nowrap !important;
+        }
+        .nav-user-btn {
+          display: inline-flex !important;
+          padding: 4px 10px 4px 6px !important;
+          white-space: nowrap !important;
+        }
+        .nav-user-name {
+          max-width: 75px !important;
+          overflow: hidden !important;
+          text-overflow: ellipsis !important;
+          white-space: nowrap !important;
+        }
+      }
+      .nav-link-item::after {
+        content: '';
+        position: absolute;
+        bottom: -4px;
+        left: 0;
+        width: 0;
+        height: 1.5px;
+        background: var(--cu);
+        transition: width .25s;
+      }
+      .nav-link-item:hover::after {
+        width: 100%;
+      }
+      .nav-dropdown-item:hover {
+        background: var(--iv) !important;
+      }
+    `}</style>
+  </>
+);
 }
