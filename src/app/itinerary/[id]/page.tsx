@@ -117,27 +117,40 @@ export default function CustomItineraryPage() {
                   ₹{(pkg.price || 0).toLocaleString("en-IN")}
                 </div>
                 <div style={{ fontSize: 12, color: "var(--ink3)", marginBottom: 16 }}>per {pkg.priceUnit || 'person'} (estimated)</div>
-                <div style={{ marginBottom: 20 }}>
+                <div style={{ marginBottom: 20, display: "flex", flexWrap: "wrap", gap: 6 }}>
                   {pkg.isInternational && (
-                    <div style={{ display: "inline-block", background: pkg.visaIncluded ? "var(--gn-gl)" : "rgba(245,166,35,.1)", padding: "4px 8px", borderRadius: 4, marginBottom: 8, marginRight: 8 }}>
-                      <span className="syne" style={{ fontSize: 10, fontWeight: 700, color: pkg.visaIncluded ? "var(--gn)" : "var(--cu-d)", textTransform: "uppercase", letterSpacing: 1 }}>
-                        {pkg.visaIncluded ? "✓ Visa Included" : "⚠ Visa Not Included"}
-                      </span>
-                    </div>
+                    <span className="syne" style={{
+                      fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1,
+                      padding: "4px 10px", borderRadius: 50, display: "inline-flex", alignItems: "center", gap: 4,
+                      background: pkg.visaIncluded ? "var(--gn-gl)" : "var(--iv2)",
+                      color: pkg.visaIncluded ? "var(--gn)" : "var(--ink3)",
+                    }}>
+                      <span className="material-symbols-rounded" style={{ fontSize: 12 }}>{pkg.visaIncluded ? "check_circle" : "info"}</span>
+                      {pkg.visaIncluded ? "Visa Included" : "Visa Not Included"}
+                    </span>
                   )}
                   {pkg.flightsIncluded !== undefined && (
-                    <div style={{ display: "inline-block", background: pkg.flightsIncluded ? "var(--gn-gl)" : "rgba(245,166,35,.1)", padding: "4px 8px", borderRadius: 4, marginBottom: 8, marginRight: 8 }}>
-                      <span className="syne" style={{ fontSize: 10, fontWeight: 700, color: pkg.flightsIncluded ? "var(--gn)" : "var(--cu-d)", textTransform: "uppercase", letterSpacing: 1 }}>
-                        {pkg.flightsIncluded ? "✈ Flights Included" : "⚠ Flights Not Included"}
-                      </span>
-                    </div>
+                    <span className="syne" style={{
+                      fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1,
+                      padding: "4px 10px", borderRadius: 50, display: "inline-flex", alignItems: "center", gap: 4,
+                      background: pkg.flightsIncluded ? "var(--gn-gl)" : "var(--iv2)",
+                      color: pkg.flightsIncluded ? "var(--gn)" : "var(--ink3)",
+                    }}>
+                      <span className="material-symbols-rounded" style={{ fontSize: 12 }}>{pkg.flightsIncluded ? "flight" : "flight"}</span>
+                      {pkg.flightsIncluded ? "Flights Included" : "Flights Not Included"}
+                    </span>
                   )}
-                  {pkg.trainsIncluded !== undefined && (
-                    <div style={{ display: "inline-block", background: pkg.trainsIncluded ? "var(--gn-gl)" : "rgba(245,166,35,.1)", padding: "4px 8px", borderRadius: 4, marginBottom: 8 }}>
-                      <span className="syne" style={{ fontSize: 10, fontWeight: 700, color: pkg.trainsIncluded ? "var(--gn)" : "var(--cu-d)", textTransform: "uppercase", letterSpacing: 1 }}>
-                        {pkg.trainsIncluded ? "🚆 Trains Included" : "⚠ Trains Not Included"}
-                      </span>
-                    </div>
+                  {/* Trains: for international packages, only show when actually included */}
+                  {(pkg.isInternational ? pkg.trainsIncluded : pkg.trainsIncluded !== undefined) && (
+                    <span className="syne" style={{
+                      fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1,
+                      padding: "4px 10px", borderRadius: 50, display: "inline-flex", alignItems: "center", gap: 4,
+                      background: pkg.trainsIncluded ? "var(--gn-gl)" : "var(--iv2)",
+                      color: pkg.trainsIncluded ? "var(--gn)" : "var(--ink3)",
+                    }}>
+                      <span className="material-symbols-rounded" style={{ fontSize: 12 }}>train</span>
+                      {pkg.trainsIncluded ? "Trains Included" : "Trains Not Included"}
+                    </span>
                   )}
                 </div>
                 {isBooked ? (

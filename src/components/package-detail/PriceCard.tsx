@@ -98,7 +98,9 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
     duration ? { icon: "calendar_today", label: "Duration:", value: `${duration.nights} Nights / ${duration.days} Days` } : null,
     hotelRating ? { icon: "hotel", label: "Stay:", value: hotelRating } : null,
     { icon: "flight_takeoff", label: "Flights:", value: flightsIncluded ? "Included" : "Not included" },
-    (pkg?.trainsIncluded || pkg?.flights?.some((f: any) => f.type === "train"))
+    // Trains: for international packages, only show row when trains are actually included
+    // (trains not applicable for most international travel — hiding "Not included" avoids false alarm)
+    (!pkg?.isInternational || pkg?.trainsIncluded) && (pkg?.trainsIncluded || pkg?.flights?.some((f: any) => f.type === "train"))
       ? { icon: "train", label: "Trains:", value: pkg?.trainsIncluded ? "Included" : "Not included" }
       : null,
     pkg?.isInternational ? { icon: "description", label: "Visa:", value: pkg?.visaIncluded ? "Included" : "Not included" } : null,
@@ -222,14 +224,14 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
               gap: 10,
               fontFamily: "var(--font-inter), 'Inter', sans-serif",
               fontSize: 13,
-              color: "var(--ink3)",
             }}
           >
-            <span className="material-symbols-rounded" style={{ fontSize: 18, color: "var(--gn3)" }}>
+            <span className="material-symbols-rounded" style={{ fontSize: 18, color: row.value === "Included" ? "var(--gn3)" : "var(--ink4)", flexShrink: 0 }}>
               {row.icon}
             </span>
             <span>
-              <strong style={{ color: "var(--ink)", fontWeight: 600 }}>{row.label}</strong> {row.value}
+              <strong style={{ color: "var(--ink)", fontWeight: 600 }}>{row.label}</strong>{" "}
+              <span style={{ color: row.value === "Included" ? "var(--ink2)" : "var(--ink4)" }}>{row.value}</span>
             </span>
           </div>
         ))}
