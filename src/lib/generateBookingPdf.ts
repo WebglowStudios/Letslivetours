@@ -16,6 +16,7 @@ interface BookingData {
     visaIncluded?: boolean;
     flightsIncluded?: boolean;
     trainsIncluded?: boolean;
+    hideTrainInfo?: boolean;
   };
   user?: {
     firstName: string;
@@ -236,7 +237,7 @@ export function generateBookingPdf(booking: BookingData): void {
       badgeX += doc.getTextWidth(fText) + 12;
     }
 
-    if (booking.package?.trainsIncluded !== undefined) {
+    if (!booking.package?.hideTrainInfo && booking.package?.trainsIncluded !== undefined && (!booking.package?.isInternational || booking.package?.trainsIncluded)) {
       const tInc = booking.package.trainsIncluded;
       const tText = tInc ? "TRAINS INCLUDED" : "TRAINS NOT INCLUDED";
       doc.setTextColor(...(tInc ? C.green : C.amber));

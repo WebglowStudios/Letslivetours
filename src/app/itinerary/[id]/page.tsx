@@ -140,8 +140,8 @@ export default function CustomItineraryPage() {
                       {pkg.flightsIncluded ? "Flights Included" : "Flights Not Included"}
                     </span>
                   )}
-                  {/* Trains: for international packages, only show when actually included */}
-                  {(pkg.isInternational ? pkg.trainsIncluded : pkg.trainsIncluded !== undefined) && (
+                  {/* Trains: for international packages or when hideTrainInfo is set, only show when actually included */}
+                  {(!pkg.hideTrainInfo && (pkg.isInternational ? pkg.trainsIncluded : pkg.trainsIncluded !== undefined)) && (
                     <span className="syne" style={{
                       fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1,
                       padding: "4px 10px", borderRadius: 50, display: "inline-flex", alignItems: "center", gap: 4,

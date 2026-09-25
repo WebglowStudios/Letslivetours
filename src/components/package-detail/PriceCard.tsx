@@ -100,7 +100,7 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
     { icon: "flight_takeoff", label: "Flights:", value: flightsIncluded ? "Included" : "Not included" },
     // Trains: for international packages, only show row when trains are actually included
     // (trains not applicable for most international travel — hiding "Not included" avoids false alarm)
-    (!pkg?.isInternational || pkg?.trainsIncluded) && (pkg?.trainsIncluded || pkg?.flights?.some((f: any) => f.type === "train"))
+    !pkg?.hideTrainInfo && (!pkg?.isInternational || pkg?.trainsIncluded) && (pkg?.trainsIncluded || pkg?.flights?.some((f: any) => f.type === "train"))
       ? { icon: "train", label: "Trains:", value: pkg?.trainsIncluded ? "Included" : "Not included" }
       : null,
     pkg?.isInternational ? { icon: "description", label: "Visa:", value: pkg?.visaIncluded ? "Included" : "Not included" } : null,
