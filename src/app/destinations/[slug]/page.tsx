@@ -66,7 +66,10 @@ const mapBadgeCls = (badge?: string) => {
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const mapPackageToCard = (pkg: any) => ({
-  img: pkg.images?.[0] || "https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=600&q=80",
+  img:
+    pkg.images?.[0] ||
+    pkg.heroImage ||
+    "https://images.unsplash.com/photo-1488646953014-85cb44e25828?w=800&q=80",
   badge: pkg.badge || "Popular",
   badgeCls: mapBadgeCls(pkg.badge),
   name: pkg.name,
@@ -75,10 +78,12 @@ const mapPackageToCard = (pkg: any) => ({
   hotel: pkg.hotelRating || "4-Star",
   stars: generateStars(pkg.rating || 0),
   reviews: `${pkg.rating || 0} · ${pkg.reviewCount || 0} reviews`,
-  origPrice: pkg.originalPrice ? formatPrice(pkg.originalPrice) : formatPrice(pkg.price + 20000),
-  price: formatPrice(pkg.price),
+  origPrice: pkg.originalPrice ? formatPrice(pkg.originalPrice) : formatPrice((pkg.price || 0) + 20000),
+  price: formatPrice(pkg.price || 0),
   perUnit: `/${pkg.priceUnit || "person"}`,
   type: pkg.category || "luxury",
+  destinationName: typeof pkg.destination === "object" ? pkg.destination?.name : undefined,
+  country: typeof pkg.destination === "object" ? pkg.destination?.country : undefined,
 });
 
 export default function DestinationDetailPage() {
@@ -162,17 +167,48 @@ export default function DestinationDetailPage() {
     );
   }
 
+  const isDubai = slug === "dubai" || destination?.name?.toLowerCase() === "dubai";
+
+  // Category matchers
+  const isHoneymoonPkg = (c: { type?: string; badge?: string; name?: string }) => {
+    const t = (c.type || "").toLowerCase();
+    const b = (c.badge || "").toLowerCase();
+    const n = (c.name || "").toLowerCase();
+    return (
+      t === "honeymoon" ||
+      b.includes("honeymoon") ||
+      b.includes("romantic") ||
+      n.includes("honeymoon") ||
+      n.includes("romantic") ||
+      n.includes("romance")
+    );
+  };
+
+  const isFamilyPkg = (c: { type?: string; badge?: string; name?: string }) => {
+    const t = (c.type || "").toLowerCase();
+    const b = (c.badge || "").toLowerCase();
+    const n = (c.name || "").toLowerCase();
+    return (
+      t === "family" ||
+      b.includes("family") ||
+      b.includes("kid") ||
+      n.includes("family") ||
+      n.includes("kids")
+    );
+  };
+
   /* ─── Map fetched packages to card format ─── */
   const mappedCards = packages.length > 0 ? packages.map(mapPackageToCard) : [];
 
-  // Split by category for the different rows, or use fallback
-  const handpickedCards = mappedCards.length > 0 ? mappedCards : fallbackHandpickedCards;
+  // Split by category. ONLY Dubai falls back to Dubai demo cards when the database has 0 packages.
+  // Non-Dubai destinations NEVER show Dubai fallback cards!
+  const handpickedCards = mappedCards.length > 0 ? mappedCards : (isDubai ? fallbackHandpickedCards : []);
   const honeymoonCards = mappedCards.length > 0
-    ? mappedCards.filter((c) => c.type === "honeymoon")
-    : fallbackHoneymoonCards;
+    ? mappedCards.filter(isHoneymoonPkg)
+    : (isDubai ? fallbackHoneymoonCards : []);
   const familyCards = mappedCards.length > 0
-    ? mappedCards.filter((c) => c.type === "family")
-    : fallbackFamilyCards;
+    ? mappedCards.filter(isFamilyPkg)
+    : (isDubai ? fallbackFamilyCards : []);
 
   const filterCards = (cards: typeof handpickedCards) => {
     let result = cards;
@@ -193,7 +229,7 @@ export default function DestinationDetailPage() {
     return result;
   };
 
-  const destinationName = destination?.name || "Dubai";
+  const destinationName = destination?.name || (isDubai ? "Dubai" : "");
 
   return (
     <>
@@ -246,28 +282,32 @@ export default function DestinationDetailPage() {
 
       <Highlights destinationName={destinationName} photoGallery={destination?.photoGallery || []} />
 
-      <PackageRow
-        eyebrow="Romance Awaits"
-        title="Honeymoon"
-        titleEm="Packages"
-        subtitle="Crafted for couples — intimate escapes with luxury stays and unforgettable moments."
-        cards={filterCards(honeymoonCards.length > 0 ? honeymoonCards : fallbackHoneymoonCards)}
-        alt
-        destinationName={destinationName}
-        country={destination?.country}
-      />
+      {filterCards(honeymoonCards).length > 0 && (
+        <PackageRow
+          eyebrow="Romance Awaits"
+          title="Honeymoon"
+          titleEm="Packages"
+          subtitle="Crafted for couples — intimate escapes with luxury stays and unforgettable moments."
+          cards={filterCards(honeymoonCards)}
+          alt
+          destinationName={destinationName}
+          country={destination?.country}
+        />
+      )}
 
       <GroupDeal groupDeal={destination?.groupDeal || null} />
 
-      <PackageRow
-        eyebrow="For the Whole Family"
-        title="Family"
-        titleEm="Tours"
-        subtitle="Kid-friendly adventures and family memories that last a lifetime — all stress-free."
-        cards={filterCards(familyCards.length > 0 ? familyCards : fallbackFamilyCards)}
-        destinationName={destinationName}
-        country={destination?.country}
-      />
+      {filterCards(familyCards).length > 0 && (
+        <PackageRow
+          eyebrow="For the Whole Family"
+          title="Family"
+          titleEm="Tours"
+          subtitle="Kid-friendly adventures and family memories that last a lifetime — all stress-free."
+          cards={filterCards(familyCards)}
+          destinationName={destinationName}
+          country={destination?.country}
+        />
+      )}
 
       <WhyDubai destinationName={destinationName} whyVisit={destination?.whyVisit || []} />
       <TravelTips tips={destination?.travelTips || []} />

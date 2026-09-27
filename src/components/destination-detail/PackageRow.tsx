@@ -17,6 +17,8 @@ interface PkgCard {
   price: string;
   perUnit: string;
   type: string;
+  destinationName?: string;
+  country?: string;
 }
 
 interface Props {
@@ -93,10 +95,10 @@ export default function PackageRow({ eyebrow, title, titleEm, subtitle, cards, a
               travel_explore
             </span>
             <div className="syne" style={{ fontSize: 14, fontWeight: 700, color: "var(--ink2)", marginBottom: 4 }}>
-              No packages found in this section
+              No packages found {destinationName ? `for ${destinationName}` : "in this section"}
             </div>
-            <p style={{ fontSize: 13, color: "var(--ink3)", margin: 0 }}>
-              Try adjusting your search terms or select another category above.
+            <p style={{ fontSize: 13, color: "var(--ink3)", margin: 0, maxWidth: 500, marginInline: "auto" }}>
+              {destinationName ? `New curated itineraries for ${destinationName} are being added. Check back soon or contact us to build a custom trip!` : "Try adjusting your search terms or select another category above."}
             </p>
           </div>
         ) : (
@@ -116,7 +118,9 @@ export default function PackageRow({ eyebrow, title, titleEm, subtitle, cards, a
                     </button>
                   </div>
                   <div style={{ padding: 20 }}>
-                    <div className="syne" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--gn3)", marginBottom: 6 }}>{destinationName || ""}{country ? ` · ${country}` : ""}</div>
+                    <div className="syne" style={{ fontSize: 11, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--gn3)", marginBottom: 6 }}>
+                      {(c.destinationName || destinationName || "")}{(c.country || country) ? ` · ${c.country || country}` : ""}
+                    </div>
                     <Link href={`/packages/${c.slug || c.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/-+$/, '')}`} style={{ textDecoration: "none", color: "inherit" }}>
                       <div className="serif" style={{ fontSize: 16, fontWeight: 600, color: "var(--ink)", lineHeight: 1.35, marginBottom: 12, cursor: "pointer" }}>{c.name}</div>
                     </Link>
