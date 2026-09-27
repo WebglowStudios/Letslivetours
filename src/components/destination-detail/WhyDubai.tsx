@@ -261,6 +261,132 @@ function resolveWhyVisitIcon(rawIcon?: string, title?: string, description?: str
   return "explore";
 }
 
+function TravelIcon({ iconName }: { iconName: string }) {
+  const norm = iconName.toLowerCase().trim();
+
+  // 1. Heritage, Castle, Fort, Monument, UNESCO
+  if (["castle", "fort", "account_balance", "heritage", "history_edu", "museum", "architecture"].includes(norm)) {
+    return (
+      <svg className="wd-icon-svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M3 21h18M5 21V7l3-2 3 2v14M13 21V7l3-2 3 2v14M9 21v-4a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4" />
+        <path d="M7 11h.01M17 11h.01" />
+      </svg>
+    );
+  }
+
+  // 2. Food, Dining, Restaurant, Culinary, Cuisine
+  if (["restaurant", "food", "dinner_dining", "local_dining", "lunch_dining", "ramen_dining", "fastfood", "bakery_dining"].includes(norm)) {
+    return (
+      <svg className="wd-icon-svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M18 2v6a3 3 0 0 1-3 3 3 3 0 0 1-3-3V2M15 11v11M5 2v8a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V2M7 12v10" />
+      </svg>
+    );
+  }
+
+  // 3. Nature, Mountain, Landscape, Terrains
+  if (["landscape", "terrain", "forest", "nature", "volcano"].includes(norm)) {
+    return (
+      <svg className="wd-icon-svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="m8 3 4 8 5-5 5 15H2L8 3z" />
+        <circle cx="17.5" cy="6.5" r="2.5" />
+      </svg>
+    );
+  }
+
+  // 4. Beach, Sea, Waves, Island
+  if (["beach_access", "waves", "surfing", "scuba_diving", "kayaking", "sailing", "pool"].includes(norm)) {
+    return (
+      <svg className="wd-icon-svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 2v20M12 2a9 9 0 0 1 9 9H3a9 9 0 0 1 9-9zM2 19c2-1 4-1 6 0s4 1 6 0 4-1 6 0" />
+      </svg>
+    );
+  }
+
+  // 5. Adventure, Hiking, Trekking, Expedition
+  if (["hiking", "explore", "downhill_skiing", "snowboarding", "camping", "directions_bike", "sports_motorsports"].includes(norm)) {
+    return (
+      <svg className="wd-icon-svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <circle cx="12" cy="12" r="10" />
+        <polygon points="16.24 7.76 14.12 14.12 7.76 16.24 9.88 9.88 16.24 7.76" fill="currentColor" fillOpacity="0.2" />
+      </svg>
+    );
+  }
+
+  // 6. Hotel, Stays, Bed, Luxury
+  if (["hotel", "bed", "hotel_class", "apartment", "chalet", "cottage"].includes(norm)) {
+    return (
+      <svg className="wd-icon-svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M2 4v16M2 8h18a2 2 0 0 1 2 2v10M2 17h20M6 8v9" />
+      </svg>
+    );
+  }
+
+  // 7. Spa, Wellness, Ayurveda
+  if (["spa", "fitness_center", "water_lux"].includes(norm)) {
+    return (
+      <svg className="wd-icon-svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+        <path d="M12 8v8M8 12h8" />
+      </svg>
+    );
+  }
+
+  // 8. Flight & Transit
+  if (["flight", "connecting_airports", "train", "directions_bus", "directions_car", "directions_boat"].includes(norm)) {
+    return (
+      <svg className="wd-icon-svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M17.8 19.2 16 11l3.5-3.5C21 6 21.5 4 21 3c-1-.5-3 0-4.5 1.5L13 8 4.8 6.2c-.5-.1-.9.1-1.1.5l-.3.5c-.2.5-.1 1 .3 1.3L9 12l-2 3H4l-1 1 3 2 2 3 1-1v-3l3-2 3.5 5.3c.3.4.8.5 1.3.3l.5-.3c.4-.2.6-.6.5-1.1z" />
+      </svg>
+    );
+  }
+
+  // 9. Shopping & Souvenirs
+  if (["shopping_bag", "local_mall"].includes(norm)) {
+    return (
+      <svg className="wd-icon-svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M6 2 3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4zM3 6h18M16 10a4 4 0 0 1-8 0" />
+      </svg>
+    );
+  }
+
+  // 10. Star, Diamond, Highlights
+  if (["stars", "diamond", "auto_awesome", "favorite", "verified"].includes(norm)) {
+    return (
+      <svg className="wd-icon-svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2" fill="currentColor" fillOpacity="0.2" />
+      </svg>
+    );
+  }
+
+  // 11. Photo & Cameras
+  if (["camera_alt", "photo", "visibility"].includes(norm)) {
+    return (
+      <svg className="wd-icon-svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z" />
+        <circle cx="12" cy="13" r="4" />
+      </svg>
+    );
+  }
+
+  // Fallback to Google Material Symbols ligature font if custom or unknown
+  return (
+    <span
+      className="material-symbols-rounded wd-icon-span"
+      style={{
+        fontSize: 32,
+        color: "currentColor",
+        display: "inline-flex",
+        alignItems: "center",
+        justifyContent: "center",
+        lineHeight: 1,
+        userSelect: "none",
+      }}
+    >
+      {iconName}
+    </span>
+  );
+}
+
 export default function WhyDubai({ destinationName = "Dubai", whyVisit }: WhyDubaiProps) {
   if (!whyVisit || whyVisit.length === 0) return null;
 
@@ -282,22 +408,8 @@ export default function WhyDubai({ destinationName = "Dubai", whyVisit }: WhyDub
             const iconName = resolveWhyVisitIcon(c.icon, c.title, c.description);
             return (
               <div key={i} className="rv wd-card-item" style={{ background: "#fff", borderRadius: "var(--r-xl)", padding: "36px 28px", textAlign: "center", boxShadow: "var(--sh)", transition: "var(--tr)", border: "1.5px solid transparent" }}>
-                <div className="wd-icon-wrap" style={{ width: 64, height: 64, borderRadius: 18, background: "var(--gn-gl)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", transition: "var(--tr)" }}>
-                  <span
-                    className="material-symbols-rounded wd-icon-span"
-                    style={{
-                      fontSize: 32,
-                      color: "var(--gn)",
-                      transition: "var(--tr)",
-                      display: "inline-flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      lineHeight: 1,
-                      userSelect: "none",
-                    }}
-                  >
-                    {iconName}
-                  </span>
+                <div className="wd-icon-wrap" style={{ width: 64, height: 64, borderRadius: 18, background: "var(--gn-gl)", color: "var(--gn)", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px", transition: "var(--tr)" }}>
+                  <TravelIcon iconName={iconName} />
                 </div>
                 <div className="serif" style={{ fontSize: 17, fontWeight: 600, color: "var(--ink)", marginBottom: 10 }}>{c.title}</div>
                 <p style={{ fontSize: 13.5, color: "var(--ink3)", lineHeight: 1.65 }}>{c.description}</p>
@@ -309,8 +421,8 @@ export default function WhyDubai({ destinationName = "Dubai", whyVisit }: WhyDub
 
       <style jsx>{`
         .wd-card-item:hover { transform: translateY(-6px); box-shadow: var(--sh-lg); border-color: var(--iv3) !important; }
-        .wd-card-item:hover .wd-icon-wrap { background: var(--gn) !important; }
-        .wd-card-item:hover .wd-icon-span { color: #fff !important; }
+        .wd-card-item:hover .wd-icon-wrap { background: var(--gn) !important; color: #fff !important; }
+        .wd-card-item:hover .wd-icon-span, .wd-card-item:hover .wd-icon-svg { color: #fff !important; }
         @media (max-width: 1100px) { .wd-grid { grid-template-columns: repeat(2, 1fr) !important; } }
         @media (max-width: 768px) { .wd-grid { grid-template-columns: 1fr !important; } }
       `}</style>
