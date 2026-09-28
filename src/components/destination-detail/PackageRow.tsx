@@ -128,7 +128,9 @@ export default function PackageRow({ eyebrow, title, titleEm, subtitle, cards, a
                       <span className="syne" style={{ fontSize: 12, fontWeight: 500, color: "var(--ink3)", display: "flex", alignItems: "center", gap: 4 }}><span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--gn3)" }}>calendar_today</span>{c.duration}</span>
                       <span className="syne" style={{ fontSize: 12, fontWeight: 500, color: "var(--ink3)", display: "flex", alignItems: "center", gap: 4 }}><span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--gn3)" }}>hotel</span>{c.hotel}</span>
                     </div>
-                    <div style={{ fontSize: 13, color: "var(--cu)", marginBottom: 14 }}>{c.stars} <span style={{ fontSize: 12, color: "var(--ink4)", fontWeight: 400 }}>({c.reviews})</span></div>
+                    {c.stars && c.reviews ? (
+                      <div style={{ fontSize: 13, color: "var(--cu)", marginBottom: 14 }}>{c.stars} <span style={{ fontSize: 12, color: "var(--ink4)", fontWeight: 400 }}>({c.reviews})</span></div>
+                    ) : null}
                     <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", paddingTop: 14, borderTop: "1px solid var(--line)" }}>
                       <div>
                         <div style={{ fontSize: 12, color: "var(--ink4)", textDecoration: "line-through" }}>{c.origPrice}</div>

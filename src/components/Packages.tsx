@@ -163,10 +163,12 @@ export default function Packages() {
                     <span style={{ display: "flex", alignItems: "center", gap: 3 }}><span className="material-symbols-rounded" style={{ fontSize: 13, color: "var(--cu)" }}>calendar_today</span>{pkg.duration.nights}N / {pkg.duration.days}D</span>
                     {pkg.hotelRating && <span style={{ display: "flex", alignItems: "center", gap: 3 }}><span className="material-symbols-rounded" style={{ fontSize: 13, color: "var(--cu)" }}>hotel</span>{pkg.hotelRating}</span>}
                   </div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 2, color: "var(--gd)", marginBottom: 14 }}>
-                    {[...Array(5)].map((_, j) => <span key={j} className="material-symbols-rounded" style={{ fontSize: 13 }}>star</span>)}
-                    <span style={{ fontSize: 11, color: "rgba(249,246,240,.35)", marginLeft: 5 }}>({pkg.rating} · {pkg.reviewCount})</span>
-                  </div>
+                  {(pkg.rating && pkg.rating > 0) ? (
+                    <div style={{ display: "flex", alignItems: "center", gap: 2, color: "var(--gd)", marginBottom: 14 }}>
+                      {[...Array(5)].map((_, j) => <span key={j} className="material-symbols-rounded" style={{ fontSize: 13 }}>star</span>)}
+                      <span style={{ fontSize: 11, color: "rgba(249,246,240,.35)", marginLeft: 5 }}>({pkg.rating}{pkg.reviewCount ? ` · ${pkg.reviewCount}` : ""})</span>
+                    </div>
+                  ) : null}
                   <div style={{ marginTop: "auto", display: "flex", alignItems: "center", justifyContent: "space-between", borderTop: "1px solid rgba(249,246,240,.1)", paddingTop: 14 }}>
                     <div>
                       <div style={{ fontSize: 10, color: "rgba(249,246,240,.35)", letterSpacing: 0.5, marginBottom: 2 }}>from</div>

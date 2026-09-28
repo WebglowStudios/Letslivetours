@@ -186,26 +186,11 @@ export default function Reviews({ packageId }: ReviewsProps) {
     });
   };
 
-  if (loading) {
-    return (
-      <div
-        id="reviews"
-        style={{
-          marginTop: 48,
-          paddingTop: 40,
-          borderTop: "2px solid var(--line)",
-          textAlign: "center",
-          padding: "60px 20px",
-        }}
-      >
-        <span className="material-symbols-rounded" style={{ fontSize: 32, color: "var(--ink4)", animation: "spin 1s linear infinite" }}>
-          progress_activity
-        </span>
-        <p style={{ fontFamily: "var(--font-inter), 'Inter', sans-serif", fontSize: 13, color: "var(--ink4)", marginTop: 8 }}>
-          Loading reviews...
-        </p>
-      </div>
-    );
+  if (loading) return null;
+
+  // If there are no reviews and the visitor cannot write a review, hide the reviews section entirely
+  if (reviews.length === 0 && !canReview && !alreadyReviewed) {
+    return null;
   }
 
   const ratingBars = getRatingBars();
@@ -492,20 +477,6 @@ export default function Reviews({ packageId }: ReviewsProps) {
         </div>
       )}
 
-      {/* Empty state */}
-      {reviews.length === 0 && (
-        <div style={{ textAlign: "center", padding: "40px 20px" }}>
-          <span className="material-symbols-rounded" style={{ fontSize: 40, color: "var(--ink4)", display: "block", marginBottom: 10 }}>
-            rate_review
-          </span>
-          <p className="syne" style={{ fontSize: 15, fontWeight: 600, color: "var(--ink3)", marginBottom: 4 }}>
-            No reviews yet
-          </p>
-          <p style={{ fontFamily: "var(--font-inter), 'Inter', sans-serif", fontSize: 13, color: "var(--ink4)" }}>
-            Be the first to share your experience!
-          </p>
-        </div>
-      )}
 
       {/* Reviews list */}
       {reviews.length > 0 && (
