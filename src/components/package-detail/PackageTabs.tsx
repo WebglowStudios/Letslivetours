@@ -471,9 +471,10 @@ function buildItineraryContent(day: any, dayFlights: any[] = [], imageMap?: Reco
 function buildStayContent(stay: any): string {
   let html = "";
   html += `<p style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:6px">${stay.name}</p>`;
-  if (stay.address) {
+  const stayAddress = stay.address || stay.location || stay.city || "";
+  if (stayAddress) {
     html += `<p style="font-size:13px;color:var(--ink3);margin-bottom:8px;display:flex;align-items:center;gap:4px">
-      <span class="material-symbols-rounded" style="font-size:15px;color:var(--gn2)">location_on</span>${stay.address}
+      <span class="material-symbols-rounded" style="font-size:15px;color:var(--gn2)">location_on</span>${stayAddress}
     </p>`;
   }
   if (stay.rating) {
