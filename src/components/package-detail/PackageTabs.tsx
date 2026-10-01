@@ -470,7 +470,12 @@ function buildItineraryContent(day: any, dayFlights: any[] = [], imageMap?: Reco
 /* ── Helper: build HTML content for stays ── */
 function buildStayContent(stay: any): string {
   let html = "";
-  html += `<p style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:8px">${stay.name}</p>`;
+  html += `<p style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:6px">${stay.name}</p>`;
+  if (stay.address) {
+    html += `<p style="font-size:13px;color:var(--ink3);margin-bottom:8px;display:flex;align-items:center;gap:4px">
+      <span class="material-symbols-rounded" style="font-size:15px;color:var(--gn2)">location_on</span>${stay.address}
+    </p>`;
+  }
   if (stay.rating) {
     html += `<div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;background:rgba(41,196,216,.1);color:var(--gn2);padding:5px 14px;border-radius:6px;margin-bottom:10px">
       <span class="material-symbols-rounded" style="font-size:14px">star</span>${stay.rating}
