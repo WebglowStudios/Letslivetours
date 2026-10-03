@@ -12,7 +12,10 @@ interface Props {
 
 const cats = [
   { label: "All", value: "all", icon: "public" },
+  { label: "Heritage", value: "heritage", icon: "temple_hindu" },
+  { label: "Nature", value: "nature", icon: "eco" },
   { label: "Beach", value: "beach", icon: "beach_access" },
+  { label: "Pilgrimage", value: "pilgrimage", icon: "auto_stories" },
   { label: "City", value: "city", icon: "location_city" },
   { label: "Mountain", value: "mountain", icon: "landscape" },
   { label: "Adventure", value: "adventure", icon: "hiking" },

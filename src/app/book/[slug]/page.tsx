@@ -226,7 +226,7 @@ function BookingContent() {
 
   const priceBreakdown = useMemo(() => {
     if (!pkg) return { adultTotal: 0, childTotal: 0, extraPaxTotal: 0, extraPaxCount: 0, includedPax: 0, total: 0 };
-    if (pkg.priceUnit === "group") {
+    if (pkg.priceUnit === "group" || pkg.priceUnit === "family") {
       const includedPax = (pkg.adultCount || 0) + (pkg.childCount || 0) || 1;
       const totalPax = adultsCount + childrenCount;
       if (totalPax > includedPax && pkg.extraPersonPrice) {
@@ -739,10 +739,10 @@ function BookingContent() {
 
               <div style={{ borderTop: "1px solid var(--line)", paddingTop: 14, marginBottom: 14 }}>
                 <div className="syne" style={{ fontSize: 9, fontWeight: 700, letterSpacing: 2, textTransform: "uppercase", color: "var(--ink4)", marginBottom: 10 }}>Price Breakdown</div>
-                {pkg.priceUnit === "group" ? (
+                {pkg.priceUnit === "group" || pkg.priceUnit === "family" ? (
                   <>
                     <div style={{ display: "flex", justifyContent: "space-between", fontSize: 13, color: "var(--ink3)", marginBottom: 5 }}>
-                      <span>Group Total (up to {priceBreakdown.includedPax || 1} pax)</span>
+                      <span>{pkg.priceUnit === "family" ? "Family Total" : "Group Total"} (up to {priceBreakdown.includedPax || 1} pax)</span>
                       <span style={{ fontWeight: 600, color: "var(--ink)" }}>{fmt(basePrice)}</span>
                     </div>
                     {priceBreakdown.extraPaxCount > 0 && (

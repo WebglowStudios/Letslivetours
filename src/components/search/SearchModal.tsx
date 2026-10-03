@@ -39,10 +39,16 @@ interface DestinationItem {
   startingPrice?: number;
   packageCount?: number;
   description?: string;
+  category?: string;
+  tags?: string[];
 }
 
 const CATEGORIES = [
   { id: "all", label: "All Themes", icon: "explore" },
+  { id: "heritage", label: "Heritage", icon: "temple_hindu" },
+  { id: "nature", label: "Nature", icon: "eco" },
+  { id: "beach", label: "Beach", icon: "beach_access" },
+  { id: "pilgrimage", label: "Pilgrimage", icon: "auto_stories" },
   { id: "honeymoon", label: "Honeymoon", icon: "favorite" },
   { id: "family", label: "Family", icon: "family_restroom" },
   { id: "luxury", label: "Luxury", icon: "diamond" },
@@ -931,6 +937,25 @@ export default function SearchModal({
                                 >
                                   {dest.name}
                                 </h4>
+                                {dest.tags && dest.tags.length > 0 && (
+                                  <div style={{ display: "flex", flexWrap: "wrap", gap: 3, marginTop: 3 }}>
+                                    {dest.tags.slice(0, 3).map((t) => (
+                                      <span
+                                        key={t}
+                                        style={{
+                                          fontSize: 9.5,
+                                          fontWeight: 600,
+                                          background: "rgba(0, 77, 94, 0.08)",
+                                          color: "var(--gn, #004d5e)",
+                                          padding: "1px 6px",
+                                          borderRadius: 4,
+                                        }}
+                                      >
+                                        {t}
+                                      </span>
+                                    ))}
+                                  </div>
+                                )}
                               </div>
 
                               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginTop: 4 }}>

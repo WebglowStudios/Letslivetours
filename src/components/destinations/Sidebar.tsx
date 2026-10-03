@@ -12,7 +12,10 @@ interface Props {
 }
 
 const categories = [
+  { value: "heritage", icon: "temple_hindu", color: "#d97706", bg: "rgba(217,119,6,.1)", label: "Heritage", count: "36" },
+  { value: "nature", icon: "eco", color: "#059669", bg: "rgba(5,150,105,.1)", label: "Nature", count: "45" },
   { value: "beach", icon: "beach_access", color: "var(--gd)", bg: "rgba(41,196,216,.1)", label: "Beach", count: "52" },
+  { value: "pilgrimage", icon: "auto_stories", color: "#ea580c", bg: "rgba(234,88,12,.1)", label: "Pilgrimage", count: "22" },
   { value: "mountain", icon: "landscape", color: "#4AC28A", bg: "rgba(74,194,138,.1)", label: "Mountain", count: "28" },
   { value: "city", icon: "location_city", color: "var(--cu)", bg: "rgba(245,166,35,.1)", label: "City", count: "64" },
   { value: "wildlife", icon: "forest", color: "#34d399", bg: "rgba(52,211,153,.1)", label: "Wildlife", count: "19" },

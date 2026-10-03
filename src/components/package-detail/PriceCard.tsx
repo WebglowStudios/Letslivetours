@@ -79,6 +79,7 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
     group: { top: "Total Group", bottom: "total group price" },
     couple: { top: "Per Couple", bottom: "per couple" },
     person: { top: "Per Adult", bottom: "per person" },
+    family: { top: "Per Family", bottom: "per family" },
   };
   const unitTopLabel = unitLabels[priceUnit as keyof typeof unitLabels]?.top || "Per Adult";
   const unitBottomLabel = unitLabels[priceUnit as keyof typeof unitLabels]?.bottom || "per person";

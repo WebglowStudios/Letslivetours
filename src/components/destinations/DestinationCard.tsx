@@ -8,6 +8,7 @@ export interface Destination {
   img: string;
   cat: string;
   catIcon: string;
+  tags?: string[];
   region: string;
   desc: string;
   season: string;
@@ -19,7 +20,10 @@ export interface Destination {
 }
 
 const badgeColors: Record<string, { bg: string; border: string; color: string }> = {
+  heritage: { bg: "rgba(180,83,9,.88)", border: "rgba(180,83,9,1)", color: "#fff" },
+  nature: { bg: "rgba(22,101,52,.88)", border: "rgba(22,101,52,1)", color: "#fff" },
   beach: { bg: "rgba(0,140,170,.88)", border: "rgba(0,140,170,1)", color: "#fff" },
+  pilgrimage: { bg: "rgba(194,65,12,.88)", border: "rgba(194,65,12,1)", color: "#fff" },
   city: { bg: "rgba(210,130,20,.88)", border: "rgba(210,130,20,1)", color: "#fff" },
   mountain: { bg: "rgba(34,160,90,.88)", border: "rgba(34,160,90,1)", color: "#fff" },
   adventure: { bg: "rgba(200,60,60,.88)", border: "rgba(200,60,60,1)", color: "#fff" },
@@ -55,10 +59,17 @@ export default function DestinationCard({ dest, listView }: Props) {
         <img src={dest.img} alt={dest.name} className="dc-card-img" style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .6s, filter .4s" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top, rgba(0,77,94,.65) 0%, transparent 55%)" }} />
         <div style={{ position: "absolute", top: 12, left: 12, right: 12, display: "flex", justifyContent: "space-between", alignItems: "flex-start", zIndex: 2 }}>
-          <span className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 50, fontSize: 9.5, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", backdropFilter: "blur(10px)", background: badge.bg, border: `1px solid ${badge.border}`, color: badge.color }}>
-            <span className="material-symbols-rounded" style={{ fontSize: 12 }}>{dest.catIcon}</span>{dest.cat}
-          </span>
-          <button style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(255,255,255,.15)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,.25)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "var(--tr)" }}>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 5, maxWidth: "calc(100% - 44px)" }}>
+            <span className="syne" style={{ display: "inline-flex", alignItems: "center", gap: 5, padding: "5px 12px", borderRadius: 50, fontSize: 9.5, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", backdropFilter: "blur(10px)", background: badge.bg, border: `1px solid ${badge.border}`, color: badge.color }}>
+              <span className="material-symbols-rounded" style={{ fontSize: 12 }}>{dest.catIcon}</span>{dest.cat}
+            </span>
+            {dest.tags && dest.tags.filter(t => t.toLowerCase() !== dest.cat.toLowerCase()).slice(0, 2).map(t => (
+              <span key={t} className="syne" style={{ display: "inline-flex", alignItems: "center", padding: "5px 10px", borderRadius: 50, fontSize: 9, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", backdropFilter: "blur(10px)", background: "rgba(0,0,0,0.5)", border: "1px solid rgba(255,255,255,0.2)", color: "#fff" }}>
+                {t}
+              </span>
+            ))}
+          </div>
+          <button style={{ width: 34, height: 34, borderRadius: "50%", background: "rgba(255,255,255,.15)", backdropFilter: "blur(10px)", border: "1px solid rgba(255,255,255,.25)", display: "flex", alignItems: "center", justifyContent: "center", cursor: "pointer", transition: "var(--tr)", flexShrink: 0 }}>
             <span className="material-symbols-rounded" style={{ fontSize: 16, color: "#fff" }}>favorite_border</span>
           </button>
         </div>

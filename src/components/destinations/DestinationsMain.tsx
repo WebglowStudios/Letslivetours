@@ -11,7 +11,10 @@ import type { Destination } from "./DestinationCard";
 
 function getCatIcon(cat: string): string {
   const icons: Record<string, string> = {
+    heritage: "temple_hindu",
+    nature: "eco",
     beach: "beach_access",
+    pilgrimage: "auto_stories",
     city: "location_city",
     mountain: "landscape",
     adventure: "hiking",
@@ -19,7 +22,7 @@ function getCatIcon(cat: string): string {
     wildlife: "forest",
     tropical: "sunny",
   };
-  return icons[cat] || "travel_explore";
+  return icons[cat.toLowerCase()] || "travel_explore";
 }
 
 function formatPrice(price: number): string {
@@ -52,21 +55,26 @@ export default function DestinationsMain() {
       try {
         const res = await api.get("/destinations");
         if (res.status === "success" && res.data && Array.isArray(res.data)) {
-          const mapped: Destination[] = res.data.map((d: Record<string, unknown>) => ({
-            name: (d.name as string) || "",
-            slug: (d.slug as string) || "",
-            img: Array.isArray(d.images) && d.images.length > 0 ? (d.images[0] as string) : "",
-            cat: (d.category as string) || "beach",
-            catIcon: getCatIcon((d.category as string) || "beach"),
-            region: (d.region as string) || "",
-            desc: (d.description as string) || "",
-            season: (d.bestSeason as string) || "Year-round",
-            packages: "View packages",
-            rating: d.rating != null ? String(d.rating) : "4.5",
-            reviews: d.reviewCount != null ? String(d.reviewCount) : "0",
-            price: (d.startingPrice as number) || 0,
-            priceLabel: formatPrice((d.startingPrice as number) || 0),
-          }));
+          const mapped: Destination[] = res.data.map((d: Record<string, unknown>) => {
+            const rawTags = Array.isArray(d.tags) ? (d.tags as string[]) : [];
+            const catStr = (d.category as string) || (rawTags.length > 0 ? rawTags[0] : "beach");
+            return {
+              name: (d.name as string) || "",
+              slug: (d.slug as string) || "",
+              img: Array.isArray(d.images) && d.images.length > 0 ? (d.images[0] as string) : "",
+              cat: catStr,
+              catIcon: getCatIcon(catStr),
+              tags: rawTags.length > 0 ? rawTags : [catStr],
+              region: (d.region as string) || "",
+              desc: (d.description as string) || "",
+              season: (d.bestSeason as string) || "Year-round",
+              packages: "View packages",
+              rating: d.rating != null ? String(d.rating) : "4.5",
+              reviews: d.reviewCount != null ? String(d.reviewCount) : "0",
+              price: (d.startingPrice as number) || 0,
+              priceLabel: formatPrice((d.startingPrice as number) || 0),
+            };
+          });
           if (mapped.length > 0) {
             setDestinations(mapped);
           }
@@ -82,11 +90,28 @@ export default function DestinationsMain() {
 
   const filtered = useMemo(() => {
     let results = destinations.filter((d) => {
-      const matchCat = activeCat === "all" || d.cat === activeCat;
-      const matchSb = checkedCats.length === 0 || checkedCats.includes(d.cat);
+      const allTags = [
+        d.cat?.toLowerCase(),
+        ...(Array.isArray(d.tags) ? d.tags.map((t: string) => t.toLowerCase()) : []),
+      ].filter(Boolean);
+
+      const matchCat =
+        activeCat === "all" ||
+        allTags.includes(activeCat.toLowerCase());
+
+      const matchSb =
+        checkedCats.length === 0 ||
+        checkedCats.some((c) => allTags.includes(c.toLowerCase()));
+
       const matchPrice = d.price <= maxPrice;
       const q = search.toLowerCase();
-      const matchSearch = !q || d.name.toLowerCase().includes(q) || d.region.toLowerCase().includes(q) || d.desc.toLowerCase().includes(q);
+      const matchSearch =
+        !q ||
+        d.name.toLowerCase().includes(q) ||
+        d.region.toLowerCase().includes(q) ||
+        d.desc.toLowerCase().includes(q) ||
+        allTags.some((t) => t.includes(q));
+
       return matchCat && matchSb && matchPrice && matchSearch;
     });
 
