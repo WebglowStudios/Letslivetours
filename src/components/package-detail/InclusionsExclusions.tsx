@@ -33,6 +33,9 @@ export default function InclusionsExclusions({ inclusions: rawInclusions, exclus
     fontSize: 13.5,
     color: "var(--ink3)",
     lineHeight: 1.7,
+    wordBreak: "break-word",
+    overflowWrap: "break-word",
+    minWidth: 0,
   };
 
   return (
@@ -51,6 +54,7 @@ export default function InclusionsExclusions({ inclusions: rawInclusions, exclus
           className="ie-table"
           style={{
             width: "100%",
+            tableLayout: "fixed",
             borderCollapse: "collapse",
             borderRadius: "var(--r)",
             overflow: "hidden",
@@ -62,6 +66,8 @@ export default function InclusionsExclusions({ inclusions: rawInclusions, exclus
               <th
                 className="syne"
                 style={{
+                  width: "50%",
+                  boxSizing: "border-box",
                   fontSize: 12,
                   fontWeight: 800,
                   letterSpacing: 1.5,
@@ -78,6 +84,8 @@ export default function InclusionsExclusions({ inclusions: rawInclusions, exclus
               <th
                 className="syne"
                 style={{
+                  width: "50%",
+                  boxSizing: "border-box",
                   fontSize: 12,
                   fontWeight: 800,
                   letterSpacing: 1.5,
@@ -94,13 +102,13 @@ export default function InclusionsExclusions({ inclusions: rawInclusions, exclus
           </thead>
           <tbody>
             <tr>
-              <td style={{ padding: "16px 18px", verticalAlign: "top", borderRight: "1px solid var(--line)" }}>
+              <td style={{ width: "50%", boxSizing: "border-box", padding: "16px 18px", verticalAlign: "top", borderRight: "1px solid var(--line)", overflowWrap: "break-word", wordBreak: "break-word" }}>
                 {inclusions && inclusions.length > 0 ? (
                   <ul style={listStyle}>
                     {inclusions.map((item, i) => (
                       <li key={i} style={itemStyle}>
                         <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--gn3)", flexShrink: 0, marginTop: 7 }} />
-                        {item}
+                        <span style={{ flex: 1, minWidth: 0 }}>{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -108,13 +116,13 @@ export default function InclusionsExclusions({ inclusions: rawInclusions, exclus
                   <span style={{ color: "var(--ink4)", fontSize: 13 }}>None listed</span>
                 )}
               </td>
-              <td style={{ padding: "16px 18px", verticalAlign: "top" }}>
+              <td style={{ width: "50%", boxSizing: "border-box", padding: "16px 18px", verticalAlign: "top", overflowWrap: "break-word", wordBreak: "break-word" }}>
                 {exclusions && exclusions.length > 0 ? (
                   <ul style={listStyle}>
                     {exclusions.map((item, i) => (
                       <li key={i} style={itemStyle}>
                         <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--cu)", flexShrink: 0, marginTop: 7 }} />
-                        {item}
+                        <span style={{ flex: 1, minWidth: 0 }}>{item}</span>
                       </li>
                     ))}
                   </ul>
@@ -143,7 +151,7 @@ export default function InclusionsExclusions({ inclusions: rawInclusions, exclus
                 {inclusions.map((item, i) => (
                   <li key={i} style={itemStyle}>
                     <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--gn3)", flexShrink: 0, marginTop: 7 }} />
-                    {item}
+                    <span style={{ flex: 1, minWidth: 0 }}>{item}</span>
                   </li>
                 ))}
               </ul>
@@ -163,7 +171,7 @@ export default function InclusionsExclusions({ inclusions: rawInclusions, exclus
                 {exclusions.map((item, i) => (
                   <li key={i} style={itemStyle}>
                     <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--cu)", flexShrink: 0, marginTop: 7 }} />
-                    {item}
+                    <span style={{ flex: 1, minWidth: 0 }}>{item}</span>
                   </li>
                 ))}
               </ul>
@@ -173,6 +181,17 @@ export default function InclusionsExclusions({ inclusions: rawInclusions, exclus
       </div>
 
       <style jsx>{`
+        .ie-table {
+          table-layout: fixed;
+          width: 100%;
+        }
+        .ie-table th,
+        .ie-table td {
+          width: 50% !important;
+          box-sizing: border-box;
+          word-break: break-word;
+          overflow-wrap: break-word;
+        }
         .ie-mobile { display: none; }
         @media (max-width: 600px) {
           .ie-table { display: none; }
