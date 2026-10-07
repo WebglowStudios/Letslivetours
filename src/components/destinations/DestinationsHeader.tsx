@@ -22,6 +22,10 @@ const cats = [
   { label: "Cultural", value: "cultural", icon: "museum" },
   { label: "Wildlife", value: "wildlife", icon: "forest" },
   { label: "Tropical", value: "tropical", icon: "sunny" },
+  { label: "Honeymoon", value: "honeymoon", icon: "favorite" },
+  { label: "Luxury", value: "luxury", icon: "diamond" },
+  { label: "Island", value: "island", icon: "water" },
+  { label: "Spiritual", value: "spiritual", icon: "self_improvement" },
 ];
 
 export default function DestinationsHeader({ activeCat, setActiveCat, search, setSearch }: Props) {
