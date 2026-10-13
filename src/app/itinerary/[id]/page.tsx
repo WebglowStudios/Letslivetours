@@ -72,8 +72,13 @@ export default function CustomItineraryPage() {
             Custom Itinerary
           </span>
           {pkg.clientName && (
-            <span style={{ fontSize: 13, color: "var(--ink3)" }}>Prepared for <strong>{pkg.clientName}</strong></span>
+            <span style={{ fontSize: 13, color: "var(--ink3)" }}>Curated for <strong style={{ color: "var(--ink)" }}>{pkg.clientName}</strong></span>
           )}
+          {(() => {
+            const raw = (pkg?.curatedBy || pkg?.preparedBy || (pkg?.assignedTo && (typeof pkg.assignedTo === 'object' ? `${pkg.assignedTo.firstName || ''} ${pkg.assignedTo.lastName || ''}`.trim() || pkg.assignedTo.name : pkg.assignedTo)) || '');
+            const clean = typeof raw === 'string' ? raw.replace(/[_-]?\s*lets\s*live\s*tours\b/gi, "").replace(/[_-]?\s*letslivetours\b/gi, "").trim() : '';
+            return clean ? <span style={{ fontSize: 13, color: "var(--ink3)" }}> · Curated by <strong style={{ color: "var(--ink)" }}>{clean}</strong></span> : null;
+          })()}
         </div>
 
         <PackageGallery
