@@ -20,20 +20,9 @@ interface PackageData {
   category?: string;
 }
 
-const fallbackPackages: PackageData[] = [
-  { _id: "1", name: "Dubai Luxury Escape — Burj Khalifa & Desert Safari", slug: "dubai-luxury-escape-burj-khalifa-desert-safari", destination: { name: "Dubai", slug: "dubai" }, images: ["https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80"], duration: { nights: 7, days: 8 }, hotelRating: "5-Star", price: 124999, rating: 4.9, reviewCount: 312, badge: "Bestseller" },
-  { _id: "2", name: "Dubai City & Dhow Cruise Getaway", slug: "dubai-city-dhow-cruise-getaway", destination: { name: "Dubai", slug: "dubai" }, images: ["https://images.unsplash.com/photo-1512453979798-5ea266f8880c?w=800&q=80"], duration: { nights: 5, days: 6 }, hotelRating: "4-Star", price: 89999, rating: 4.8, reviewCount: 219, badge: "Hot Deal" },
-  { _id: "3", name: "Singapore Classic with Universal Studios", slug: "singapore-classic-with-universal-studios", destination: { name: "Singapore", slug: "singapore" }, images: ["https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=800&q=80"], duration: { nights: 5, days: 6 }, hotelRating: "4-Star", price: 72999, rating: 4.8, reviewCount: 401, badge: "Popular" },
-  { _id: "4", name: "Japan Cherry Blossom Season Special", slug: "japan-cherry-blossom-season-special", destination: { name: "Japan", slug: "japan" }, images: ["https://images.unsplash.com/photo-1493976040374-85c8e12f0c0e?w=800&q=80"], duration: { nights: 9, days: 10 }, hotelRating: "4-Star", price: 114999, rating: 5.0, reviewCount: 178, badge: "New" },
-  { _id: "5", name: "Bali Honeymoon Private Villa Retreat", slug: "bali-honeymoon-private-villa-retreat", destination: { name: "Bali", slug: "bali" }, images: ["https://images.unsplash.com/photo-1537996194471-e657df975ab4?w=800&q=80"], duration: { nights: 6, days: 7 }, hotelRating: "5-Star", price: 64999, rating: 4.9, reviewCount: 524, badge: "Top Rated" },
-  { _id: "6", name: "Bangkok & Phuket Beach Holiday", slug: "bangkok-phuket-beach-holiday", destination: { name: "Thailand", slug: "thailand" }, images: ["https://images.unsplash.com/photo-1552465011-b4e21bf6e79a?w=800&q=80"], duration: { nights: 6, days: 7 }, hotelRating: "4-Star", price: 54999, rating: 4.8, reviewCount: 374, badge: "Bestseller" },
-  { _id: "7", name: "Maldives Overwater Bungalow Experience", slug: "maldives-overwater-bungalow-experience", destination: { name: "Maldives", slug: "maldives" }, images: ["https://images.unsplash.com/photo-1514282401047-d79a71a590e8?w=800&q=80"], duration: { nights: 5, days: 6 }, hotelRating: "5-Star", price: 119999, rating: 5.0, reviewCount: 209, badge: "All-Inclusive" },
-  { _id: "8", name: "Singapore + Sentosa Island Luxury Package", slug: "singapore-sentosa-island-luxury-package", destination: { name: "Singapore", slug: "singapore" }, images: ["https://images.unsplash.com/photo-1525625293386-3f8f99389edd?w=800&q=80"], duration: { nights: 6, days: 7 }, hotelRating: "5-Star", price: 105000, rating: 4.9, reviewCount: 188, badge: "Premium" },
-];
-
 export default function Packages() {
   const [active, setActive] = useState("all");
-  const [packages, setPackages] = useState<PackageData[]>(fallbackPackages);
+  const [packages, setPackages] = useState<PackageData[]>([]);
 
   useEffect(() => {
     const fetchPackages = async () => {
@@ -44,10 +33,18 @@ export default function Packages() {
           const json = await res.json();
           if (json.data && json.data.length > 0) {
             setPackages(json.data);
+            return;
+          }
+        }
+        const allRes = await fetch(`${baseUrl}/packages?limit=8`);
+        if (allRes.ok) {
+          const allJson = await allRes.json();
+          if (allJson.data && allJson.data.length > 0) {
+            setPackages(allJson.data);
           }
         }
       } catch {
-        // Use fallback data
+        // Quietly fail
       }
     };
     fetchPackages();

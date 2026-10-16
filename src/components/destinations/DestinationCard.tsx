@@ -19,7 +19,16 @@ export interface Destination {
   price: number;
   priceLabel: string;
   visaType?: "free" | "on-arrival" | "required" | string;
+  isInternational?: boolean;
   isFeatured?: boolean;
+}
+
+export function isDestInternational(d: { country?: string; region?: string; isInternational?: boolean }): boolean {
+  if (typeof d.isInternational === "boolean") return d.isInternational;
+  const c = (d.country || "").toLowerCase().trim();
+  const r = (d.region || "").toLowerCase().trim();
+  if (c === "india" || r.includes("india") || r.includes("domestic")) return false;
+  return Boolean(c || r);
 }
 
 const badgeColors: Record<string, { bg: string; border: string; color: string }> = {
@@ -133,8 +142,8 @@ export default function DestinationCard({ dest, listView, onTagClick, onVisaClic
               <span className="material-symbols-rounded" style={{ fontSize: 12 }}>{dest.catIcon}</span>{dest.cat}
             </span>
 
-            {/* Visa Badge */}
-            {visaBadge && (
+            {/* Visa Badge (international destinations only) */}
+            {visaBadge && isDestInternational(dest) && (
               <span
                 className="syne"
                 onClick={(e) => {

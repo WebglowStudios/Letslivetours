@@ -25,6 +25,31 @@ function getVehicleIcon(type?: string): string {
   return "directions_car"; // default
 }
 
+function parseBulletPoints(text: string | null | undefined): { isList: boolean; items: string[] } {
+  if (!text) return { isList: false, items: [] };
+
+  const raw = String(text).trim();
+  if (!raw) return { isList: false, items: [] };
+
+  const hasBulletChar = /[•●▪■]/.test(raw);
+  const hasNewlines = raw.includes("\n") || raw.includes("\\n");
+
+  if (!hasBulletChar && !hasNewlines) {
+    return { isList: false, items: [raw] };
+  }
+
+  const parts = raw
+    .split(/(?:\s*[•●▪■]\s*|\\r\\n|\\n|\\r|[\r\n]+)/)
+    .map((s) => s.replace(/^[•\-\*\s–—:]+/, "").trim())
+    .filter((s) => s.length > 2);
+
+  if (parts.length > 1 || (parts.length === 1 && (hasBulletChar || raw.startsWith("•")))) {
+    return { isList: true, items: parts };
+  }
+
+  return { isList: false, items: [raw] };
+}
+
 /* ── ACCORDION ITEM ── */
 function AccordionItem({
   item,
@@ -420,7 +445,19 @@ function buildItineraryContent(day: any, dayFlights: any[] = [], imageMap?: Reco
     html += `</div>`;
   }
   if (day.description) {
-    html += `<p style="margin-bottom:10px">${day.description}</p>`;
+    const { isList, items } = parseBulletPoints(day.description);
+    if (isList && items.length > 1) {
+      html += `<ul style="display:flex;flex-direction:column;gap:8px;margin:8px 0 14px;padding:0;list-style:none">`;
+      items.forEach((item) => {
+        html += `<li style="display:flex;align-items:flex-start;gap:9px;font-size:13.5px;color:var(--ink3);line-height:1.6">
+          <span style="width:6px;height:6px;border-radius:50%;background:var(--cu);flex-shrink:0;margin-top:7px"></span>
+          <span style="flex:1;min-width:0">${item}</span>
+        </li>`;
+      });
+      html += `</ul>`;
+    } else {
+      html += `<p style="margin-bottom:10px">${items[0] || day.description}</p>`;
+    }
   }
   // Collect all activity images + day.images for the slider (with labels)
   const allDayImages: { src: string; label?: string }[] = [];

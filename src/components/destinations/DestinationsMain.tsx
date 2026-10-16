@@ -7,7 +7,7 @@ import Sidebar from "./Sidebar";
 import DestinationCard from "./DestinationCard";
 import { destinations as staticDestinations } from "./destinationsData";
 import { api } from "@/lib/api";
-import type { Destination } from "./DestinationCard";
+import { Destination, isDestInternational } from "./DestinationCard";
 
 function getCatIcon(cat: string): string {
   const icons: Record<string, string> = {
@@ -41,6 +41,7 @@ export default function DestinationsMain() {
   const [activeCat, setActiveCat] = useState("all");
   const [search, setSearch] = useState(initialSearch);
   const [checkedCats, setCheckedCats] = useState<string[]>([]);
+  const [destinationScope, setDestinationScope] = useState<"all" | "international" | "domestic">("all");
   const [selectedVisa, setSelectedVisa] = useState("all");
   const [selectedRegion, setSelectedRegion] = useState("all");
   const [selectedSeason, setSelectedSeason] = useState("all");
@@ -92,6 +93,7 @@ export default function DestinationsMain() {
               price: (d.startingPrice as number) || 0,
               priceLabel: formatPrice((d.startingPrice as number) || 0),
               visaType: (d.visaType as string) || undefined,
+              isInternational: typeof d.isInternational === "boolean" ? (d.isInternational as boolean) : undefined,
               isFeatured: Boolean(d.isFeatured),
             };
           });
@@ -116,6 +118,13 @@ export default function DestinationsMain() {
         ...(Array.isArray(d.tags) ? d.tags.map((t: string) => t.toLowerCase()) : []),
       ].filter(Boolean);
 
+      // 0. Destination Scope (All / International / Domestic)
+      const isIntl = isDestInternational(d);
+      const matchScope =
+        destinationScope === "all" ||
+        (destinationScope === "international" && isIntl) ||
+        (destinationScope === "domestic" && !isIntl);
+
       // 1. Header category pill
       const matchCat =
         activeCat === "all" || allTags.includes(activeCat.toLowerCase());
@@ -125,10 +134,10 @@ export default function DestinationsMain() {
         checkedCats.length === 0 ||
         checkedCats.some((c) => allTags.includes(c.toLowerCase()));
 
-      // 3. Visa requirements
+      // 3. Visa requirements (applicable to international trips)
       const matchVisa =
         selectedVisa === "all" ||
-        (d.visaType && d.visaType.toLowerCase() === selectedVisa.toLowerCase());
+        (isIntl && d.visaType && d.visaType.toLowerCase() === selectedVisa.toLowerCase());
 
       // 4. Region
       const matchRegion =
@@ -168,6 +177,7 @@ export default function DestinationsMain() {
         (d.visaType && d.visaType.toLowerCase().includes(q));
 
       return (
+        matchScope &&
         matchCat &&
         matchSbCats &&
         matchVisa &&
@@ -201,6 +211,7 @@ export default function DestinationsMain() {
     activeCat,
     search,
     checkedCats,
+    destinationScope,
     selectedVisa,
     selectedRegion,
     selectedSeason,
@@ -215,6 +226,7 @@ export default function DestinationsMain() {
     setActiveCat("all");
     setSearch("");
     setCheckedCats([]);
+    setDestinationScope("all");
     setSelectedVisa("all");
     setSelectedRegion("all");
     setSelectedSeason("all");
@@ -236,6 +248,7 @@ export default function DestinationsMain() {
 
   // Click on a visa badge on any card -> connects directly to filter
   const handleVisaClick = (visa: string) => {
+    setDestinationScope("international");
     setSelectedVisa(visa.toLowerCase());
   };
 
@@ -255,6 +268,13 @@ export default function DestinationsMain() {
         onRemove: () => setCheckedCats(checkedCats.filter((cat) => cat !== c)),
       });
     });
+    if (destinationScope !== "all") {
+      const sLabel = destinationScope === "international" ? "International" : "Domestic (India)";
+      chips.push({
+        label: `Scope: ${sLabel}`,
+        onRemove: () => setDestinationScope("all"),
+      });
+    }
     if (selectedVisa !== "all") {
       const vLabel = selectedVisa === "free" ? "Visa Free" : selectedVisa === "on-arrival" ? "Visa on Arrival" : "Visa Required";
       chips.push({
@@ -303,6 +323,7 @@ export default function DestinationsMain() {
   }, [
     activeCat,
     checkedCats,
+    destinationScope,
     selectedVisa,
     selectedRegion,
     selectedSeason,
@@ -462,6 +483,8 @@ export default function DestinationsMain() {
               <Sidebar
                 checkedCats={checkedCats}
                 setCheckedCats={setCheckedCats}
+                destinationScope={destinationScope}
+                setDestinationScope={setDestinationScope}
                 selectedVisa={selectedVisa}
                 setSelectedVisa={setSelectedVisa}
                 selectedRegion={selectedRegion}
@@ -509,6 +532,8 @@ export default function DestinationsMain() {
               <Sidebar
                 checkedCats={checkedCats}
                 setCheckedCats={setCheckedCats}
+                destinationScope={destinationScope}
+                setDestinationScope={setDestinationScope}
                 selectedVisa={selectedVisa}
                 setSelectedVisa={setSelectedVisa}
                 selectedRegion={selectedRegion}

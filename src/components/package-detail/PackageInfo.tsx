@@ -4,6 +4,31 @@ interface PackageInfoProps {
   pkg: any;
 }
 
+function parseBulletPoints(text: string | null | undefined): { isList: boolean; items: string[] } {
+  if (!text) return { isList: false, items: [] };
+
+  const raw = String(text).trim();
+  if (!raw) return { isList: false, items: [] };
+
+  const hasBulletChar = /[•●▪■]/.test(raw);
+  const hasNewlines = raw.includes("\n") || raw.includes("\\n");
+
+  if (!hasBulletChar && !hasNewlines) {
+    return { isList: false, items: [raw] };
+  }
+
+  const parts = raw
+    .split(/(?:\s*[•●▪■]\s*|\\r\\n|\\n|\\r|[\r\n]+)/)
+    .map((s) => s.replace(/^[•\-\*\s–—:]+/, "").trim())
+    .filter((s) => s.length > 2);
+
+  if (parts.length > 1 || (parts.length === 1 && (hasBulletChar || raw.startsWith("•")))) {
+    return { isList: true, items: parts };
+  }
+
+  return { isList: false, items: [raw] };
+}
+
 export default function PackageInfo({ pkg }: PackageInfoProps) {
   const name = pkg?.name || "Package";
   const destinationName = pkg?.destination?.name || pkg?.customDestinationText;
@@ -85,11 +110,26 @@ export default function PackageInfo({ pkg }: PackageInfoProps) {
       )}
 
       {/* Description */}
-      {description && (
-        <p style={{ fontFamily: "var(--font-inter), 'Inter', sans-serif", fontSize: 14, color: "var(--ink3)", lineHeight: 1.7, marginBottom: 24 }}>
-          {description}
-        </p>
-      )}
+      {description && (() => {
+        const { isList, items } = parseBulletPoints(description);
+        if (isList && items.length > 1) {
+          return (
+            <ul style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 24, padding: 0, listStyle: "none" }}>
+              {items.map((pt, i) => (
+                <li key={i} style={{ display: "flex", alignItems: "flex-start", gap: 10, fontFamily: "var(--font-inter), 'Inter', sans-serif", fontSize: 14, color: "var(--ink3)", lineHeight: 1.65 }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--gn3)", flexShrink: 0, marginTop: 7 }} />
+                  <span style={{ flex: 1, minWidth: 0 }}>{pt}</span>
+                </li>
+              ))}
+            </ul>
+          );
+        }
+        return (
+          <p style={{ fontFamily: "var(--font-inter), 'Inter', sans-serif", fontSize: 14, color: "var(--ink3)", lineHeight: 1.7, marginBottom: 24 }}>
+            {items[0] || description}
+          </p>
+        );
+      })()}
 
       {/* Trip Highlights — bullet list */}
       {highlights.length > 0 && (

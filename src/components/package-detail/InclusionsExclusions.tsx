@@ -9,9 +9,47 @@ interface InclusionsExclusionsProps {
   trainsIncluded?: boolean;
 }
 
+function cleanItemText(raw: string): string {
+  if (!raw) return "";
+  return String(raw)
+    .replace(/\\u0026amp;/gi, "&")
+    .replace(/\\u0026/gi, "&")
+    .replace(/&amp;/gi, "&")
+    .replace(/\\u003c/gi, "<")
+    .replace(/\\u003e/gi, ">")
+    .replace(/&lt;/gi, "<")
+    .replace(/&gt;/gi, ">")
+    .replace(/&quot;/gi, '"')
+    .replace(/&#39;/gi, "'")
+    .replace(/&apos;/gi, "'")
+    .replace(/&nbsp;/gi, " ")
+    .replace(/\u00a0/g, " ")
+    .replace(/\\r\\n|\\n|\\r/g, " ")
+    .replace(/[\r\n\t]+/g, " ")
+    .replace(/^[•\-\*\s–—:]+/, "")
+    .replace(/\s+/g, " ")
+    .trim();
+}
+
+function sanitizeList(list: any[]): string[] {
+  if (!Array.isArray(list)) return [];
+  const res: string[] = [];
+  for (const item of list) {
+    if (!item) continue;
+    const parts = String(item).split(/\\r\\n|\\n|\\r|[\r\n]+/);
+    for (const p of parts) {
+      const cleaned = cleanItemText(p);
+      if (cleaned.length > 2) {
+        res.push(cleaned);
+      }
+    }
+  }
+  return Array.from(new Set(res));
+}
+
 export default function InclusionsExclusions({ inclusions: rawInclusions, exclusions: rawExclusions, isInternational, visaIncluded, flightsIncluded, trainsIncluded }: InclusionsExclusionsProps) {
-  let inclusions = [...(rawInclusions || [])];
-  let exclusions = [...(rawExclusions || [])];
+  let inclusions = sanitizeList(rawInclusions);
+  let exclusions = sanitizeList(rawExclusions);
 
 
 

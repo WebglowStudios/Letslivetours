@@ -1,11 +1,13 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import type { Destination } from "./DestinationCard";
+import { Destination, isDestInternational } from "./DestinationCard";
 
 interface Props {
   checkedCats: string[];
   setCheckedCats: (cats: string[]) => void;
+  destinationScope: "all" | "international" | "domestic";
+  setDestinationScope: (scope: "all" | "international" | "domestic") => void;
   selectedVisa: string;
   setSelectedVisa: (visa: string) => void;
   selectedRegion: string;
@@ -45,6 +47,8 @@ const CATEGORY_DEFINITIONS = [
 export default function Sidebar({
   checkedCats,
   setCheckedCats,
+  destinationScope,
+  setDestinationScope,
   selectedVisa,
   setSelectedVisa,
   selectedRegion,
@@ -89,10 +93,30 @@ export default function Sidebar({
     return counts;
   }, [destinations]);
 
-  // Dynamic Visa counts
-  const visaCounts = useMemo(() => {
-    const counts: Record<string, number> = { all: destinations.length, free: 0, "on-arrival": 0, required: 0 };
+  // Dynamic Scope counts
+  const scopeCounts = useMemo(() => {
+    let intl = 0;
+    let dom = 0;
     destinations.forEach((d) => {
+      if (isDestInternational(d)) {
+        intl++;
+      } else {
+        dom++;
+      }
+    });
+    return { all: destinations.length, international: intl, domestic: dom };
+  }, [destinations]);
+
+  // Dynamic Visa counts (computed specifically for international destinations)
+  const visaCounts = useMemo(() => {
+    const intlList = destinations.filter(isDestInternational);
+    const counts: Record<string, number> = {
+      all: intlList.length,
+      free: 0,
+      "on-arrival": 0,
+      required: 0,
+    };
+    intlList.forEach((d) => {
       const v = d.visaType?.toLowerCase();
       if (v === "free") counts.free++;
       else if (v === "on-arrival" || v === "arrival") counts["on-arrival"]++;
@@ -121,6 +145,7 @@ export default function Sidebar({
   // Count active filters
   const activeCount =
     checkedCats.length +
+    (destinationScope !== "all" ? 1 : 0) +
     (selectedVisa !== "all" ? 1 : 0) +
     (selectedRegion !== "all" ? 1 : 0) +
     (selectedSeason !== "all" ? 1 : 0) +
@@ -227,6 +252,79 @@ export default function Sidebar({
         </label>
       </div>
 
+      {/* Destination Scope Filter (All / International / Domestic) */}
+      <div style={{ padding: "18px 22px", borderBottom: "1px solid var(--line)" }}>
+        <div
+          className="syne"
+          style={{
+            fontSize: 10,
+            fontWeight: 700,
+            letterSpacing: 2,
+            textTransform: "uppercase",
+            color: "var(--ink4)",
+            marginBottom: 12,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
+          <span>Destination Scope</span>
+          {destinationScope !== "all" && (
+            <span
+              onClick={() => setDestinationScope("all")}
+              style={{ fontSize: 10, color: "var(--cu)", cursor: "pointer", textTransform: "none", letterSpacing: 0 }}
+            >
+              Reset
+            </span>
+          )}
+        </div>
+        <div style={{ display: "flex", flexDirection: "column", gap: 6 }}>
+          {[
+            { id: "all", label: "All Destinations", icon: "travel_explore", color: "var(--gn2)", count: scopeCounts.all },
+            { id: "international", label: "International", icon: "flight_takeoff", color: "#00aecd", count: scopeCounts.international },
+            { id: "domestic", label: "Domestic (India)", icon: "temple_hindu", color: "#d97706", count: scopeCounts.domestic },
+          ].map((scope) => {
+            const isSelected = destinationScope === scope.id;
+            return (
+              <label
+                key={scope.id}
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "space-between",
+                  padding: "7px 10px",
+                  borderRadius: 10,
+                  cursor: "pointer",
+                  background: isSelected ? "var(--gn-gl)" : "transparent",
+                  transition: "background .2s",
+                }}
+              >
+                <div style={{ display: "flex", alignItems: "center", gap: 9 }}>
+                  <input
+                    type="radio"
+                    name="scopeFilter"
+                    checked={isSelected}
+                    onChange={() => {
+                      setDestinationScope(scope.id as "all" | "international" | "domestic");
+                    }}
+                    style={{ accentColor: "var(--gn)", cursor: "pointer" }}
+                  />
+                  <span className="material-symbols-rounded" style={{ fontSize: 16, color: scope.color || "var(--ink3)" }}>
+                    {scope.icon}
+                  </span>
+                  <span style={{ fontSize: 12.5, fontWeight: isSelected ? 600 : 500, color: isSelected ? "var(--gn2)" : "var(--ink2)" }}>
+                    {scope.label}
+                  </span>
+                </div>
+                <span className="syne" style={{ fontSize: 11, color: "var(--ink4)", background: "var(--iv2)", borderRadius: 50, padding: "2px 7px", fontWeight: 600 }}>
+                  {scope.count}
+                </span>
+              </label>
+            );
+          })}
+        </div>
+      </div>
+
       {/* Visa Requirements Filter */}
       <div style={{ padding: "18px 22px", borderBottom: "1px solid var(--line)" }}>
         <div
@@ -280,7 +378,12 @@ export default function Sidebar({
                     type="radio"
                     name="visaFilter"
                     checked={isSelected}
-                    onChange={() => setSelectedVisa(v.id)}
+                    onChange={() => {
+                      if (v.id !== "all" && destinationScope === "domestic") {
+                        setDestinationScope("international");
+                      }
+                      setSelectedVisa(v.id);
+                    }}
                     style={{ accentColor: "var(--gn)", cursor: "pointer" }}
                   />
                   <span className="material-symbols-rounded" style={{ fontSize: 16, color: v.color || "var(--ink3)" }}>

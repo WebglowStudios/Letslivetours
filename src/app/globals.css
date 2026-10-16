@@ -37,6 +37,7 @@ a{text-decoration:none;color:inherit}
 ul{list-style:none}
 img{display:block;width:100%;height:100%;object-fit:cover}
 .container{max-width:1360px;margin:0 auto;padding:0 48px}
+.pkg-page-wrap{max-width:1240px;margin:0 auto;padding:88px 24px 60px;box-sizing:border-box;width:100%}
 @media(max-width:768px){
   .container{padding:0 20px}
   .pkg-page-wrap{padding-left:16px !important;padding-right:16px !important}

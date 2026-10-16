@@ -21,17 +21,17 @@ interface Role {
 }
 
 const roles: Role[] = [
-  { id: "sr-travel-consultant", dept: "operations", deptLabel: "Operations", icon: "travel_explore", iconCls: "ops", title: "Senior Travel Consultant \u2014 Dubai & Middle East", location: "Bengaluru", type: "Full-time", experience: "3\u20135 yrs exp" },
+  { id: "sr-travel-consultant", dept: "operations", deptLabel: "Operations", icon: "travel_explore", iconCls: "ops", title: "Senior Travel Consultant \u2014 Dubai & Middle East", location: "Pune", type: "Full-time", experience: "3\u20135 yrs exp" },
   { id: "customer-exp-manager", dept: "operations", deptLabel: "Operations", icon: "support_agent", iconCls: "ops", title: "Customer Experience Manager", location: "Mumbai", type: "Full-time", experience: "2\u20134 yrs exp" },
   { id: "destination-expert-sea", dept: "operations", deptLabel: "Operations", icon: "map", iconCls: "ops", title: "Destination Expert \u2014 Southeast Asia", location: "Remote", type: "Full-time", experience: "1\u20133 yrs exp" },
-  { id: "perf-marketing-lead", dept: "marketing", deptLabel: "Marketing", icon: "campaign", iconCls: "mkt", title: "Performance Marketing Lead \u2014 Paid Social & Search", location: "Bengaluru", type: "Full-time", experience: "4\u20136 yrs exp" },
+  { id: "perf-marketing-lead", dept: "marketing", deptLabel: "Marketing", icon: "campaign", iconCls: "mkt", title: "Performance Marketing Lead \u2014 Paid Social & Search", location: "Pune", type: "Full-time", experience: "4\u20136 yrs exp" },
   { id: "content-strategist", dept: "marketing", deptLabel: "Marketing", icon: "edit_note", iconCls: "mkt", title: "Content Strategist & Travel Writer", location: "Remote", type: "Full-time", experience: "2\u20134 yrs exp" },
-  { id: "social-media-creator", dept: "marketing", deptLabel: "Marketing", icon: "photo_camera", iconCls: "mkt", title: "Social Media & Video Creator", location: "Bengaluru", type: "Full-time", experience: "1\u20133 yrs exp" },
+  { id: "social-media-creator", dept: "marketing", deptLabel: "Marketing", icon: "photo_camera", iconCls: "mkt", title: "Social Media & Video Creator", location: "Pune", type: "Full-time", experience: "1\u20133 yrs exp" },
   { id: "sr-fullstack-engineer", dept: "technology", deptLabel: "Technology", icon: "code", iconCls: "tech", title: "Senior Full-Stack Engineer (React + Node)", location: "Remote", type: "Full-time", experience: "4\u20137 yrs exp" },
-  { id: "product-designer", dept: "technology", deptLabel: "Technology", icon: "palette", iconCls: "tech", title: "Product Designer \u2014 UX/UI (Travel Platform)", location: "Bengaluru", type: "Full-time", experience: "3\u20135 yrs exp" },
+  { id: "product-designer", dept: "technology", deptLabel: "Technology", icon: "palette", iconCls: "tech", title: "Product Designer \u2014 UX/UI (Travel Platform)", location: "Pune", type: "Full-time", experience: "3\u20135 yrs exp" },
   { id: "data-analyst", dept: "technology", deptLabel: "Technology", icon: "analytics", iconCls: "tech", title: "Data Analyst \u2014 Growth & Revenue", location: "Remote", type: "Full-time", experience: "2\u20134 yrs exp" },
-  { id: "talent-acquisition", dept: "hr", deptLabel: "People & HR", icon: "people", iconCls: "hr", title: "Talent Acquisition Specialist", location: "Bengaluru", type: "Full-time", experience: "2\u20134 yrs exp" },
-  { id: "finance-manager", dept: "finance", deptLabel: "Finance", icon: "account_balance", iconCls: "fin", title: "Finance Manager \u2014 Revenue & Reconciliation", location: "Bengaluru", type: "Full-time", experience: "5\u20138 yrs exp" },
+  { id: "talent-acquisition", dept: "hr", deptLabel: "People & HR", icon: "people", iconCls: "hr", title: "Talent Acquisition Specialist", location: "Pune", type: "Full-time", experience: "2\u20134 yrs exp" },
+  { id: "finance-manager", dept: "finance", deptLabel: "Finance", icon: "account_balance", iconCls: "fin", title: "Finance Manager \u2014 Revenue & Reconciliation", location: "Pune", type: "Full-time", experience: "5\u20138 yrs exp" },
 ];
 
 const tabs = [
