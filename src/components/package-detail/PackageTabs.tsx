@@ -4,6 +4,8 @@ import { useState } from "react";
 
 interface PackageTabsProps {
   pkg: any;
+  selectedHotelOptions?: Record<number, string>;
+  onSelectHotelOption?: (stayIndex: number, optionId: string) => void;
 }
 
 /* ── BADGE STYLES ── */
@@ -735,12 +737,12 @@ function buildDayActivitiesContent(day: any, imageMap?: Record<string, string>):
 
 // Tabs definition removed from here, moved inside the component to be dynamic
 
-export default function PackageTabs({ pkg }: PackageTabsProps) {
+export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOption }: PackageTabsProps) {
   const [activeTab, setActiveTab] = useState("itinerary");
   const [openItems, setOpenItems] = useState<Record<string, number | null>>({
     itinerary: null,
     activities: null,
-    stay: null,
+    stay: 0,
     transfers: null,
     policies: null,
   });
@@ -1027,18 +1029,321 @@ export default function PackageTabs({ pkg }: PackageTabsProps) {
           </div>
         )}
 
-        {/* Accordion List or Empty State */}
+        {/* Accordion List or Stay Options or Empty State */}
         {tabData.length > 0 ? (
-          <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
-            {tabData.map((item: any, idx: number) => (
-              <AccordionItem
-                key={`${activeTab}-${idx}`}
-                item={item}
-                isOpen={openItems[activeTab] === idx}
-                onToggle={() => toggleItem(activeTab, idx)}
-                onImageClick={(imgs, i) => { setLightboxImages(imgs); setLightboxIdx(i); setLightboxOpen(true); }}
-              />
-            ))}
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+            {activeTab === "stay" ? (
+              <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+                {/* Banner if any stay has multiple options */}
+                {stays.some((s: any) => s.hasOptions && s.options && s.options.length > 1) && (
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
+                      flexWrap: "wrap",
+                      gap: 12,
+                      padding: "16px 20px",
+                      background: "linear-gradient(135deg, rgba(0,77,94,0.06) 0%, rgba(245,166,35,0.08) 100%)",
+                      borderRadius: "var(--r)",
+                      border: "1.5px solid rgba(0,77,94,0.12)",
+                      marginBottom: 4,
+                    }}
+                  >
+                    <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+                      <span className="material-symbols-rounded" style={{ fontSize: 26, color: "var(--cu)" }}>
+                        hotel_class
+                      </span>
+                      <div>
+                        <div className="syne" style={{ fontSize: 13.5, fontWeight: 700, color: "var(--gn)" }}>
+                          Choose Your Hotel Preference
+                        </div>
+                        <div style={{ fontSize: 12, color: "var(--ink2)", marginTop: 2 }}>
+                          Select your desired hotel for each stay. Price updates automatically in real-time.
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
+                {stays.map((stay: any, idx: number) => {
+                  const hasOptions = stay.hasOptions && stay.options && stay.options.length > 1;
+                  const currentChosenOptionId = selectedHotelOptions?.[idx];
+                  const isOpen = openItems["stay"] === idx;
+
+                  // Find chosen option or default
+                  const chosenOpt = hasOptions
+                    ? (stay.options.find((o: any) => o.optionId === currentChosenOptionId) ||
+                       stay.options.find((o: any) => o.isDefault) ||
+                       stay.options[0])
+                    : null;
+
+                  return (
+                    <div
+                      key={`stay-${idx}`}
+                      style={{
+                        background: "#fff",
+                        borderRadius: "var(--r)",
+                        border: `1.5px solid ${isOpen ? "var(--gn3)" : "var(--line)"}`,
+                        overflow: "hidden",
+                        transition: "var(--tr)",
+                        boxShadow: isOpen ? "var(--sh)" : "none",
+                      }}
+                    >
+                      {/* Stay Accordion Header */}
+                      <button
+                        onClick={() => toggleItem("stay", idx)}
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                          justifyContent: "space-between",
+                          padding: "16px 18px",
+                          cursor: "pointer",
+                          gap: 14,
+                          width: "100%",
+                          textAlign: "left",
+                          background: "none",
+                          border: "none",
+                        }}
+                      >
+                        <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", flex: 1 }}>
+                          <span
+                            className="syne"
+                            style={{
+                              fontSize: 10.5,
+                              fontWeight: 800,
+                              letterSpacing: 1,
+                              textTransform: "uppercase",
+                              padding: "4px 12px",
+                              borderRadius: 50,
+                              whiteSpace: "nowrap",
+                              flexShrink: 0,
+                              background: "rgba(41,196,216,.12)",
+                              color: "var(--gn2)",
+                            }}
+                          >
+                            Stay {idx + 1}
+                          </span>
+                          <span
+                            className="syne"
+                            style={{
+                              fontSize: 14.5,
+                              fontWeight: 600,
+                              color: isOpen ? "var(--gn)" : "var(--ink)",
+                              lineHeight: 1.4,
+                            }}
+                          >
+                            {stay.name || stay.stayLocation || `Location ${idx + 1}`}
+                          </span>
+                          {stay.nights && (
+                            <span style={{ fontSize: 12, color: "var(--ink4)" }}>
+                              • {stay.nights} {stay.nights > 1 ? "Nights" : "Night"}
+                            </span>
+                          )}
+                          {chosenOpt && (
+                            <span
+                              style={{
+                                marginLeft: "auto",
+                                marginRight: 8,
+                                fontSize: 11.5,
+                                fontWeight: 700,
+                                background: chosenOpt.priceDifference > 0 ? "rgba(245,166,35,0.12)" : "rgba(16,185,129,0.1)",
+                                color: chosenOpt.priceDifference > 0 ? "var(--cu-d)" : "#059669",
+                                padding: "3px 10px",
+                                borderRadius: 50,
+                                display: "inline-flex",
+                                alignItems: "center",
+                                gap: 4,
+                              }}
+                            >
+                              <span className="material-symbols-rounded" style={{ fontSize: 13 }}>hotel</span>
+                              {chosenOpt.name || chosenOpt.hotelName}
+                              {chosenOpt.priceDifference > 0 ? ` (+₹${chosenOpt.priceDifference.toLocaleString()})` : " (Included)"}
+                            </span>
+                          )}
+                        </div>
+                        <div
+                          style={{
+                            width: 28,
+                            height: 28,
+                            borderRadius: "50%",
+                            background: isOpen ? "var(--gn)" : "var(--gn-gl)",
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexShrink: 0,
+                            transition: "var(--tr)",
+                            transform: isOpen ? "rotate(45deg)" : "none",
+                          }}
+                        >
+                          <span
+                            className="material-symbols-rounded"
+                            style={{ fontSize: 16, color: isOpen ? "#fff" : "var(--gn)", transition: "var(--tr)" }}
+                          >
+                            add
+                          </span>
+                        </div>
+                      </button>
+
+                      {/* Stay Accordion Content */}
+                      <div
+                        style={{
+                          display: "grid",
+                          gridTemplateRows: isOpen ? "1fr" : "0fr",
+                          transition: "grid-template-rows .35s ease",
+                        }}
+                      >
+                        <div style={{ overflow: "hidden", minHeight: 0 }}>
+                          <div
+                            style={{
+                              padding: "0 18px 18px",
+                              fontSize: 13,
+                              lineHeight: 1.6,
+                              color: "var(--ink2)",
+                              borderTop: "1px solid var(--line2)",
+                              paddingTop: 14,
+                            }}
+                          >
+                            {hasOptions ? (
+                              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                                <p style={{ fontSize: 12.5, fontWeight: 600, color: "var(--ink3)", marginBottom: 4 }}>
+                                  Select an option below to apply to your package:
+                                </p>
+                                <div
+                                  style={{
+                                    display: "grid",
+                                    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+                                    gap: 12,
+                                  }}
+                                >
+                                  {stay.options.map((opt: any) => {
+                                    const isSelected =
+                                      currentChosenOptionId === opt.optionId ||
+                                      (!currentChosenOptionId && (opt.isDefault || opt === stay.options[0]));
+                                    return (
+                                      <div
+                                        key={opt.optionId}
+                                        onClick={() => onSelectHotelOption && onSelectHotelOption(idx, opt.optionId)}
+                                        style={{
+                                          background: isSelected ? "rgba(41,196,216,0.06)" : "#fafafa",
+                                          border: `1.5px solid ${isSelected ? "var(--gn2)" : "var(--line)"}`,
+                                          borderRadius: 14,
+                                          padding: "14px 16px",
+                                          cursor: "pointer",
+                                          transition: "all 0.2s ease",
+                                          position: "relative",
+                                          boxShadow: isSelected ? "0 4px 16px rgba(41,196,216,0.15)" : "none",
+                                        }}
+                                      >
+                                        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
+                                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                            <div
+                                              style={{
+                                                width: 18,
+                                                height: 18,
+                                                borderRadius: "50%",
+                                                border: `2px solid ${isSelected ? "var(--gn2)" : "var(--ink4)"}`,
+                                                background: isSelected ? "var(--gn2)" : "#fff",
+                                                display: "flex",
+                                                alignItems: "center",
+                                                justifyContent: "center",
+                                                flexShrink: 0,
+                                              }}
+                                            >
+                                              {isSelected && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }} />}
+                                            </div>
+                                            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>
+                                              {opt.name || opt.hotelName}
+                                            </div>
+                                          </div>
+                                          <div>
+                                            {opt.priceDifference > 0 ? (
+                                              <span
+                                                style={{
+                                                  fontSize: 11,
+                                                  fontWeight: 700,
+                                                  background: "rgba(245,166,35,0.15)",
+                                                  color: "var(--cu-d)",
+                                                  padding: "3px 8px",
+                                                  borderRadius: 50,
+                                                  whiteSpace: "nowrap",
+                                                }}
+                                              >
+                                                +₹{opt.priceDifference.toLocaleString()} / pax
+                                              </span>
+                                            ) : (
+                                              <span
+                                                style={{
+                                                  fontSize: 11,
+                                                  fontWeight: 700,
+                                                  background: "rgba(16,185,129,0.12)",
+                                                  color: "#059669",
+                                                  padding: "3px 8px",
+                                                  borderRadius: 50,
+                                                  whiteSpace: "nowrap",
+                                                }}
+                                              >
+                                                Included (₹0)
+                                              </span>
+                                            )}
+                                          </div>
+                                        </div>
+
+                                        {/* Details row */}
+                                        <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8, fontSize: 12, color: "var(--ink3)" }}>
+                                          {opt.rating && (
+                                            <span style={{ display: "flex", alignItems: "center", gap: 2, color: "var(--cu)", fontWeight: 700 }}>
+                                              <span className="material-symbols-rounded" style={{ fontSize: 14 }}>star</span>
+                                              {opt.rating}
+                                            </span>
+                                          )}
+                                          {opt.roomType && (
+                                            <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                                              <span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--ink4)" }}>bed</span>
+                                              {opt.roomType}
+                                            </span>
+                                          )}
+                                        </div>
+
+                                        {(opt.address || opt.remark) && (
+                                          <div style={{ fontSize: 12, color: "var(--ink4)", marginTop: 6, lineHeight: 1.4 }}>
+                                            {opt.address || opt.remark}
+                                          </div>
+                                        )}
+
+                                        {isSelected && (
+                                          <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "var(--gn2)" }}>
+                                            <span className="material-symbols-rounded" style={{ fontSize: 14 }}>check_circle</span>
+                                            Active Selection
+                                          </div>
+                                        )}
+                                      </div>
+                                    );
+                                  })}
+                                </div>
+                              </div>
+                            ) : (
+                              /* Standard Stay content when single option */
+                              <div dangerouslySetInnerHTML={{ __html: buildStayContent(stay) }} />
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            ) : (
+              tabData.map((item: any, idx: number) => (
+                <AccordionItem
+                  key={`${activeTab}-${idx}`}
+                  item={item}
+                  isOpen={openItems[activeTab] === idx}
+                  onToggle={() => toggleItem(activeTab, idx)}
+                  onImageClick={(imgs, i) => { setLightboxImages(imgs); setLightboxIdx(i); setLightboxOpen(true); }}
+                />
+              ))
+            )}
 
             {/* End Of Trip tagline — itinerary tab only */}
             {activeTab === "itinerary" && (

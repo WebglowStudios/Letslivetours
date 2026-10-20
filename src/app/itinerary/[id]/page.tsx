@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import Navbar from "@/components/Navbar";
@@ -25,6 +25,7 @@ export default function CustomItineraryPage() {
   const [pkg, setPkg] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [isBooked, setIsBooked] = useState(false);
+  const [selectedHotelOptions, setSelectedHotelOptions] = useState<Record<number, string>>({});
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -43,6 +44,76 @@ export default function CustomItineraryPage() {
       .catch(() => {})
       .finally(() => setLoading(false));
   }, [id]);
+
+  // Initialize selected hotels when package data loads
+  useEffect(() => {
+    if (pkg?.stays && Array.isArray(pkg.stays)) {
+      const initial: Record<number, string> = {};
+      pkg.stays.forEach((stay: any, idx: number) => {
+        if (stay.hasOptions && stay.options && stay.options.length > 0) {
+          const defaultOpt = stay.options.find((o: any) => o.isDefault) || stay.options[0];
+          initial[idx] = defaultOpt.optionId;
+        } else {
+          initial[idx] = "default";
+        }
+      });
+      setSelectedHotelOptions(initial);
+    }
+  }, [pkg]);
+
+  const handleSelectHotelOption = (stayIndex: number, optionId: string) => {
+    setSelectedHotelOptions((prev) => ({
+      ...prev,
+      [stayIndex]: optionId,
+    }));
+  };
+
+  const hotelUpgradePerPax = useMemo(() => {
+    if (!pkg?.stays) return 0;
+    let total = 0;
+    pkg.stays.forEach((stay: any, idx: number) => {
+      if (!stay.hasOptions || !stay.options) return;
+      const chosenOptionId = selectedHotelOptions[idx];
+      const opt = stay.options.find((o: any) => o.optionId === chosenOptionId) || stay.options[0];
+      if (opt?.priceDifference) {
+        total += Number(opt.priceDifference);
+      }
+    });
+    return total;
+  }, [pkg, selectedHotelOptions]);
+
+  const effectivePrice = (pkg?.price || 0) + hotelUpgradePerPax;
+
+  const selectedHotelOptionsPayload = useMemo(() => {
+    if (!pkg?.stays) return [];
+    return pkg.stays.map((stay: any, idx: number) => {
+      const chosenOptionId = selectedHotelOptions[idx];
+      const opt = stay.options?.find((o: any) => o.optionId === chosenOptionId) || stay.options?.[0];
+      return {
+        stayIndex: idx,
+        stayLocation: stay.stayLocation || stay.name || `Location ${idx + 1}`,
+        optionId: opt?.optionId || "default",
+        hotelName: opt?.name || opt?.hotelName || stay.name || "Standard Hotel",
+        hotelRating: opt?.rating ? Number(opt.rating) : (stay.rating ? Number(stay.rating) : undefined),
+        roomType: opt?.roomType || stay.roomType,
+        priceDifferenceApplied: opt?.priceDifference || 0,
+      };
+    });
+  }, [pkg, selectedHotelOptions]);
+
+  // Persist to sessionStorage for booking checkout
+  useEffect(() => {
+    if (id && selectedHotelOptionsPayload.length > 0) {
+      try {
+        sessionStorage.setItem(`selectedHotelOptions_${id}`, JSON.stringify(selectedHotelOptionsPayload));
+        if (pkg?.slug) {
+          sessionStorage.setItem(`selectedHotelOptions_${pkg.slug}`, JSON.stringify(selectedHotelOptionsPayload));
+        }
+      } catch (e) {
+        console.error("Failed to store selected hotel options", e);
+      }
+    }
+  }, [id, pkg, selectedHotelOptionsPayload]);
 
   if (loading) {
     return (
@@ -104,7 +175,11 @@ export default function CustomItineraryPage() {
               />
             )}
 
-            <PackageTabs pkg={pkg} />
+            <PackageTabs
+              pkg={pkg}
+              selectedHotelOptions={selectedHotelOptions}
+              onSelectHotelOption={handleSelectHotelOption}
+            />
             <InclusionsExclusions inclusions={pkg.inclusions || []} exclusions={pkg.exclusions || []} isInternational={pkg.isInternational} visaIncluded={pkg.visaIncluded} flightsIncluded={pkg.flightsIncluded} trainsIncluded={pkg.trainsIncluded} />
             <PackageTrustPillars destinationName={pkg?.destination?.name} destinationSlug={pkg?.destination?.slug} />
             <KnowBeforeYouGo items={pkg.knowBeforeYouGo || []} />
@@ -119,9 +194,31 @@ export default function CustomItineraryPage() {
                   {pkg.duration?.nights}N / {pkg.duration?.days}D • {pkg.hotelRating || ""}
                 </div>
                 <div className="serif" style={{ fontSize: 28, fontWeight: 700, color: "var(--gn)", marginBottom: 4 }}>
-                  ₹{(pkg.price || 0).toLocaleString("en-IN")}
+                  ₹{effectivePrice.toLocaleString("en-IN")}
                 </div>
-                <div style={{ fontSize: 12, color: "var(--ink3)", marginBottom: 16 }}>per {pkg.priceUnit || 'person'} (estimated)</div>
+                <div style={{ fontSize: 12, color: "var(--ink3)", marginBottom: hotelUpgradePerPax > 0 ? 8 : 16 }}>
+                  per {pkg.priceUnit || 'person'} (estimated)
+                </div>
+                {hotelUpgradePerPax > 0 && (
+                  <div
+                    className="syne"
+                    style={{
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 5,
+                      fontSize: 11,
+                      fontWeight: 700,
+                      background: "rgba(245,166,35,.15)",
+                      color: "var(--cu-d)",
+                      padding: "4px 12px",
+                      borderRadius: 50,
+                      marginBottom: 16,
+                    }}
+                  >
+                    <span className="material-symbols-rounded" style={{ fontSize: 13 }}>hotel</span>
+                    Includes +₹{hotelUpgradePerPax.toLocaleString()} hotel upgrade
+                  </div>
+                )}
                 <div style={{ marginBottom: 20, display: "flex", flexWrap: "wrap", gap: 6 }}>
                   {pkg.isInternational && (
                     <span className="syne" style={{

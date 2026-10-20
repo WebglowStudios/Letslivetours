@@ -8,6 +8,8 @@ import PhoneInput from "@/components/ui/PhoneInput";
 interface PriceCardProps {
   pkg: any;
   slug: string;
+  effectivePrice?: number;
+  hotelUpgradePerPax?: number;
 }
 
 const trustBadges = [
@@ -16,7 +18,7 @@ const trustBadges = [
   { icon: "support_agent", text: "24/7 Support" },
 ];
 
-export default function PriceCard({ pkg, slug }: PriceCardProps) {
+export default function PriceCard({ pkg, slug, effectivePrice, hotelUpgradePerPax = 0 }: PriceCardProps) {
   const [showCallback, setShowCallback] = useState(false);
   const [cbName, setCbName] = useState("");
   const [cbPhone, setCbPhone] = useState("");
@@ -57,7 +59,7 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
       setCbLoading(false);
     }
   };
-  const price = pkg?.price || 0;
+  const price = effectivePrice !== undefined ? effectivePrice : (pkg?.price || 0);
   const originalPrice = pkg?.originalPrice || 0;
   const discount = pkg?.discount || 0;
   const discountType = pkg?.discountType || "percent";
@@ -191,6 +193,26 @@ export default function PriceCard({ pkg, slug }: PriceCardProps) {
             >
               <span className="material-symbols-rounded" style={{ fontSize: 14 }}>local_offer</span>
               You save {formatPrice(savings)} {discountType === "percent" ? `(${discount}% off)` : ""}
+            </div>
+          )}
+          {hotelUpgradePerPax > 0 && (
+            <div
+              className="syne"
+              style={{
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 5,
+                fontSize: 11,
+                fontWeight: 700,
+                background: "rgba(245,166,35,.15)",
+                color: "var(--cu-d)",
+                padding: "4px 12px",
+                borderRadius: 50,
+                marginTop: 8,
+              }}
+            >
+              <span className="material-symbols-rounded" style={{ fontSize: 13 }}>hotel</span>
+              Includes +{formatPrice(hotelUpgradePerPax)} hotel upgrade
             </div>
           )}
         </div>

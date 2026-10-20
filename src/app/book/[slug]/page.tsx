@@ -28,6 +28,7 @@ interface PackageData {
   images: string[];
   description?: string;
   travelDates?: { startDate: string; endDate?: string };
+  stays?: any[];
   departures?: {
     _id: string;
     startDate: string;
@@ -103,6 +104,7 @@ function BookingContent() {
   const [departurePrice, setDeparturePrice] = useState<number | null>(null);
   const [specialRequests, setSpecialRequests] = useState("");
   const [travellers, setTravellers] = useState<TravellerEntry[]>([]);
+  const [selectedHotelOptions, setSelectedHotelOptions] = useState<any[]>([]);
 
   // payment option chosen by user (full or deposit) — only relevant when mode=partial
   const [chosenPayment, setChosenPayment] = useState<"full" | "deposit">("full");
@@ -151,6 +153,9 @@ function BookingContent() {
           setPrimaryIssuingCountry(parsed.primaryIssuingCountry || "");
           setCouponInput(parsed.couponInput || "");
           setChosenPayment(parsed.chosenPayment || "full");
+          if (parsed.selectedHotelOptions && Array.isArray(parsed.selectedHotelOptions)) {
+            setSelectedHotelOptions(parsed.selectedHotelOptions);
+          }
           // Optionally auto-submit if desired, but user can just review and click submit
           sessionStorage.removeItem("pendingBookingData");
         }
@@ -176,6 +181,47 @@ function BookingContent() {
             }
           } else if (fetchedPkg.travelDates?.startDate) {
             setTravelDate(fetchedPkg.travelDates.startDate.split('T')[0]);
+          }
+
+          // Restore or initialize selected hotel options
+          let initialHotels: any[] = [];
+          const queryHotels = searchParams?.get("hotels");
+          if (queryHotels) {
+            try {
+              initialHotels = JSON.parse(decodeURIComponent(queryHotels));
+            } catch (e) {
+              console.error("Failed to parse hotels from query", e);
+            }
+          }
+          if (!initialHotels || initialHotels.length === 0) {
+            try {
+              const savedPkg = sessionStorage.getItem(`selectedHotelOptions_${fetchedPkg._id}`);
+              const savedSlug = sessionStorage.getItem(`selectedHotelOptions_${slug}`);
+              if (savedPkg) {
+                initialHotels = JSON.parse(savedPkg);
+              } else if (savedSlug) {
+                initialHotels = JSON.parse(savedSlug);
+              }
+            } catch (e) {
+              console.error("Failed to parse hotels from sessionStorage", e);
+            }
+          }
+          if ((!initialHotels || initialHotels.length === 0) && fetchedPkg.stays && Array.isArray(fetchedPkg.stays)) {
+            initialHotels = fetchedPkg.stays.map((stay: any, idx: number) => {
+              const opt = stay.options?.find((o: any) => o.isDefault) || stay.options?.[0];
+              return {
+                stayIndex: idx,
+                stayLocation: stay.stayLocation || stay.name || `Location ${idx + 1}`,
+                optionId: opt?.optionId || "default",
+                hotelName: opt?.name || opt?.hotelName || stay.name || "Standard Hotel",
+                hotelRating: opt?.rating ? Number(opt.rating) : (stay.rating ? Number(stay.rating) : undefined),
+                roomType: opt?.roomType || stay.roomType,
+                priceDifferenceApplied: opt?.priceDifference || 0,
+              };
+            });
+          }
+          if (initialHotels && initialHotels.length > 0) {
+            setSelectedHotelOptions(initialHotels);
           }
           
           // fetch payment config
@@ -224,22 +270,41 @@ function BookingContent() {
     return departurePrice !== null ? departurePrice : pkg.price;
   }, [pkg, departurePrice]);
 
+  const hotelUpgradePerPax = useMemo(() => {
+    let totalDiff = 0;
+    for (const opt of selectedHotelOptions) {
+      const diff = Number(opt.priceDifferenceApplied || 0);
+      if (!isNaN(diff) && diff !== 0) {
+        totalDiff += diff;
+      }
+    }
+    return totalDiff;
+  }, [selectedHotelOptions]);
+
+  const hotelUpgradeTotal = useMemo(() => {
+    if (!pkg) return 0;
+    if (pkg.priceUnit === "group" || pkg.priceUnit === "family") {
+      return hotelUpgradePerPax;
+    }
+    return hotelUpgradePerPax * (adultsCount + childrenCount);
+  }, [pkg, hotelUpgradePerPax, adultsCount, childrenCount]);
+
   const priceBreakdown = useMemo(() => {
-    if (!pkg) return { adultTotal: 0, childTotal: 0, extraPaxTotal: 0, extraPaxCount: 0, includedPax: 0, total: 0 };
+    if (!pkg) return { adultTotal: 0, childTotal: 0, extraPaxTotal: 0, extraPaxCount: 0, includedPax: 0, hotelUpgradeTotal: 0, total: 0 };
     if (pkg.priceUnit === "group" || pkg.priceUnit === "family") {
       const includedPax = (pkg.adultCount || 0) + (pkg.childCount || 0) || 1;
       const totalPax = adultsCount + childrenCount;
       if (totalPax > includedPax && pkg.extraPersonPrice) {
         const extraPaxCount = totalPax - includedPax;
         const extraPaxTotal = extraPaxCount * pkg.extraPersonPrice;
-        return { adultTotal: basePrice, childTotal: 0, extraPaxTotal, extraPaxCount, includedPax, total: basePrice + extraPaxTotal };
+        return { adultTotal: basePrice, childTotal: 0, extraPaxTotal, extraPaxCount, includedPax, hotelUpgradeTotal, total: basePrice + extraPaxTotal + hotelUpgradeTotal };
       }
-      return { adultTotal: basePrice, childTotal: 0, extraPaxTotal: 0, extraPaxCount: 0, includedPax, total: basePrice };
+      return { adultTotal: basePrice, childTotal: 0, extraPaxTotal: 0, extraPaxCount: 0, includedPax, hotelUpgradeTotal, total: basePrice + hotelUpgradeTotal };
     }
     const adultTotal = basePrice * adultsCount;
     const childTotal = basePrice * childrenCount;
-    return { adultTotal, childTotal, extraPaxTotal: 0, extraPaxCount: 0, includedPax: 0, total: adultTotal + childTotal };
-  }, [pkg, adultsCount, childrenCount, basePrice]);
+    return { adultTotal, childTotal, extraPaxTotal: 0, extraPaxCount: 0, includedPax: 0, hotelUpgradeTotal, total: adultTotal + childTotal + hotelUpgradeTotal };
+  }, [pkg, adultsCount, childrenCount, basePrice, hotelUpgradeTotal]);
 
   // how much the user will actually pay right now
   const chargeNow = useMemo(() => {
@@ -299,7 +364,7 @@ function BookingContent() {
       const formState = {
         firstName, lastName, email, phone, panCard, travelDate, departureId,
         specialRequests, travellers, primaryPassport, primaryPassportExpiry,
-        primaryIssuingCountry, couponInput, chosenPayment
+        primaryIssuingCountry, couponInput, chosenPayment, selectedHotelOptions
       };
       sessionStorage.setItem("pendingBookingData", JSON.stringify(formState));
 
@@ -380,6 +445,7 @@ function BookingContent() {
         couponCode: appliedCoupon?.code,
         departureId: searchParams?.get("departureId") || undefined,
         enquiryId: searchParams?.get("enquiryId") || undefined,
+        selectedHotelOptions: selectedHotelOptions.length > 0 ? selectedHotelOptions : undefined,
       });
 
       if (bookingRes.status !== "success" || !bookingRes.data) {
@@ -666,6 +732,39 @@ function BookingContent() {
                 style={{ width: "100%", padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, fontSize: 14, color: "var(--ink)", outline: "none", resize: "vertical" }} />
             </div>
 
+            {/* Selected Accommodations Review */}
+            {selectedHotelOptions.length > 0 && (
+              <div style={{ background: "#fff", borderRadius: "var(--r-xl)", border: "1px solid var(--line)", padding: 28 }}>
+                <h3 className="syne" style={{ fontSize: 13, fontWeight: 700, letterSpacing: 1, textTransform: "uppercase", color: "var(--ink3)", marginBottom: 16, display: "flex", alignItems: "center", gap: 8 }}>
+                  <span className="material-symbols-rounded" style={{ fontSize: 18, color: "var(--gn2)" }}>hotel</span>Selected Accommodations ({selectedHotelOptions.length})
+                </h3>
+                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                  {selectedHotelOptions.map((opt, i) => (
+                    <div key={i} style={{ display: "flex", alignItems: "center", justifyContent: "space-between", padding: "12px 16px", background: "var(--iv)", borderRadius: 12, fontSize: 13, border: "1px solid var(--line2)" }}>
+                      <div>
+                        <div style={{ fontWeight: 700, color: "var(--ink)" }}>{opt.stayLocation}: {opt.hotelName}</div>
+                        <div style={{ fontSize: 11.5, color: "var(--ink3)", marginTop: 2, display: "flex", alignItems: "center", gap: 8 }}>
+                          {opt.hotelRating && <span style={{ color: "var(--cu)", fontWeight: 700 }}>{opt.hotelRating}★</span>}
+                          {opt.roomType && <span>Room: {opt.roomType}</span>}
+                        </div>
+                      </div>
+                      <div>
+                        {opt.priceDifferenceApplied > 0 ? (
+                          <span style={{ fontSize: 11, fontWeight: 700, color: "var(--cu-d)", background: "rgba(245,166,35,0.15)", padding: "3px 10px", borderRadius: 50, whiteSpace: "nowrap" }}>
+                            +₹{opt.priceDifferenceApplied.toLocaleString()} / pax
+                          </span>
+                        ) : (
+                          <span style={{ fontSize: 11, fontWeight: 700, color: "#059669", background: "rgba(16,185,129,0.12)", padding: "3px 10px", borderRadius: 50, whiteSpace: "nowrap" }}>
+                            Included (Base)
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Payment option selector — only shown for partial packages */}
             {paymentConfig?.mode === "partial" && (
               <div style={{ background: "#fff", borderRadius: "var(--r-xl)", border: "1px solid var(--line)", padding: 28 }}>
@@ -765,6 +864,15 @@ function BookingContent() {
                       </div>
                     )}
                   </>
+                )}
+                {hotelUpgradeTotal > 0 && (
+                  <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", fontSize: 13, color: "var(--cu-d)", marginBottom: 5, background: "rgba(245,166,35,0.08)", padding: "4px 8px", borderRadius: 6 }}>
+                    <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
+                      <span className="material-symbols-rounded" style={{ fontSize: 15 }}>hotel</span>
+                      Hotel Upgrades
+                    </span>
+                    <span style={{ fontWeight: 700 }}>+{fmt(hotelUpgradeTotal)}</span>
+                  </div>
                 )}
                 <div style={{ display: "flex", justifyContent: "space-between", paddingTop: 10, borderTop: "1px solid var(--line)" }}>
                   <span className="syne" style={{ fontSize: 11, fontWeight: 700, color: "var(--ink)" }}>Package Total</span>

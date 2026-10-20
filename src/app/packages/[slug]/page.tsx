@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
 import { api } from "@/lib/api";
@@ -30,6 +30,7 @@ export default function PackageDetailPage() {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [pkg, setPkg] = useState<any>(null);
   const [notFound, setNotFound] = useState(false);
+  const [selectedHotelOptions, setSelectedHotelOptions] = useState<Record<number, string>>({});
 
   useEffect(() => {
     if (!slug) return;
@@ -53,6 +54,76 @@ export default function PackageDetailPage() {
 
     fetchPackage();
   }, [slug]);
+
+  // Initialize selected hotels when package data loads
+  useEffect(() => {
+    if (pkg?.stays && Array.isArray(pkg.stays)) {
+      const initial: Record<number, string> = {};
+      pkg.stays.forEach((stay: any, idx: number) => {
+        if (stay.hasOptions && stay.options && stay.options.length > 0) {
+          const defaultOpt = stay.options.find((o: any) => o.isDefault) || stay.options[0];
+          initial[idx] = defaultOpt.optionId;
+        } else {
+          initial[idx] = "default";
+        }
+      });
+      setSelectedHotelOptions(initial);
+    }
+  }, [pkg]);
+
+  const handleSelectHotelOption = (stayIndex: number, optionId: string) => {
+    setSelectedHotelOptions((prev) => ({
+      ...prev,
+      [stayIndex]: optionId,
+    }));
+  };
+
+  const hotelUpgradePerPax = useMemo(() => {
+    if (!pkg?.stays) return 0;
+    let total = 0;
+    pkg.stays.forEach((stay: any, idx: number) => {
+      if (!stay.hasOptions || !stay.options) return;
+      const chosenOptionId = selectedHotelOptions[idx];
+      const opt = stay.options.find((o: any) => o.optionId === chosenOptionId) || stay.options[0];
+      if (opt?.priceDifference) {
+        total += Number(opt.priceDifference);
+      }
+    });
+    return total;
+  }, [pkg, selectedHotelOptions]);
+
+  const effectivePrice = (pkg?.price || 0) + hotelUpgradePerPax;
+
+  const selectedHotelOptionsPayload = useMemo(() => {
+    if (!pkg?.stays) return [];
+    return pkg.stays.map((stay: any, idx: number) => {
+      const chosenOptionId = selectedHotelOptions[idx];
+      const opt = stay.options?.find((o: any) => o.optionId === chosenOptionId) || stay.options?.[0];
+      return {
+        stayIndex: idx,
+        stayLocation: stay.stayLocation || stay.name || `Location ${idx + 1}`,
+        optionId: opt?.optionId || "default",
+        hotelName: opt?.name || opt?.hotelName || stay.name || "Standard Hotel",
+        hotelRating: opt?.rating ? Number(opt.rating) : (stay.rating ? Number(stay.rating) : undefined),
+        roomType: opt?.roomType || stay.roomType,
+        priceDifferenceApplied: opt?.priceDifference || 0,
+      };
+    });
+  }, [pkg, selectedHotelOptions]);
+
+  // Persist to sessionStorage for seamless transfer into booking checkout
+  useEffect(() => {
+    if (pkg?._id && selectedHotelOptionsPayload.length > 0) {
+      try {
+        sessionStorage.setItem(`selectedHotelOptions_${pkg._id}`, JSON.stringify(selectedHotelOptionsPayload));
+        if (slug) {
+          sessionStorage.setItem(`selectedHotelOptions_${slug}`, JSON.stringify(selectedHotelOptionsPayload));
+        }
+      } catch (e) {
+        console.error("Failed to store selected hotel options", e);
+      }
+    }
+  }, [pkg, slug, selectedHotelOptionsPayload]);
 
   /* ─── Loading state ─── */
   if (loading) {
@@ -166,7 +237,11 @@ export default function PackageDetailPage() {
               />
             )}
             
-            <PackageTabs pkg={pkg} />
+            <PackageTabs
+              pkg={pkg}
+              selectedHotelOptions={selectedHotelOptions}
+              onSelectHotelOption={handleSelectHotelOption}
+            />
             <InclusionsExclusions inclusions={pkg?.inclusions || []} exclusions={pkg?.exclusions || []} isInternational={pkg?.isInternational} visaIncluded={pkg?.visaIncluded} flightsIncluded={pkg?.flightsIncluded} trainsIncluded={pkg?.trainsIncluded} />
             <PackageTrustPillars destinationName={destinationName} destinationSlug={destinationSlug} />
             <KnowBeforeYouGo items={pkg?.knowBeforeYouGo || []} />
@@ -176,7 +251,12 @@ export default function PackageDetailPage() {
           {/* Right Column (Sticky) */}
           {!pkg?.isGroupTour && (
             <div style={{ position: "sticky", top: 84 }}>
-              <PriceCard pkg={pkg} slug={slug} />
+              <PriceCard
+                pkg={pkg}
+                slug={slug}
+                effectivePrice={effectivePrice}
+                hotelUpgradePerPax={hotelUpgradePerPax}
+              />
               <EnquiryForm packageName={packageName} packageId={pkg?._id} destinationName={destinationName} isGroupTour={pkg?.isGroupTour} departures={pkg?.departures} />
             </div>
           )}
@@ -194,7 +274,7 @@ export default function PackageDetailPage() {
         <div>
           <div style={{ fontSize: 11, color: "rgba(255,255,255,.7)", fontFamily: "var(--font-jakarta),'Plus Jakarta Sans',sans-serif", fontWeight: 600, textTransform: "uppercase", letterSpacing: 1 }}>Per Adult</div>
           <div style={{ fontSize: 20, fontWeight: 700, color: "#fff", fontFamily: "var(--font-sora),'Sora',sans-serif", lineHeight: 1 }}>
-            {pkg?.price ? "₹" + pkg.price.toLocaleString("en-IN") : "Get Price"}
+            {effectivePrice ? "₹" + effectivePrice.toLocaleString("en-IN") : "Get Price"}
           </div>
         </div>
         <button
