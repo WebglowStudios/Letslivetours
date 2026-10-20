@@ -178,6 +178,8 @@ export default function PackageDetailPage() {
           padding: "88px 24px 60px",
           boxSizing: "border-box",
           width: "100%",
+          minWidth: 0,
+          overflowX: "hidden",
         }}
       >
         {/* Breadcrumb */}
@@ -221,10 +223,13 @@ export default function PackageDetailPage() {
             gridTemplateColumns: pkg?.isGroupTour ? "minmax(0, 1fr)" : "minmax(0, 1fr) 380px",
             gap: 32,
             alignItems: "start",
+            minWidth: 0,
+            maxWidth: "100%",
+            width: "100%",
           }}
         >
           {/* Left Column */}
-          <div>
+          <div style={{ minWidth: 0, maxWidth: "100%", width: "100%", overflowX: "hidden" }}>
             <PackageInfo pkg={pkg} />
             
             {pkg?.isGroupTour && (
@@ -308,6 +313,11 @@ export default function PackageDetailPage() {
           display: none;
         }
         @media (max-width: 900px) {
+          .pkg-page-wrap {
+            padding-left: 16px !important;
+            padding-right: 16px !important;
+            overflow-x: hidden !important;
+          }
           .mobile-cta-bar {
             display: flex;
             align-items: center;
@@ -324,6 +334,15 @@ export default function PackageDetailPage() {
           }
           .content-grid {
             grid-template-columns: minmax(0, 1fr) !important;
+            min-width: 0 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+          }
+          .content-grid > div {
+            min-width: 0 !important;
+            max-width: 100% !important;
+            width: 100% !important;
+            overflow-x: hidden !important;
           }
         }
         @media (max-width: 900px) {

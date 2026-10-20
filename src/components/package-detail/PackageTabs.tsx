@@ -97,6 +97,9 @@ function AccordionItem({
         overflow: "hidden",
         transition: "var(--tr)",
         boxShadow: isOpen ? "var(--sh)" : "none",
+        minWidth: 0,
+        maxWidth: "100%",
+        boxSizing: "border-box",
       }}
     >
       <button
@@ -107,14 +110,16 @@ function AccordionItem({
           justifyContent: "space-between",
           padding: "16px 18px",
           cursor: "pointer",
-          gap: 14,
+          gap: 12,
           width: "100%",
           textAlign: "left",
           background: "none",
           border: "none",
+          minWidth: 0,
+          boxSizing: "border-box",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
           <span
             className="syne"
             style={{
@@ -140,13 +145,19 @@ function AccordionItem({
               lineHeight: 1.4,
               display: "flex",
               alignItems: "center",
-              gap: 6
+              gap: 6,
+              flex: 1,
+              minWidth: 0,
+              wordBreak: "break-word",
+              overflowWrap: "anywhere",
             }}
           >
             {item.badgeType === 'flight' && (
-              <span className="material-symbols-rounded" style={{ fontSize: 18, color: "var(--gn3)" }}>flight_takeoff</span>
+              <span className="material-symbols-rounded" style={{ fontSize: 18, color: "var(--gn3)", flexShrink: 0 }}>flight_takeoff</span>
             )}
-            {item.title}
+            <span style={{ flex: 1, minWidth: 0, wordBreak: "break-word", overflowWrap: "anywhere" }}>
+              {item.title}
+            </span>
           </span>
         </div>
         <div
@@ -187,6 +198,9 @@ function AccordionItem({
               color: "var(--ink2)",
               borderTop: "1px solid var(--line2)",
               paddingTop: 14,
+              wordBreak: "break-word",
+              overflowWrap: "anywhere",
+              minWidth: 0,
             }}
             onClick={handleBodyClick}
             dangerouslySetInnerHTML={{ __html: item.content }}
@@ -199,12 +213,12 @@ function AccordionItem({
 
 /* ── Shared: styled bullet list ── */
 function buildBulletList(items: string[], accentColor = "var(--cu)"): string {
-  return `<ul style="display:flex;flex-direction:column;gap:8px;margin:10px 0 4px">${items
+  return `<ul style="display:flex;flex-direction:column;gap:8px;margin:10px 0 4px;padding:0;list-style:none">${items
     .map(
       (item) =>
-        `<li style="display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:var(--ink2);line-height:1.65">
+        `<li style="display:flex;align-items:flex-start;gap:10px;font-size:13.5px;color:var(--ink2);line-height:1.65;min-width:0">
           <span style="width:7px;height:7px;border-radius:50%;background:${accentColor};flex-shrink:0;margin-top:6px"></span>
-          <span>${item}</span>
+          <span style="flex:1;min-width:0;word-break:break-word;overflow-wrap:anywhere">${item}</span>
         </li>`
     )
     .join("")}</ul>`;
@@ -229,11 +243,11 @@ function buildActivitiesList(
       const img = rawImages.filter(Boolean)[0] || "";
 
       // Shared card shell — no image (images are in the day slider)
-      return `<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 2px">
+      return `<div style="display:flex;align-items:flex-start;gap:8px;padding:6px 2px;min-width:0">
         <span style="width:7px;height:7px;border-radius:50%;background:${accentColor};flex-shrink:0;margin-top:5px"></span>
-        <div>
-          <div style="font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.4">${title}</div>
-          ${desc ? `<p style="font-size:12.5px;color:var(--ink3);margin-top:3px;line-height:1.5">${desc}</p>` : ""}
+        <div style="flex:1;min-width:0">
+          <div style="font-size:13.5px;font-weight:600;color:var(--ink);line-height:1.4;word-break:break-word;overflow-wrap:anywhere">${title}</div>
+          ${desc ? `<p style="font-size:12.5px;color:var(--ink3);margin-top:3px;line-height:1.5;word-break:break-word;overflow-wrap:anywhere">${desc}</p>` : ""}
         </div>
       </div>`;
     })
@@ -405,17 +419,17 @@ function buildFlightContent(flight: any, hideHeader: boolean = false): string {
   
   if (flight.class) html += `<p style="font-size:12px;color:var(--ink4)">${isTrain ? "Class" : "Class"}: ${flight.class}</p>`;
 
-  html += `<div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;background:var(--iv);border-radius:10px;padding:12px;border:1px solid var(--line)">`;
-  html += `<div><p style="font-size:11px;color:var(--ink4);text-transform:uppercase;letter-spacing:1px;font-weight:600">Departure</p><p style="font-size:14px;font-weight:700;color:var(--ink)">${flight.departure}</p><p style="font-size:12px;color:var(--ink3)">${flight.from}</p></div>`;
+  html += `<div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;background:var(--iv);border-radius:10px;padding:12px;border:1px solid var(--line);flex-wrap:wrap;gap:10px;min-width:0">`;
+  html += `<div style="flex:1;min-width:110px"><p style="font-size:11px;color:var(--ink4);text-transform:uppercase;letter-spacing:1px;font-weight:600">Departure</p><p style="font-size:14px;font-weight:700;color:var(--ink);word-break:break-word">${flight.departure}</p><p style="font-size:12px;color:var(--ink3);word-break:break-word">${flight.from}</p></div>`;
   
-  html += `<div style="text-align:right"><p style="font-size:11px;color:var(--ink4);text-transform:uppercase;letter-spacing:1px;font-weight:600">Arrival</p><p style="font-size:14px;font-weight:700;color:var(--ink)">${flight.arrival}</p><p style="font-size:12px;color:var(--ink3)">${flight.to}</p></div>`;
+  html += `<div style="text-align:right;flex:1;min-width:110px"><p style="font-size:11px;color:var(--ink4);text-transform:uppercase;letter-spacing:1px;font-weight:600">Arrival</p><p style="font-size:14px;font-weight:700;color:var(--ink);word-break:break-word">${flight.arrival}</p><p style="font-size:12px;color:var(--ink3);word-break:break-word">${flight.to}</p></div>`;
   html += `</div>`;
 
   if (flight.pnr) {
-    html += `<div style="display:inline-flex;align-items:center;gap:6px;background:var(--cu-gl);color:var(--cu-d);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600;margin-top:12px;margin-bottom:0">PNR: ${flight.pnr}</div>`;
+    html += `<div style="display:inline-flex;align-items:center;gap:6px;background:var(--cu-gl);color:var(--cu-d);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600;margin-top:12px;margin-bottom:0;max-width:100%;word-break:break-word">PNR: ${flight.pnr}</div>`;
   }
   if (flight.notes) {
-    html += `<p style="font-size:13px;color:var(--ink2);margin-top:8px">${flight.notes}</p>`;
+    html += `<p style="font-size:13px;color:var(--ink2);margin-top:8px;word-break:break-word">${flight.notes}</p>`;
   }
   html += `</div></div>`;
   return html;
@@ -569,7 +583,7 @@ function buildLegRouteHtml(leg: { from?: string; to?: string; stops?: string[]; 
       ).join("");
     }
 
-    html += `<div style="display:flex;gap:12px;align-items:stretch">`;
+    html += `<div style="display:flex;gap:12px;align-items:stretch;min-width:0;max-width:100%">`;
     // Left spine
     html += `<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:12px">
       <div style="width:12px;height:12px;border-radius:50%;border:2.5px solid var(--cu);background:#fff;flex-shrink:0"></div>
@@ -577,23 +591,25 @@ function buildLegRouteHtml(leg: { from?: string; to?: string; stops?: string[]; 
       <div style="width:12px;height:12px;border-radius:50%;background:var(--cu);flex-shrink:0"></div>
     </div>`;
     // Right content
-    html += `<div style="flex:1;display:flex;flex-direction:column;gap:4px">`;
+    html += `<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:4px">`;
     if (leg.from) {
-      html += `<div style="background:#fffbf0;border:1px solid #fde68a;border-radius:8px;padding:8px 12px">
+      html += `<div style="background:#fffbf0;border:1px solid #fde68a;border-radius:8px;padding:8px 12px;min-width:0">
         <div style="font-size:9px;font-weight:700;color:var(--cu);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">From</div>
-        <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--ink)">
-          <span class="material-symbols-rounded" style="font-size:15px;color:var(--ink3)">location_on</span>${leg.from}
+        <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--ink);min-width:0;word-break:break-word;overflow-wrap:anywhere">
+          <span class="material-symbols-rounded" style="font-size:15px;color:var(--ink3);flex-shrink:0">location_on</span>
+          <span style="flex:1;min-width:0;word-break:break-word;overflow-wrap:anywhere">${leg.from}</span>
         </div>
       </div>`;
     }
     if (stopsHtml) {
-      html += `<div style="padding:2px 10px">${stopsHtml}</div>`;
+      html += `<div style="padding:2px 10px;min-width:0;word-break:break-word;overflow-wrap:anywhere">${stopsHtml}</div>`;
     }
     if (leg.to) {
-      html += `<div style="background:#fffbf0;border:1px solid #fde68a;border-radius:8px;padding:8px 12px">
+      html += `<div style="background:#fffbf0;border:1px solid #fde68a;border-radius:8px;padding:8px 12px;min-width:0">
         <div style="font-size:9px;font-weight:700;color:var(--cu);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px">To</div>
-        <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--ink)">
-          <span class="material-symbols-rounded" style="font-size:15px;color:var(--ink3)">location_on</span>${leg.to}
+        <div style="display:flex;align-items:center;gap:6px;font-size:13px;font-weight:500;color:var(--ink);min-width:0;word-break:break-word;overflow-wrap:anywhere">
+          <span class="material-symbols-rounded" style="font-size:15px;color:var(--ink3);flex-shrink:0">location_on</span>
+          <span style="flex:1;min-width:0;word-break:break-word;overflow-wrap:anywhere">${leg.to}</span>
         </div>
       </div>`;
     }
@@ -653,29 +669,31 @@ function buildTransferContent(transfer: any): string {
         ).join("");
       }
 
-      html += `<div style="display:flex;gap:14px;align-items:stretch">`;
+      html += `<div style="display:flex;gap:14px;align-items:stretch;min-width:0;max-width:100%">`;
       html += `<div style="display:flex;flex-direction:column;align-items:center;flex-shrink:0;width:14px">
         <div style="width:14px;height:14px;border-radius:50%;border:2.5px solid var(--cu);background:#fff;flex-shrink:0"></div>
         <div style="flex:1;width:0;border-left:2px dotted var(--cu);margin:4px 0;min-height:40px"></div>
         <div style="width:14px;height:14px;border-radius:50%;background:var(--cu);flex-shrink:0"></div>
       </div>`;
-      html += `<div style="flex:1;display:flex;flex-direction:column;gap:8px">`;
+      html += `<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px">`;
       if (transfer.from) {
-        html += `<div style="background:#fffbf0;border:1px solid #fde68a;border-radius:10px;padding:10px 14px">
+        html += `<div style="background:#fffbf0;border:1px solid #fde68a;border-radius:10px;padding:10px 14px;min-width:0">
           <div style="font-size:10px;font-weight:700;color:var(--cu);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">From</div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--ink)">
-            <span class="material-symbols-rounded" style="font-size:18px;color:var(--ink3)">location_on</span>${transfer.from}
+          <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--ink);min-width:0;word-break:break-word;overflow-wrap:anywhere">
+            <span class="material-symbols-rounded" style="font-size:18px;color:var(--ink3);flex-shrink:0">location_on</span>
+            <span style="flex:1;min-width:0;word-break:break-word;overflow-wrap:anywhere">${transfer.from}</span>
           </div>
         </div>`;
       }
       if (stopsHtml) {
-        html += `<div style="padding:2px 12px">${stopsHtml}</div>`;
+        html += `<div style="padding:2px 12px;min-width:0;word-break:break-word;overflow-wrap:anywhere">${stopsHtml}</div>`;
       }
       if (transfer.to) {
-        html += `<div style="background:#fffbf0;border:1px solid #fde68a;border-radius:10px;padding:10px 14px">
+        html += `<div style="background:#fffbf0;border:1px solid #fde68a;border-radius:10px;padding:10px 14px;min-width:0">
           <div style="font-size:10px;font-weight:700;color:var(--cu);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px">To</div>
-          <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--ink)">
-            <span class="material-symbols-rounded" style="font-size:18px;color:var(--ink3)">location_on</span>${transfer.to}
+          <div style="display:flex;align-items:center;gap:8px;font-size:14px;font-weight:500;color:var(--ink);min-width:0;word-break:break-word;overflow-wrap:anywhere">
+            <span class="material-symbols-rounded" style="font-size:18px;color:var(--ink3);flex-shrink:0">location_on</span>
+            <span style="flex:1;min-width:0;word-break:break-word;overflow-wrap:anywhere">${transfer.to}</span>
           </div>
         </div>`;
       }
@@ -894,7 +912,7 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
   }
 
   return (
-    <div style={{ marginBottom: 28 }}>
+    <div style={{ marginBottom: 28, maxWidth: "100%", minWidth: 0, width: "100%", boxSizing: "border-box" }}>
       {/* Tab Navigation */}
       {availableTabs.length > 1 && (
         <div
@@ -902,8 +920,12 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
             display: "flex",
             gap: 0,
             overflowX: "auto",
+            WebkitOverflowScrolling: "touch",
             borderBottom: "2px solid var(--line)",
             marginBottom: 0,
+            maxWidth: "100%",
+            minWidth: 0,
+            scrollbarWidth: "none",
           }}
         >
           {availableTabs.map((tab) => (
@@ -925,6 +947,7 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
                 borderTop: "none",
                 borderLeft: "none",
                 borderRight: "none",
+                flexShrink: 0,
               }}
             >
               {tab.label}
@@ -934,7 +957,7 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
       )}
 
       {/* Tab Panels */}
-      <div style={{ paddingTop: 20 }}>
+      <div style={{ paddingTop: 20, maxWidth: "100%", minWidth: 0 }}>
         {/* Itinerary Hero (only for itinerary tab) */}
         {activeTab === "itinerary" && itinImages.length > 0 && (
           <div
@@ -1088,6 +1111,9 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
                         overflow: "hidden",
                         transition: "var(--tr)",
                         boxShadow: isOpen ? "var(--sh)" : "none",
+                        minWidth: 0,
+                        maxWidth: "100%",
+                        boxSizing: "border-box",
                       }}
                     >
                       {/* Stay Accordion Header */}
@@ -1099,14 +1125,16 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
                           justifyContent: "space-between",
                           padding: "16px 18px",
                           cursor: "pointer",
-                          gap: 14,
+                          gap: 12,
                           width: "100%",
                           textAlign: "left",
                           background: "none",
                           border: "none",
+                          minWidth: 0,
+                          boxSizing: "border-box",
                         }}
                       >
-                        <div style={{ display: "flex", alignItems: "center", gap: 12, flexWrap: "wrap", flex: 1 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", flex: 1, minWidth: 0 }}>
                           <span
                             className="syne"
                             style={{
@@ -1131,12 +1159,15 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
                               fontWeight: 600,
                               color: isOpen ? "var(--gn)" : "var(--ink)",
                               lineHeight: 1.4,
+                              minWidth: 0,
+                              wordBreak: "break-word",
+                              overflowWrap: "anywhere",
                             }}
                           >
                             {stay.name || stay.stayLocation || `Location ${idx + 1}`}
                           </span>
                           {stay.nights && (
-                            <span style={{ fontSize: 12, color: "var(--ink4)" }}>
+                            <span style={{ fontSize: 12, color: "var(--ink4)", flexShrink: 0 }}>
                               • {stay.nights} {stay.nights > 1 ? "Nights" : "Night"}
                             </span>
                           )}
@@ -1154,11 +1185,13 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
                                 display: "inline-flex",
                                 alignItems: "center",
                                 gap: 4,
+                                maxWidth: "100%",
+                                wordBreak: "break-word",
                               }}
                             >
-                              <span className="material-symbols-rounded" style={{ fontSize: 13 }}>hotel</span>
-                              {chosenOpt.name || chosenOpt.hotelName}
-                              {chosenOpt.priceDifference > 0 ? ` (+₹${chosenOpt.priceDifference.toLocaleString()})` : " (Included)"}
+                              <span className="material-symbols-rounded" style={{ fontSize: 13, flexShrink: 0 }}>hotel</span>
+                              <span>{chosenOpt.name || chosenOpt.hotelName}</span>
+                              <span style={{ whiteSpace: "nowrap" }}>{chosenOpt.priceDifference > 0 ? ` (+₹${chosenOpt.priceDifference.toLocaleString()})` : " (Included)"}</span>
                             </span>
                           )}
                         </div>
