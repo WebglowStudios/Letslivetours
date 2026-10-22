@@ -393,17 +393,21 @@ export function generateBookingPdf(booking: BookingData): void {
       doc.text(`${i + 1}.`, M, y);
       doc.setTextColor(...C.ink);
       doc.setFont("helvetica", "normal");
-      const infoText = `${s(t.name || "—")}${dobStr}${ageStr}${phoneStr}`;
-      doc.text(infoText, M + 8, y);
 
-      // Type badge
+      // Wrap infoText to content width minus index prefix (8) and badge space (20)
+      const infoText = `${s(t.name || "—")}${dobStr}${ageStr}${phoneStr}`;
+      const maxInfoW = CW - 8 - 22;
+      const infoLines = doc.splitTextToSize(infoText, maxInfoW);
+      doc.text(infoLines, M + 8, y);
+
+      // Type badge — fixed right-column position, aligned to first line
       doc.setFont("helvetica", "bold");
       doc.setFontSize(7);
       doc.setTextColor(...C.gray);
-      doc.text(`[${typeLabel}]`, M + 8 + doc.getTextWidth(infoText) + 4, y);
+      doc.text(`[${typeLabel}]`, M + CW - doc.getTextWidth(`[${typeLabel}]`), y);
       doc.setFontSize(8.5);
 
-      y += 6;
+      y += infoLines.length * 5.5 + 1;
     }
     y += 6;
   }
