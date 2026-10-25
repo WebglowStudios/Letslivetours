@@ -27,7 +27,13 @@ export function isDestInternational(d: { country?: string; region?: string; isIn
   if (typeof d.isInternational === "boolean") return d.isInternational;
   const c = (d.country || "").toLowerCase().trim();
   const r = (d.region || "").toLowerCase().trim();
-  if (c === "india" || r.includes("india") || r.includes("domestic")) return false;
+  // Check if country is India explicitly (exact match only)
+  if (c === "india") return false;
+  // Check region — but only match "india" as a standalone word, NOT "indian ocean"
+  // e.g. "North India", "South India", "West India" → domestic
+  // but "Indian Ocean", "South Asia / Indian Ocean" → NOT matched
+  const regionIsIndia = /\bindia\b/.test(r) || r === "domestic";
+  if (regionIsIndia) return false;
   return Boolean(c || r);
 }
 
