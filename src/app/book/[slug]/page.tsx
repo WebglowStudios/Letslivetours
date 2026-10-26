@@ -7,6 +7,7 @@ import { useAuth } from "@/hooks/useAuth";
 import { openRazorpayCheckout } from "@/lib/razorpay";
 import Navbar from "@/components/Navbar";
 import PhoneInput from "@/components/ui/PhoneInput";
+import CountrySelect from "@/components/ui/CountrySelect";
 
 interface PackageData {
   _id: string;
@@ -80,9 +81,9 @@ function BookingContent() {
   const { user, loading: authLoading } = useAuth();
   const slug = params.slug as string;
 
-  // Gatekeeper: redirect to login if not authenticated and not continuing as guest
+  // Gatekeeper: redirect to login if not authenticated and not continuing as guest (or via direct proposal enquiry link)
   useEffect(() => {
-    if (!authLoading && !user && searchParams?.get("guest") !== "true") {
+    if (!authLoading && !user && searchParams?.get("guest") !== "true" && !searchParams?.get("enquiryId")) {
       const currentQuery = searchParams?.toString();
       const redirectUrl = `/book/${slug}${currentQuery ? `?${currentQuery}` : ""}`;
       router.push(`/login?redirect=${encodeURIComponent(redirectUrl)}`);
@@ -121,7 +122,7 @@ function BookingContent() {
   // Primary Traveller Passport
   const [primaryPassport, setPrimaryPassport] = useState("");
   const [primaryPassportExpiry, setPrimaryPassportExpiry] = useState("");
-  const [primaryIssuingCountry, setPrimaryIssuingCountry] = useState("");
+  const [primaryIssuingCountry, setPrimaryIssuingCountry] = useState("India");
 
   useEffect(() => {
     if (user) {
@@ -150,7 +151,7 @@ function BookingContent() {
           setTravellers(parsed.travellers || []);
           setPrimaryPassport(parsed.primaryPassport || "");
           setPrimaryPassportExpiry(parsed.primaryPassportExpiry || "");
-          setPrimaryIssuingCountry(parsed.primaryIssuingCountry || "");
+          setPrimaryIssuingCountry(parsed.primaryIssuingCountry || "India");
           setCouponInput(parsed.couponInput || "");
           setChosenPayment(parsed.chosenPayment || "full");
           if (parsed.selectedHotelOptions && Array.isArray(parsed.selectedHotelOptions)) {
@@ -251,7 +252,7 @@ function BookingContent() {
   }, [success, router]);
 
   const addTraveller = (type: "adult" | "child" | "infant") =>
-    setTravellers([...travellers, { name: "", age: "", dob: "", phone: "", type }]);
+    setTravellers([...travellers, { name: "", age: "", dob: "", phone: "", type, issuingCountry: "India" }]);
 
   const removeTraveller = (i: number) =>
     setTravellers(travellers.filter((_, idx) => idx !== i));
@@ -653,7 +654,11 @@ function BookingContent() {
                     </div>
                     <div className="form-field">
                       <label className="syne" style={{ display: "block", fontSize: 9.5, fontWeight: 700, letterSpacing: 1.5, textTransform: "uppercase", color: "var(--ink4)", marginBottom: 6 }}>Issuing Country *</label>
-                      <input type="text" required={pkg.isInternational} value={primaryIssuingCountry} onChange={(e) => setPrimaryIssuingCountry(e.target.value)} placeholder="India" style={{ width: "100%", padding: "13px 16px", background: "var(--iv)", border: "1.5px solid var(--line2)", borderRadius: 12, fontSize: 14, color: "var(--ink)", outline: "none", boxSizing: "border-box" }} />
+                      <CountrySelect
+                        value={primaryIssuingCountry}
+                        onChange={(val) => setPrimaryIssuingCountry(val)}
+                        required={pkg.isInternational}
+                      />
                     </div>
                   </>
                 )}
@@ -766,7 +771,12 @@ function BookingContent() {
                             <input type="date" value={t.passportExpiry || ""} onChange={(e) => updateTraveller(i, "passportExpiry", e.target.value)} style={{ width: "100%", padding: "8px 12px", background: "#fff", border: "1px solid var(--line2)", borderRadius: 8, fontSize: 12, outline: "none", color: t.passportExpiry ? "inherit" : "transparent", boxSizing: "border-box" }} />
                             {!t.passportExpiry && <span style={{ position: "absolute", left: 12, top: 9, fontSize: 12, color: "#999", pointerEvents: "none" }}>Expiry *</span>}
                           </div>
-                          <input type="text" placeholder="Country *" value={t.issuingCountry || ""} onChange={(e) => updateTraveller(i, "issuingCountry", e.target.value)} style={{ padding: "8px 12px", background: "#fff", border: "1px solid var(--line2)", borderRadius: 8, fontSize: 12, outline: "none", boxSizing: "border-box", width: "100%" }} />
+                          <CountrySelect
+                            value={t.issuingCountry || "India"}
+                            onChange={(val) => updateTraveller(i, "issuingCountry", val)}
+                            compact
+                            required={pkg.isInternational}
+                          />
                         </div>
                       )}
                     </div>

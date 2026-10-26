@@ -11,12 +11,14 @@ import { useAuth } from "@/hooks/useAuth";
 interface BookingDetail {
   _id: string;
   bookingId: string;
+  destination?: { _id?: string; name?: string; slug?: string } | string;
   package: {
     _id: string;
     name: string;
     slug?: string;
     isCustom?: boolean;
-    destination?: { name: string };
+    destination?: { _id?: string; name?: string; slug?: string } | string;
+    customDestinationText?: string;
     duration?: number | { nights?: number; days?: number };
     images?: string[];
   };
@@ -521,7 +523,11 @@ export default function BookingDetailPage() {
             <div>
               <p style={{ fontSize: 12, color: "var(--ink3)" }}>Destination</p>
               <p className="syne" style={{ fontSize: 15, fontWeight: 600, color: "var(--ink)", marginTop: 4 }}>
-                {booking.package?.destination?.name || "—"}
+                {(typeof booking.destination === "object" ? booking.destination?.name : null) ||
+                  (typeof booking.package?.destination === "object" ? booking.package?.destination?.name : null) ||
+                  booking.package?.customDestinationText ||
+                  (typeof booking.destination === "string" ? booking.destination : null) ||
+                  "—"}
               </p>
             </div>
             <div>

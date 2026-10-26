@@ -7,7 +7,13 @@ import Link from "next/link";
 
 interface Booking {
   _id: string;
-  package: { name: string; destination?: { name: string }; images?: string[] };
+  destination?: { name?: string } | string;
+  package: { 
+    name: string; 
+    destination?: { name?: string } | string; 
+    customDestinationText?: string;
+    images?: string[];
+  };
   travelDate: string;
   status: string;
   totalAmount: number;
@@ -188,7 +194,10 @@ export default function DashboardOverview() {
                     {booking.package?.name || "Package"}
                   </p>
                   <p style={{ fontSize: 13, color: "var(--ink3)", marginTop: 4 }}>
-                    {booking.package?.destination?.name || "—"} •{" "}
+                    {(typeof booking.destination === "object" ? booking.destination?.name : null) ||
+                      (typeof booking.package?.destination === "object" ? booking.package?.destination?.name : null) ||
+                      booking.package?.customDestinationText ||
+                      "—"} •{" "}
                     {new Date(booking.travelDate).toLocaleDateString("en-US", {
                       month: "short",
                       day: "numeric",

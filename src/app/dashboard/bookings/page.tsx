@@ -6,10 +6,12 @@ import Link from "next/link";
 
 interface Booking {
   _id: string;
+  destination?: { name?: string } | string;
   package: {
     _id: string;
     name: string;
-    destination?: { name: string };
+    destination?: { name: string } | string;
+    customDestinationText?: string;
     images?: string[];
     duration?: number;
   };
@@ -221,7 +223,10 @@ export default function MyBookingsPage() {
                   {booking.package?.name || "Package"}
                 </p>
                 <p style={{ fontSize: 13, color: "var(--ink3)", marginTop: 4 }}>
-                  {booking.package?.destination?.name || "—"} •{" "}
+                  {(typeof booking.destination === "object" ? booking.destination?.name : null) ||
+                    (typeof booking.package?.destination === "object" ? (booking.package?.destination as any)?.name : null) ||
+                    booking.package?.customDestinationText ||
+                    "—"} •{" "}
                   {new Date(booking.travelDate).toLocaleDateString("en-US", {
                     month: "short",
                     day: "numeric",
