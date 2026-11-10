@@ -1485,55 +1485,55 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
                                 paddingTop: 14,
                               }}
                             >
-                              {/* Check-in & Check-out Info Banner in Expanded Accordion */}
-                              <div
-                                style={{
-                                  display: "grid",
-                                  gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
-                                  gap: 10,
-                                  background: "linear-gradient(135deg, rgba(41,196,216,0.05) 0%, rgba(245,166,35,0.06) 100%)",
-                                  border: "1px solid rgba(41,196,216,0.18)",
-                                  borderRadius: 10,
-                                  padding: "10px 14px",
-                                  marginBottom: 14,
-                                }}
-                              >
-                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                  <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(16,185,129,0.12)", color: "#059669", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                                    <span className="material-symbols-rounded" style={{ fontSize: 16 }}>login</span>
-                                  </div>
-                                  <div>
-                                    <div style={{ fontSize: 9.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: "var(--ink4)" }}>Check-in Date</div>
-                                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--ink)", marginTop: 1 }}>{dateInfo.checkInStr || (dateInfo.hasDates ? dateInfo.checkInShort : `Day ${dateInfo.startDay}`)}</div>
-                                    <div style={{ fontSize: 10.5, color: "var(--ink3)" }}>{stay.checkInTime ? `Time: ${stay.checkInTime}` : "Standard: 2:00 PM"}</div>
-                                  </div>
-                                </div>
-
-                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                  <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(239,68,68,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                                    <span className="material-symbols-rounded" style={{ fontSize: 16 }}>logout</span>
-                                  </div>
-                                  <div>
-                                    <div style={{ fontSize: 9.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: "var(--ink4)" }}>Check-out Date</div>
-                                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--ink)", marginTop: 1 }}>{dateInfo.checkOutStr || (dateInfo.hasDates ? dateInfo.checkOutShort : `Day ${dateInfo.endDay}`)}</div>
-                                    <div style={{ fontSize: 10.5, color: "var(--ink3)" }}>{stay.checkOutTime ? `Time: ${stay.checkOutTime}` : "Standard: 11:00 AM"}</div>
-                                  </div>
-                                </div>
-
-                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                  <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(79,70,229,0.1)", color: "#4f46e5", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                                    <span className="material-symbols-rounded" style={{ fontSize: 16 }}>bed</span>
-                                  </div>
-                                  <div>
-                                    <div style={{ fontSize: 9.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: "var(--ink4)" }}>Duration of Stay</div>
-                                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--ink)", marginTop: 1 }}>{dateInfo.nights} {dateInfo.nights > 1 ? "Nights" : "Night"}</div>
-                                    <div style={{ fontSize: 10.5, color: "var(--ink3)" }}>{stay.roomType || "Standard Room"}</div>
-                                  </div>
-                                </div>
-                              </div>
-
                               {hasOptions ? (
                                 <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                                  {/* Check-in & Check-out Date Banner for Options */}
+                                  <div
+                                    style={{
+                                      display: "grid",
+                                      gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+                                      gap: 10,
+                                      background: "linear-gradient(135deg, rgba(41,196,216,0.05) 0%, rgba(245,166,35,0.06) 100%)",
+                                      border: "1px solid rgba(41,196,216,0.18)",
+                                      borderRadius: 10,
+                                      padding: "10px 14px",
+                                      marginBottom: 6,
+                                    }}
+                                  >
+                                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                      <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(16,185,129,0.12)", color: "#059669", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                        <span className="material-symbols-rounded" style={{ fontSize: 16 }}>login</span>
+                                      </div>
+                                      <div>
+                                        <div style={{ fontSize: 9.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: "var(--ink4)" }}>Check-in Date</div>
+                                        <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--ink)", marginTop: 1 }}>{dateInfo.checkInStr || (dateInfo.hasDates ? dateInfo.checkInShort : `Day ${dateInfo.startDay}`)}</div>
+                                        <div style={{ fontSize: 10.5, color: "var(--ink3)" }}>{stay.checkInTime ? `Time: ${stay.checkInTime}` : "Standard: 2:00 PM"}</div>
+                                      </div>
+                                    </div>
+
+                                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                      <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(239,68,68,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                        <span className="material-symbols-rounded" style={{ fontSize: 16 }}>logout</span>
+                                      </div>
+                                      <div>
+                                        <div style={{ fontSize: 9.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: "var(--ink4)" }}>Check-out Date</div>
+                                        <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--ink)", marginTop: 1 }}>{dateInfo.checkOutStr || (dateInfo.hasDates ? dateInfo.checkOutShort : `Day ${dateInfo.endDay}`)}</div>
+                                        <div style={{ fontSize: 10.5, color: "var(--ink3)" }}>{stay.checkOutTime ? `Time: ${stay.checkOutTime}` : "Standard: 11:00 AM"}</div>
+                                      </div>
+                                    </div>
+
+                                    <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                      <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(79,70,229,0.1)", color: "#4f46e5", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                        <span className="material-symbols-rounded" style={{ fontSize: 16 }}>bed</span>
+                                      </div>
+                                      <div>
+                                        <div style={{ fontSize: 9.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: "var(--ink4)" }}>Duration of Stay</div>
+                                        <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--ink)", marginTop: 1 }}>{dateInfo.nights} {dateInfo.nights > 1 ? "Nights" : "Night"}</div>
+                                        <div style={{ fontSize: 10.5, color: "var(--ink3)" }}>{stay.roomType || "Standard Room"}</div>
+                                      </div>
+                                    </div>
+                                  </div>
+
                                   <p style={{ fontSize: 12.5, fontWeight: 600, color: "var(--ink3)", marginBottom: 4 }}>
                                     Select an option below to apply to your package:
                                   </p>
