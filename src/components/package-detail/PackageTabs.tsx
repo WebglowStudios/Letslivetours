@@ -251,17 +251,18 @@ function AccordionItem({
               style={{
                 fontSize: 11,
                 fontWeight: 700,
-                color: "var(--cu-d)",
-                background: "rgba(245,166,35,.12)",
+                color: "#0284c7",
+                background: "rgba(14, 165, 233, 0.09)",
+                border: "1px solid rgba(14, 165, 233, 0.22)",
                 padding: "3px 10px",
                 borderRadius: 50,
                 flexShrink: 0,
                 display: "inline-flex",
                 alignItems: "center",
-                gap: 4,
+                gap: 5,
               }}
             >
-              <span className="material-symbols-rounded" style={{ fontSize: 12 }}>calendar_month</span>
+              <span className="material-symbols-rounded" style={{ fontSize: 13, color: "#0284c7" }}>calendar_month</span>
               {item.dateStr}
             </span>
           )}
@@ -573,8 +574,8 @@ function buildFlightContent(flight: any, hideHeader: boolean = false, flightDate
 function buildItineraryContent(day: any, dayFlights: any[] = [], imageMap?: Record<string, string>, dateStr?: string): string {
   let html = "";
   if (dateStr) {
-    html += `<div style="display:inline-flex;align-items:center;gap:6px;background:rgba(245,166,35,.12);color:var(--cu-d);padding:4px 12px;border-radius:50px;font-size:11.5px;font-weight:700;margin-bottom:14px">
-      <span class="material-symbols-rounded" style="font-size:14px">calendar_month</span>
+    html += `<div style="display:inline-flex;align-items:center;gap:6px;background:rgba(14,165,233,.09);color:#0284c7;border:1px solid rgba(14,165,233,.22);padding:4px 12px;border-radius:50px;font-size:11.5px;font-weight:700;margin-bottom:14px">
+      <span class="material-symbols-rounded" style="font-size:14px;color:#0284c7">calendar_month</span>
       <span>${dateStr}</span>
     </div>`;
   }
