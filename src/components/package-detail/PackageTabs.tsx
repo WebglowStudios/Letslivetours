@@ -68,20 +68,97 @@ function computeDate(startDate?: string | Date, dayNum: number = 1): string {
   }
 }
 
-function computeStayDateRange(startDate?: string | Date, startOffsetDays: number = 0, nights: number = 1): string {
-  if (!startDate) return "";
-  try {
-    const s = new Date(startDate);
-    if (isNaN(s.getTime())) return "";
-    s.setDate(s.getDate() + startOffsetDays);
-    const e = new Date(s);
-    e.setDate(e.getDate() + Math.max(1, nights));
-    const sStr = s.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
-    const eStr = e.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
-    return `${sStr} – ${eStr} (${nights}N)`;
-  } catch {
-    return "";
+export interface StayDateInfo {
+  checkInDate: Date | null;
+  checkOutDate: Date | null;
+  checkInStr: string;
+  checkOutStr: string;
+  checkInShort: string;
+  checkOutShort: string;
+  startDay: number;
+  endDay: number;
+  nights: number;
+  hasDates: boolean;
+}
+
+export function resolveStayDates(stay: any, accumulatedNights: number, startDate?: string | Date): StayDateInfo {
+  const nights = Math.max(1, stay?.nights || 1);
+  const startDay = stay?.day || (accumulatedNights + 1);
+  const endDay = startDay + nights;
+
+  let checkInDate: Date | null = null;
+  let checkOutDate: Date | null = null;
+
+  // 1. Check if stay has explicit checkIn & checkOut
+  if (stay?.checkIn) {
+    const parsed = new Date(stay.checkIn);
+    if (!isNaN(parsed.getTime())) {
+      checkInDate = parsed;
+    }
   }
+  if (stay?.checkOut) {
+    const parsed = new Date(stay.checkOut);
+    if (!isNaN(parsed.getTime())) {
+      checkOutDate = parsed;
+    }
+  }
+
+  // 2. If no explicit dates, calculate from package travel startDate
+  if (!checkInDate && startDate) {
+    const s = new Date(startDate);
+    if (!isNaN(s.getTime())) {
+      const offsetDays = stay?.day ? Math.max(0, stay.day - 1) : accumulatedNights;
+      s.setDate(s.getDate() + offsetDays);
+      checkInDate = s;
+    }
+  }
+
+  if (checkInDate && !checkOutDate) {
+    const e = new Date(checkInDate);
+    e.setDate(e.getDate() + nights);
+    checkOutDate = e;
+  }
+
+  if (checkInDate && checkOutDate) {
+    const inShort = checkInDate.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+    const outShort = checkOutDate.toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" });
+    const inFull = checkInDate.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+    const outFull = checkOutDate.toLocaleDateString("en-IN", { weekday: "short", day: "numeric", month: "short", year: "numeric" });
+
+    return {
+      checkInDate,
+      checkOutDate,
+      checkInStr: inFull,
+      checkOutStr: outFull,
+      checkInShort: inShort,
+      checkOutShort: outShort,
+      startDay,
+      endDay,
+      nights,
+      hasDates: true,
+    };
+  }
+
+  return {
+    checkInDate: null,
+    checkOutDate: null,
+    checkInStr: "",
+    checkOutStr: "",
+    checkInShort: "",
+    checkOutShort: "",
+    startDay,
+    endDay,
+    nights,
+    hasDates: false,
+  };
+}
+
+function computeStayDateRange(startDate?: string | Date, startOffsetDays: number = 0, nights: number = 1): string {
+  const info = resolveStayDates({ nights }, startOffsetDays, startDate);
+  if (info.hasDates) {
+    return `${info.checkInShort} – ${info.checkOutShort} (${nights}N)`;
+  }
+  return `Day ${info.startDay} – Day ${info.endDay} (${nights}N)`;
 }
 
 /* ── ACCORDION ITEM ── */
@@ -584,7 +661,7 @@ function buildItineraryContent(day: any, dayFlights: any[] = [], imageMap?: Reco
 
 
 /* ── Helper: build HTML content for stays ── */
-function buildStayContent(stay: any): string {
+function buildStayContent(stay: any, dateInfo?: StayDateInfo): string {
   let html = "";
   html += `<p style="font-size:15px;font-weight:600;color:var(--ink);margin-bottom:6px">${stay.name}</p>`;
   const stayAddress = stay.address || stay.location || stay.city || "";
@@ -596,6 +673,42 @@ function buildStayContent(stay: any): string {
   if (stay.rating) {
     html += `<div style="display:inline-flex;align-items:center;gap:6px;font-size:12px;font-weight:700;background:rgba(41,196,216,.1);color:var(--gn2);padding:5px 14px;border-radius:6px;margin-bottom:10px">
       <span class="material-symbols-rounded" style="font-size:14px">star</span>${stay.rating}
+    </div>`;
+  }
+
+  // Check-in & Check-out banner in content
+  if (dateInfo) {
+    html += `<div style="display:grid;grid-template-columns:repeat(auto-fit, minmax(170px, 1fr));gap:10px;background:linear-gradient(135deg, rgba(41,196,216,0.05) 0%, rgba(245,166,35,0.06) 100%);border:1px solid rgba(41,196,216,0.18);border-radius:10px;padding:10px 14px;margin-bottom:12px">
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:30px;height:30px;border-radius:50%;background:rgba(16,185,129,0.12);color:#059669;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <span class="material-symbols-rounded" style="font-size:16px">login</span>
+        </div>
+        <div>
+          <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--ink4)">Check-in Date</div>
+          <div style="font-size:12.5px;font-weight:700;color:var(--ink);margin-top:1px">${dateInfo.checkInStr || (dateInfo.hasDates ? dateInfo.checkInShort : 'Day ' + dateInfo.startDay)}</div>
+          <div style="font-size:10.5px;color:var(--ink3)">${stay.checkInTime ? 'Time: ' + stay.checkInTime : 'Standard: 2:00 PM'}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:30px;height:30px;border-radius:50%;background:rgba(239,68,68,0.1);color:#dc2626;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <span class="material-symbols-rounded" style="font-size:16px">logout</span>
+        </div>
+        <div>
+          <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--ink4)">Check-out Date</div>
+          <div style="font-size:12.5px;font-weight:700;color:var(--ink);margin-top:1px">${dateInfo.checkOutStr || (dateInfo.hasDates ? dateInfo.checkOutShort : 'Day ' + dateInfo.endDay)}</div>
+          <div style="font-size:10.5px;color:var(--ink3)">${stay.checkOutTime ? 'Time: ' + stay.checkOutTime : 'Standard: 11:00 AM'}</div>
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <div style="width:30px;height:30px;border-radius:50%;background:rgba(79,70,229,0.1);color:#4f46e5;display:flex;align-items:center;justify-content:center;flex-shrink:0">
+          <span class="material-symbols-rounded" style="font-size:16px">bed</span>
+        </div>
+        <div>
+          <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--ink4)">Duration of Stay</div>
+          <div style="font-size:12.5px;font-weight:700;color:var(--ink);margin-top:1px">${dateInfo.nights} ${dateInfo.nights > 1 ? 'Nights' : 'Night'}</div>
+          <div style="font-size:10.5px;color:var(--ink3)">${stay.roomType || 'Standard Room'}</div>
+        </div>
+      </div>
     </div>`;
   }
   const meta: string[] = [];
@@ -955,15 +1068,14 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
       case "stay": {
         let accumulatedNights = 0;
         return stays.map((s: any, i: number) => {
-          const nights = s.nights || 1;
-          const dateStr = pkg?.travelDates?.startDate ? computeStayDateRange(pkg.travelDates.startDate, accumulatedNights, nights) : undefined;
-          accumulatedNights += nights;
+          const dateInfo = resolveStayDates(s, accumulatedNights, pkg?.travelDates?.startDate);
+          accumulatedNights += (s.nights || 1);
           return {
             badge: `Stay ${i + 1}`,
             badgeType: "stay",
-            dateStr,
+            dateStr: dateInfo.hasDates ? `In: ${dateInfo.checkInShort} → Out: ${dateInfo.checkOutShort}` : `Day ${dateInfo.startDay} – Day ${dateInfo.endDay}`,
             title: s.name,
-            content: buildStayContent(s),
+            content: buildStayContent(s, dateInfo),
           };
         });
       }
@@ -1189,282 +1301,366 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
                   </div>
                 )}
 
-                {stays.map((stay: any, idx: number) => {
-                  const hasOptions = stay.hasOptions && stay.options && stay.options.length > 1;
-                  const currentChosenOptionId = selectedHotelOptions?.[idx];
-                  const isOpen = openItems["stay"] === idx;
+                {(() => {
+                  let accumulatedNights = 0;
+                  const stayDateInfos = stays.map((s: any) => {
+                    const info = resolveStayDates(s, accumulatedNights, pkg?.travelDates?.startDate);
+                    accumulatedNights += (s.nights || 1);
+                    return info;
+                  });
 
-                  // Find chosen option or default
-                  const chosenOpt = hasOptions
-                    ? (stay.options.find((o: any) => o.optionId === currentChosenOptionId) ||
-                       stay.options.find((o: any) => o.isDefault) ||
-                       stay.options[0])
-                    : null;
+                  return stays.map((stay: any, idx: number) => {
+                    const hasOptions = stay.hasOptions && stay.options && stay.options.length > 1;
+                    const currentChosenOptionId = selectedHotelOptions?.[idx];
+                    const isOpen = openItems["stay"] === idx;
+                    const dateInfo = stayDateInfos[idx];
 
-                  return (
-                    <div
-                      key={`stay-${idx}`}
-                      style={{
-                        background: "#fff",
-                        borderRadius: "var(--r)",
-                        border: `1.5px solid ${isOpen ? "var(--gn3)" : "var(--line)"}`,
-                        overflow: "hidden",
-                        transition: "var(--tr)",
-                        boxShadow: isOpen ? "var(--sh)" : "none",
-                        minWidth: 0,
-                        maxWidth: "100%",
-                        boxSizing: "border-box",
-                      }}
-                    >
-                      {/* Stay Accordion Header */}
-                      <button
-                        onClick={() => toggleItem("stay", idx)}
+                    // Find chosen option or default
+                    const chosenOpt = hasOptions
+                      ? (stay.options.find((o: any) => o.optionId === currentChosenOptionId) ||
+                         stay.options.find((o: any) => o.isDefault) ||
+                         stay.options[0])
+                      : null;
+
+                    return (
+                      <div
+                        key={`stay-${idx}`}
                         style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                          padding: "16px 18px",
-                          cursor: "pointer",
-                          gap: 12,
-                          width: "100%",
-                          textAlign: "left",
-                          background: "none",
-                          border: "none",
+                          background: "#fff",
+                          borderRadius: "var(--r)",
+                          border: `1.5px solid ${isOpen ? "var(--gn3)" : "var(--line)"}`,
+                          overflow: "hidden",
+                          transition: "var(--tr)",
+                          boxShadow: isOpen ? "var(--sh)" : "none",
                           minWidth: 0,
+                          maxWidth: "100%",
                           boxSizing: "border-box",
                         }}
                       >
-                        <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", flex: 1, minWidth: 0 }}>
-                          <span
-                            className="syne"
-                            style={{
-                              fontSize: 10.5,
-                              fontWeight: 800,
-                              letterSpacing: 1,
-                              textTransform: "uppercase",
-                              padding: "4px 12px",
-                              borderRadius: 50,
-                              whiteSpace: "nowrap",
-                              flexShrink: 0,
-                              background: "rgba(41,196,216,.12)",
-                              color: "var(--gn2)",
-                            }}
-                          >
-                            Stay {idx + 1}
-                          </span>
-                          <span
-                            className="syne"
-                            style={{
-                              fontSize: 14.5,
-                              fontWeight: 600,
-                              color: isOpen ? "var(--gn)" : "var(--ink)",
-                              lineHeight: 1.4,
-                              minWidth: 0,
-                              wordBreak: "break-word",
-                              overflowWrap: "anywhere",
-                            }}
-                          >
-                            {stay.name || stay.stayLocation || `Location ${idx + 1}`}
-                          </span>
-                          {stay.nights && (
-                            <span style={{ fontSize: 12, color: "var(--ink4)", flexShrink: 0 }}>
-                              • {stay.nights} {stay.nights > 1 ? "Nights" : "Night"}
-                            </span>
-                          )}
-                          {chosenOpt && (
-                            <span
-                              style={{
-                                marginLeft: "auto",
-                                marginRight: 8,
-                                fontSize: 11.5,
-                                fontWeight: 700,
-                                background: chosenOpt.priceDifference > 0 ? "rgba(245,166,35,0.12)" : "rgba(16,185,129,0.1)",
-                                color: chosenOpt.priceDifference > 0 ? "var(--cu-d)" : "#059669",
-                                padding: "3px 10px",
-                                borderRadius: 50,
-                                display: "inline-flex",
-                                alignItems: "center",
-                                gap: 4,
-                                maxWidth: "100%",
-                                wordBreak: "break-word",
-                              }}
-                            >
-                              <span className="material-symbols-rounded" style={{ fontSize: 13, flexShrink: 0 }}>hotel</span>
-                              <span>{chosenOpt.name || chosenOpt.hotelName}</span>
-                              <span style={{ whiteSpace: "nowrap" }}>{chosenOpt.priceDifference > 0 ? ` (+₹${chosenOpt.priceDifference.toLocaleString()})` : " (Included)"}</span>
-                            </span>
-                          )}
-                        </div>
-                        <div
+                        {/* Stay Accordion Header */}
+                        <button
+                          onClick={() => toggleItem("stay", idx)}
                           style={{
-                            width: 28,
-                            height: 28,
-                            borderRadius: "50%",
-                            background: isOpen ? "var(--gn)" : "var(--gn-gl)",
                             display: "flex",
                             alignItems: "center",
-                            justifyContent: "center",
-                            flexShrink: 0,
-                            transition: "var(--tr)",
-                            transform: isOpen ? "rotate(45deg)" : "none",
+                            justifyContent: "space-between",
+                            padding: "16px 18px",
+                            cursor: "pointer",
+                            gap: 12,
+                            width: "100%",
+                            textAlign: "left",
+                            background: "none",
+                            border: "none",
+                            minWidth: 0,
+                            boxSizing: "border-box",
                           }}
                         >
-                          <span
-                            className="material-symbols-rounded"
-                            style={{ fontSize: 16, color: isOpen ? "#fff" : "var(--gn)", transition: "var(--tr)" }}
-                          >
-                            add
-                          </span>
-                        </div>
-                      </button>
-
-                      {/* Stay Accordion Content */}
-                      <div
-                        style={{
-                          display: "grid",
-                          gridTemplateRows: isOpen ? "1fr" : "0fr",
-                          transition: "grid-template-rows .35s ease",
-                        }}
-                      >
-                        <div style={{ overflow: "hidden", minHeight: 0 }}>
-                          <div
-                            style={{
-                              padding: "0 18px 18px",
-                              fontSize: 13,
-                              lineHeight: 1.6,
-                              color: "var(--ink2)",
-                              borderTop: "1px solid var(--line2)",
-                              paddingTop: 14,
-                            }}
-                          >
-                            {hasOptions ? (
-                              <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                                <p style={{ fontSize: 12.5, fontWeight: 600, color: "var(--ink3)", marginBottom: 4 }}>
-                                  Select an option below to apply to your package:
-                                </p>
-                                <div
+                          <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1, minWidth: 0 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", minWidth: 0 }}>
+                              <span
+                                className="syne"
+                                style={{
+                                  fontSize: 10.5,
+                                  fontWeight: 800,
+                                  letterSpacing: 1,
+                                  textTransform: "uppercase",
+                                  padding: "4px 12px",
+                                  borderRadius: 50,
+                                  whiteSpace: "nowrap",
+                                  flexShrink: 0,
+                                  background: "rgba(41,196,216,.12)",
+                                  color: "var(--gn2)",
+                                }}
+                              >
+                                Stay {idx + 1}
+                              </span>
+                              <span
+                                className="syne"
+                                style={{
+                                  fontSize: 14.5,
+                                  fontWeight: 600,
+                                  color: isOpen ? "var(--gn)" : "var(--ink)",
+                                  lineHeight: 1.4,
+                                  minWidth: 0,
+                                  wordBreak: "break-word",
+                                  overflowWrap: "anywhere",
+                                }}
+                              >
+                                {stay.name || stay.stayLocation || `Location ${idx + 1}`}
+                              </span>
+                              {stay.nights && (
+                                <span style={{ fontSize: 12, color: "var(--ink4)", flexShrink: 0 }}>
+                                  • {stay.nights} {stay.nights > 1 ? "Nights" : "Night"}
+                                </span>
+                              )}
+                              {chosenOpt && (
+                                <span
                                   style={{
-                                    display: "grid",
-                                    gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
-                                    gap: 12,
+                                    marginLeft: "auto",
+                                    marginRight: 8,
+                                    fontSize: 11.5,
+                                    fontWeight: 700,
+                                    background: chosenOpt.priceDifference > 0 ? "rgba(245,166,35,0.12)" : "rgba(16,185,129,0.1)",
+                                    color: chosenOpt.priceDifference > 0 ? "var(--cu-d)" : "#059669",
+                                    padding: "3px 10px",
+                                    borderRadius: 50,
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: 4,
+                                    maxWidth: "100%",
+                                    wordBreak: "break-word",
                                   }}
                                 >
-                                  {stay.options.map((opt: any) => {
-                                    const isSelected =
-                                      currentChosenOptionId === opt.optionId ||
-                                      (!currentChosenOptionId && (opt.isDefault || opt === stay.options[0]));
-                                    return (
-                                      <div
-                                        key={opt.optionId}
-                                        onClick={() => onSelectHotelOption && onSelectHotelOption(idx, opt.optionId)}
-                                        style={{
-                                          background: isSelected ? "rgba(41,196,216,0.06)" : "#fafafa",
-                                          border: `1.5px solid ${isSelected ? "var(--gn2)" : "var(--line)"}`,
-                                          borderRadius: 14,
-                                          padding: "14px 16px",
-                                          cursor: "pointer",
-                                          transition: "all 0.2s ease",
-                                          position: "relative",
-                                          boxShadow: isSelected ? "0 4px 16px rgba(41,196,216,0.15)" : "none",
-                                        }}
-                                      >
-                                        <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
-                                          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                                            <div
-                                              style={{
-                                                width: 18,
-                                                height: 18,
-                                                borderRadius: "50%",
-                                                border: `2px solid ${isSelected ? "var(--gn2)" : "var(--ink4)"}`,
-                                                background: isSelected ? "var(--gn2)" : "#fff",
-                                                display: "flex",
-                                                alignItems: "center",
-                                                justifyContent: "center",
-                                                flexShrink: 0,
-                                              }}
-                                            >
-                                              {isSelected && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }} />}
+                                  <span className="material-symbols-rounded" style={{ fontSize: 13, flexShrink: 0 }}>hotel</span>
+                                  <span>{chosenOpt.name || chosenOpt.hotelName}</span>
+                                  <span style={{ whiteSpace: "nowrap" }}>{chosenOpt.priceDifference > 0 ? ` (+₹${chosenOpt.priceDifference.toLocaleString()})` : " (Included)"}</span>
+                                </span>
+                              )}
+                            </div>
+
+                            {/* Check-in & Check-out Date Pill in Header */}
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap" }}>
+                              <span
+                                className="syne"
+                                style={{
+                                  fontSize: 11,
+                                  fontWeight: 700,
+                                  background: "rgba(245, 166, 35, 0.09)",
+                                  color: "var(--cu-d)",
+                                  padding: "3px 10px",
+                                  borderRadius: 6,
+                                  display: "inline-flex",
+                                  alignItems: "center",
+                                  gap: 6,
+                                  border: "1px solid rgba(245, 166, 35, 0.22)",
+                                }}
+                              >
+                                <span className="material-symbols-rounded" style={{ fontSize: 13, color: "#16a34a" }}>login</span>
+                                <span>Check-in: <strong style={{ color: "var(--ink)" }}>{dateInfo.checkInShort || `Day ${dateInfo.startDay}`}</strong></span>
+                                <span style={{ color: "var(--ink4)" }}>→</span>
+                                <span className="material-symbols-rounded" style={{ fontSize: 13, color: "#dc2626" }}>logout</span>
+                                <span>Check-out: <strong style={{ color: "var(--ink)" }}>{dateInfo.checkOutShort || `Day ${dateInfo.endDay}`}</strong></span>
+                              </span>
+                            </div>
+                          </div>
+                          <div
+                            style={{
+                              width: 28,
+                              height: 28,
+                              borderRadius: "50%",
+                              background: isOpen ? "var(--gn)" : "var(--gn-gl)",
+                              display: "flex",
+                              alignItems: "center",
+                              justifyContent: "center",
+                              flexShrink: 0,
+                              transition: "var(--tr)",
+                              transform: isOpen ? "rotate(45deg)" : "none",
+                            }}
+                          >
+                            <span
+                              className="material-symbols-rounded"
+                              style={{ fontSize: 16, color: isOpen ? "#fff" : "var(--gn)", transition: "var(--tr)" }}
+                            >
+                              add
+                            </span>
+                          </div>
+                        </button>
+
+                        {/* Stay Accordion Content */}
+                        <div
+                          style={{
+                            display: "grid",
+                            gridTemplateRows: isOpen ? "1fr" : "0fr",
+                            transition: "grid-template-rows .35s ease",
+                          }}
+                        >
+                          <div style={{ overflow: "hidden", minHeight: 0 }}>
+                            <div
+                              style={{
+                                padding: "0 18px 18px",
+                                fontSize: 13,
+                                lineHeight: 1.6,
+                                color: "var(--ink2)",
+                                borderTop: "1px solid var(--line2)",
+                                paddingTop: 14,
+                              }}
+                            >
+                              {/* Check-in & Check-out Info Banner in Expanded Accordion */}
+                              <div
+                                style={{
+                                  display: "grid",
+                                  gridTemplateColumns: "repeat(auto-fit, minmax(170px, 1fr))",
+                                  gap: 10,
+                                  background: "linear-gradient(135deg, rgba(41,196,216,0.05) 0%, rgba(245,166,35,0.06) 100%)",
+                                  border: "1px solid rgba(41,196,216,0.18)",
+                                  borderRadius: 10,
+                                  padding: "10px 14px",
+                                  marginBottom: 14,
+                                }}
+                              >
+                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                  <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(16,185,129,0.12)", color: "#059669", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                    <span className="material-symbols-rounded" style={{ fontSize: 16 }}>login</span>
+                                  </div>
+                                  <div>
+                                    <div style={{ fontSize: 9.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: "var(--ink4)" }}>Check-in Date</div>
+                                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--ink)", marginTop: 1 }}>{dateInfo.checkInStr || (dateInfo.hasDates ? dateInfo.checkInShort : `Day ${dateInfo.startDay}`)}</div>
+                                    <div style={{ fontSize: 10.5, color: "var(--ink3)" }}>{stay.checkInTime ? `Time: ${stay.checkInTime}` : "Standard: 2:00 PM"}</div>
+                                  </div>
+                                </div>
+
+                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                  <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(239,68,68,0.1)", color: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                    <span className="material-symbols-rounded" style={{ fontSize: 16 }}>logout</span>
+                                  </div>
+                                  <div>
+                                    <div style={{ fontSize: 9.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: "var(--ink4)" }}>Check-out Date</div>
+                                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--ink)", marginTop: 1 }}>{dateInfo.checkOutStr || (dateInfo.hasDates ? dateInfo.checkOutShort : `Day ${dateInfo.endDay}`)}</div>
+                                    <div style={{ fontSize: 10.5, color: "var(--ink3)" }}>{stay.checkOutTime ? `Time: ${stay.checkOutTime}` : "Standard: 11:00 AM"}</div>
+                                  </div>
+                                </div>
+
+                                <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                  <div style={{ width: 32, height: 32, borderRadius: "50%", background: "rgba(79,70,229,0.1)", color: "#4f46e5", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                                    <span className="material-symbols-rounded" style={{ fontSize: 16 }}>bed</span>
+                                  </div>
+                                  <div>
+                                    <div style={{ fontSize: 9.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: "var(--ink4)" }}>Duration of Stay</div>
+                                    <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--ink)", marginTop: 1 }}>{dateInfo.nights} {dateInfo.nights > 1 ? "Nights" : "Night"}</div>
+                                    <div style={{ fontSize: 10.5, color: "var(--ink3)" }}>{stay.roomType || "Standard Room"}</div>
+                                  </div>
+                                </div>
+                              </div>
+
+                              {hasOptions ? (
+                                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+                                  <p style={{ fontSize: 12.5, fontWeight: 600, color: "var(--ink3)", marginBottom: 4 }}>
+                                    Select an option below to apply to your package:
+                                  </p>
+                                  <div
+                                    style={{
+                                      display: "grid",
+                                      gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))",
+                                      gap: 12,
+                                    }}
+                                  >
+                                    {stay.options.map((opt: any) => {
+                                      const isSelected =
+                                        currentChosenOptionId === opt.optionId ||
+                                        (!currentChosenOptionId && (opt.isDefault || opt === stay.options[0]));
+                                      return (
+                                        <div
+                                          key={opt.optionId}
+                                          onClick={() => onSelectHotelOption && onSelectHotelOption(idx, opt.optionId)}
+                                          style={{
+                                            background: isSelected ? "rgba(41,196,216,0.06)" : "#fafafa",
+                                            border: `1.5px solid ${isSelected ? "var(--gn2)" : "var(--line)"}`,
+                                            borderRadius: 14,
+                                            padding: "14px 16px",
+                                            cursor: "pointer",
+                                            transition: "all 0.2s ease",
+                                            position: "relative",
+                                            boxShadow: isSelected ? "0 4px 16px rgba(41,196,216,0.15)" : "none",
+                                          }}
+                                        >
+                                          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 8 }}>
+                                            <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                                              <div
+                                                style={{
+                                                  width: 18,
+                                                  height: 18,
+                                                  borderRadius: "50%",
+                                                  border: `2px solid ${isSelected ? "var(--gn2)" : "var(--ink4)"}`,
+                                                  background: isSelected ? "var(--gn2)" : "#fff",
+                                                  display: "flex",
+                                                  alignItems: "center",
+                                                  justifyContent: "center",
+                                                  flexShrink: 0,
+                                                }}
+                                              >
+                                                {isSelected && <div style={{ width: 6, height: 6, borderRadius: "50%", background: "#fff" }} />}
+                                              </div>
+                                              <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>
+                                                {opt.name || opt.hotelName}
+                                              </div>
                                             </div>
-                                            <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>
-                                              {opt.name || opt.hotelName}
+                                            <div>
+                                              {opt.priceDifference > 0 ? (
+                                                <span
+                                                  style={{
+                                                    fontSize: 11,
+                                                    fontWeight: 700,
+                                                    background: "rgba(245,166,35,0.15)",
+                                                    color: "var(--cu-d)",
+                                                    padding: "3px 8px",
+                                                    borderRadius: 50,
+                                                    whiteSpace: "nowrap",
+                                                  }}
+                                                >
+                                                  +₹{opt.priceDifference.toLocaleString()} / pax
+                                                </span>
+                                              ) : (
+                                                <span
+                                                  style={{
+                                                    fontSize: 11,
+                                                    fontWeight: 700,
+                                                    background: "rgba(16,185,129,0.12)",
+                                                    color: "#059669",
+                                                    padding: "3px 8px",
+                                                    borderRadius: 50,
+                                                    whiteSpace: "nowrap",
+                                                  }}
+                                                >
+                                                  Included (₹0)
+                                                </span>
+                                              )}
                                             </div>
                                           </div>
-                                          <div>
-                                            {opt.priceDifference > 0 ? (
-                                              <span
-                                                style={{
-                                                  fontSize: 11,
-                                                  fontWeight: 700,
-                                                  background: "rgba(245,166,35,0.15)",
-                                                  color: "var(--cu-d)",
-                                                  padding: "3px 8px",
-                                                  borderRadius: 50,
-                                                  whiteSpace: "nowrap",
-                                                }}
-                                              >
-                                                +₹{opt.priceDifference.toLocaleString()} / pax
+
+                                          {/* Details row */}
+                                          <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8, fontSize: 12, color: "var(--ink3)" }}>
+                                            {opt.rating && (
+                                              <span style={{ display: "flex", alignItems: "center", gap: 2, color: "var(--cu)", fontWeight: 700 }}>
+                                                <span className="material-symbols-rounded" style={{ fontSize: 14 }}>star</span>
+                                                {opt.rating}
                                               </span>
-                                            ) : (
-                                              <span
-                                                style={{
-                                                  fontSize: 11,
-                                                  fontWeight: 700,
-                                                  background: "rgba(16,185,129,0.12)",
-                                                  color: "#059669",
-                                                  padding: "3px 8px",
-                                                  borderRadius: 50,
-                                                  whiteSpace: "nowrap",
-                                                }}
-                                              >
-                                                Included (₹0)
+                                            )}
+                                            {opt.roomType && (
+                                              <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
+                                                <span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--ink4)" }}>bed</span>
+                                                {opt.roomType}
                                               </span>
                                             )}
                                           </div>
-                                        </div>
 
-                                        {/* Details row */}
-                                        <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 8, fontSize: 12, color: "var(--ink3)" }}>
-                                          {opt.rating && (
-                                            <span style={{ display: "flex", alignItems: "center", gap: 2, color: "var(--cu)", fontWeight: 700 }}>
-                                              <span className="material-symbols-rounded" style={{ fontSize: 14 }}>star</span>
-                                              {opt.rating}
-                                            </span>
+                                          {(opt.address || opt.remark) && (
+                                            <div style={{ fontSize: 12, color: "var(--ink4)", marginTop: 6, lineHeight: 1.4 }}>
+                                              {opt.address || opt.remark}
+                                            </div>
                                           )}
-                                          {opt.roomType && (
-                                            <span style={{ display: "flex", alignItems: "center", gap: 4 }}>
-                                              <span className="material-symbols-rounded" style={{ fontSize: 14, color: "var(--ink4)" }}>bed</span>
-                                              {opt.roomType}
-                                            </span>
+
+                                          {isSelected && (
+                                            <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "var(--gn2)" }}>
+                                              <span className="material-symbols-rounded" style={{ fontSize: 14 }}>check_circle</span>
+                                              Active Selection
+                                            </div>
                                           )}
                                         </div>
-
-                                        {(opt.address || opt.remark) && (
-                                          <div style={{ fontSize: 12, color: "var(--ink4)", marginTop: 6, lineHeight: 1.4 }}>
-                                            {opt.address || opt.remark}
-                                          </div>
-                                        )}
-
-                                        {isSelected && (
-                                          <div style={{ marginTop: 10, display: "flex", alignItems: "center", gap: 4, fontSize: 11, fontWeight: 700, color: "var(--gn2)" }}>
-                                            <span className="material-symbols-rounded" style={{ fontSize: 14 }}>check_circle</span>
-                                            Active Selection
-                                          </div>
-                                        )}
-                                      </div>
-                                    );
-                                  })}
+                                      );
+                                    })}
+                                  </div>
                                 </div>
-                              </div>
-                            ) : (
-                              /* Standard Stay content when single option */
-                              <div dangerouslySetInnerHTML={{ __html: buildStayContent(stay) }} />
-                            )}
+                              ) : (
+                                /* Standard Stay content when single option */
+                                <div dangerouslySetInnerHTML={{ __html: buildStayContent(stay, dateInfo) }} />
+                              )}
+                            </div>
                           </div>
                         </div>
                       </div>
-                    </div>
-                  );
-                })}
+                    );
+                  });
+                })()}
               </div>
             ) : (
               tabData.map((item: any, idx: number) => (
