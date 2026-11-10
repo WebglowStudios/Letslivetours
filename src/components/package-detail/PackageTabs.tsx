@@ -52,6 +52,38 @@ function parseBulletPoints(text: string | null | undefined): { isList: boolean; 
   return { isList: false, items: [raw] };
 }
 
+function computeDate(startDate?: string | Date, dayNum: number = 1): string {
+  if (!startDate) return "";
+  try {
+    const d = new Date(startDate);
+    if (isNaN(d.getTime())) return "";
+    d.setDate(d.getDate() + Math.max(0, dayNum - 1));
+    return d.toLocaleDateString("en-IN", {
+      weekday: "short",
+      day: "numeric",
+      month: "short",
+    });
+  } catch {
+    return "";
+  }
+}
+
+function computeStayDateRange(startDate?: string | Date, startOffsetDays: number = 0, nights: number = 1): string {
+  if (!startDate) return "";
+  try {
+    const s = new Date(startDate);
+    if (isNaN(s.getTime())) return "";
+    s.setDate(s.getDate() + startOffsetDays);
+    const e = new Date(s);
+    e.setDate(e.getDate() + Math.max(1, nights));
+    const sStr = s.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+    const eStr = e.toLocaleDateString("en-IN", { day: "numeric", month: "short" });
+    return `${sStr} – ${eStr} (${nights}N)`;
+  } catch {
+    return "";
+  }
+}
+
 /* ── ACCORDION ITEM ── */
 function AccordionItem({
   item,
@@ -59,7 +91,7 @@ function AccordionItem({
   onToggle,
   onImageClick,
 }: {
-  item: { badge: string; badgeType?: string; title: string; content: string };
+  item: { badge: string; badgeType?: string; title: string; content: string; dateStr?: string };
   isOpen: boolean;
   onToggle: () => void;
   onImageClick?: (images: string[], idx: number) => void;
@@ -119,7 +151,7 @@ function AccordionItem({
           boxSizing: "border-box",
         }}
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0 }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0, flexWrap: "wrap" }}>
           <span
             className="syne"
             style={{
@@ -136,6 +168,26 @@ function AccordionItem({
           >
             {item.badge}
           </span>
+          {item.dateStr && (
+            <span
+              className="syne"
+              style={{
+                fontSize: 11,
+                fontWeight: 700,
+                color: "var(--cu-d)",
+                background: "rgba(245,166,35,.12)",
+                padding: "3px 10px",
+                borderRadius: 50,
+                flexShrink: 0,
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 4,
+              }}
+            >
+              <span className="material-symbols-rounded" style={{ fontSize: 12 }}>calendar_month</span>
+              {item.dateStr}
+            </span>
+          )}
           <span
             className="syne"
             style={{
@@ -403,7 +455,7 @@ function buildDayImageSlider(images: { src: string; label?: string }[]): string 
 }
 
 /* ── Helper: build HTML content for a flight or train ── */
-function buildFlightContent(flight: any, hideHeader: boolean = false): string {
+function buildFlightContent(flight: any, hideHeader: boolean = false, flightDate?: string): string {
   const isTrain = (flight.type ?? "flight") === "train";
   const icon = isTrain ? "train" : "flight_takeoff";
   const iconColor = isTrain ? "#c2410c" : "#4338ca";
@@ -412,50 +464,61 @@ function buildFlightContent(flight: any, hideHeader: boolean = false): string {
   if (!hideHeader) {
     html += `<span class="material-symbols-rounded" style="font-size:24px;color:${iconColor}">${icon}</span>`;
     html += `<div style="flex:1">`;
-    html += `<p style="font-size:15px;font-weight:700;color:var(--ink)">${flight.airline} <span style="color:var(--ink3);font-weight:500">${flight.flightNumber}</span></p>`;
+    html += `<p style="font-size:15px;font-weight:700;color:var(--ink)">${flight.airline || (isTrain ? "Train" : "Flight")} <span style="color:var(--ink3);font-weight:500">${flight.flightNumber || ""}</span>${flightDate ? ` <span style="font-size:11.5px;font-weight:700;color:var(--cu-d);background:rgba(245,166,35,.12);padding:2px 8px;border-radius:6px;margin-left:8px">📅 ${flightDate}</span>` : ""}</p>`;
   } else {
     html += `<div style="flex:1">`;
+    if (flightDate) {
+      html += `<p style="font-size:11.5px;font-weight:700;color:var(--cu-d);margin-bottom:6px">📅 Travel Date: ${flightDate}</p>`;
+    }
   }
   
-  if (flight.class) html += `<p style="font-size:12px;color:var(--ink4)">${isTrain ? "Class" : "Class"}: ${flight.class}</p>`;
+  if (flight.class) html += `<p style="font-size:12px;color:var(--ink4)">${isTrain ? "Train Class" : "Cabin Class"}: <strong>${flight.class}</strong></p>`;
 
-  html += `<div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;background:var(--iv);border-radius:10px;padding:12px;border:1px solid var(--line);flex-wrap:wrap;gap:10px;min-width:0">`;
-  html += `<div style="flex:1;min-width:110px"><p style="font-size:11px;color:var(--ink4);text-transform:uppercase;letter-spacing:1px;font-weight:600">Departure</p><p style="font-size:14px;font-weight:700;color:var(--ink);word-break:break-word">${flight.departure}</p><p style="font-size:12px;color:var(--ink3);word-break:break-word">${flight.from}</p></div>`;
+  html += `<div style="display:flex;justify-content:space-between;align-items:center;margin-top:12px;background:var(--iv);border-radius:10px;padding:12px 14px;border:1px solid var(--line);flex-wrap:wrap;gap:10px;min-width:0">`;
+  html += `<div style="flex:1;min-width:110px"><p style="font-size:10px;color:var(--ink4);text-transform:uppercase;letter-spacing:1px;font-weight:700">Departure</p><p style="font-size:15px;font-weight:700;color:var(--ink);word-break:break-word;margin:2px 0">${flight.departure || "Scheduled"}</p><p style="font-size:12.5px;font-weight:500;color:var(--ink2);word-break:break-word">${flight.from}</p></div>`;
   
-  html += `<div style="text-align:right;flex:1;min-width:110px"><p style="font-size:11px;color:var(--ink4);text-transform:uppercase;letter-spacing:1px;font-weight:600">Arrival</p><p style="font-size:14px;font-weight:700;color:var(--ink);word-break:break-word">${flight.arrival}</p><p style="font-size:12px;color:var(--ink3);word-break:break-word">${flight.to}</p></div>`;
+  html += `<div style="display:flex;flex-direction:column;align-items:center;gap:2px;min-width:50px"><span class="material-symbols-rounded" style="font-size:18px;color:${iconColor}">${icon}</span><span style="font-size:9.5px;font-weight:700;color:var(--ink4);text-transform:uppercase">Transit</span></div>`;
+
+  html += `<div style="text-align:right;flex:1;min-width:110px"><p style="font-size:10px;color:var(--ink4);text-transform:uppercase;letter-spacing:1px;font-weight:700">Arrival</p><p style="font-size:15px;font-weight:700;color:var(--ink);word-break:break-word;margin:2px 0">${flight.arrival || "Scheduled"}</p><p style="font-size:12.5px;font-weight:500;color:var(--ink2);word-break:break-word">${flight.to}</p></div>`;
   html += `</div>`;
 
   if (flight.pnr) {
-    html += `<div style="display:inline-flex;align-items:center;gap:6px;background:var(--cu-gl);color:var(--cu-d);padding:6px 12px;border-radius:6px;font-size:13px;font-weight:600;margin-top:12px;margin-bottom:0;max-width:100%;word-break:break-word">PNR: ${flight.pnr}</div>`;
+    html += `<div style="display:inline-flex;align-items:center;gap:6px;background:rgba(16,185,129,.12);color:#065f46;border:1px solid rgba(16,185,129,.25);padding:4px 10px;border-radius:6px;font-size:12px;font-weight:700;margin-top:12px;margin-bottom:0;max-width:100%;word-break:break-word">PNR: ${flight.pnr}</div>`;
   }
   if (flight.notes) {
-    html += `<p style="font-size:13px;color:var(--ink2);margin-top:8px;word-break:break-word">${flight.notes}</p>`;
+    html += `<p style="font-size:12px;color:var(--ink2);margin-top:8px;word-break:break-word;line-height:1.5">🧳 <strong>Baggage & Notes:</strong> ${flight.notes}</p>`;
   }
   html += `</div></div>`;
   return html;
 }
 
 /* ── Helper: build HTML content for an itinerary day ── */
-function buildItineraryContent(day: any, dayFlights: any[] = [], imageMap?: Record<string, string>): string {
+function buildItineraryContent(day: any, dayFlights: any[] = [], imageMap?: Record<string, string>, dateStr?: string): string {
   let html = "";
+  if (dateStr) {
+    html += `<div style="display:inline-flex;align-items:center;gap:6px;background:rgba(245,166,35,.12);color:var(--cu-d);padding:4px 12px;border-radius:50px;font-size:11.5px;font-weight:700;margin-bottom:14px">
+      <span class="material-symbols-rounded" style="font-size:14px">calendar_month</span>
+      <span>${dateStr}</span>
+    </div>`;
+  }
   const dayActualFlights = dayFlights.filter((f: any) => (f.type ?? "flight") === "flight");
   const dayTrains = dayFlights.filter((f: any) => f.type === "train");
   if (dayActualFlights.length > 0) {
-    html += sectionLabel("flight_takeoff", "Flights");
+    html += sectionLabel("flight_takeoff", "Scheduled Flights");
     html += `<div style="margin-bottom:16px">`;
     dayActualFlights.forEach((flight) => {
-      html += `<div style="border:1px solid #e0e7ff;border-radius:10px;padding:12px;margin-bottom:8px">`;
-      html += buildFlightContent(flight);
+      html += `<div style="border:1.5px solid #e0e7ff;border-radius:12px;padding:12px;margin-bottom:10px;background:#fff">`;
+      html += buildFlightContent(flight, false, dateStr);
       html += `</div>`;
     });
     html += `</div>`;
   }
   if (dayTrains.length > 0) {
-    html += sectionLabel("train", "Trains");
+    html += sectionLabel("train", "Scheduled Trains");
     html += `<div style="margin-bottom:16px">`;
     dayTrains.forEach((train) => {
-      html += `<div style="border:1px solid #fed7aa;border-radius:10px;padding:12px;margin-bottom:8px">`;
-      html += buildFlightContent(train);
+      html += `<div style="border:1.5px solid #fed7aa;border-radius:12px;padding:12px;margin-bottom:10px;background:#fff">`;
+      html += buildFlightContent(train, false, dateStr);
       html += `</div>`;
     });
     html += `</div>`;
@@ -791,7 +854,7 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
   const flights = pkg?.flights || [];
   const hasFlights = flights.some((f: any) => (f.type ?? "flight") === "flight");
   const hasTrains = flights.some((f: any) => f.type === "train");
-  const hasAnyFlightOrTrain = flights.length > 0;
+  const hasAnyFlightOrTrain = flights.length > 0 || Boolean(pkg?.flightsIncluded);
   const hasTransfers = transfers.length > 0 || !!pkg?.transferSummary;
   const hasPolicies = (pkg?.paymentPolicy?.length > 0) || (pkg?.cancellationPolicy?.length > 0) || (pkg?.flightCancellationPolicy?.length > 0);
 
@@ -823,61 +886,98 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
     switch (tabId) {
       case "itinerary":
         return itinerary.map((day: any) => {
-          const dayFlights = flights.filter((f: any) => f.day == day.day);
+          const dayFlights = flights.filter((f: any) => f.day == day.day || (day.day === 1 && (!f.day || f.day === 0)));
+          const dateStr = pkg?.travelDates?.startDate ? computeDate(pkg.travelDates.startDate, day.day) : undefined;
           return {
             badge: `Day ${day.day}`,
             badgeType: "day",
+            dateStr,
             title: day.title,
-            content: buildItineraryContent(day, dayFlights, pkg?.imageMap),
+            content: buildItineraryContent(day, dayFlights, pkg?.imageMap, dateStr),
           };
         });
       case "activities":
         // Show activity and recommendation entries from each itinerary day
         return itinerary
           .filter((day: any) => (day.activities && day.activities.length > 0) || (day.recommendations && day.recommendations.length > 0))
-          .map((day: any) => ({
-            badge: `Day ${day.day}`,
-            badgeType: "activity",
-            title: day.title || `Day ${day.day}`,
-            content: buildDayActivitiesContent(day, pkg?.imageMap),
-          }));
+          .map((day: any) => {
+            const dateStr = pkg?.travelDates?.startDate ? computeDate(pkg.travelDates.startDate, day.day) : undefined;
+            return {
+              badge: `Day ${day.day}`,
+              badgeType: "activity",
+              dateStr,
+              title: day.title || `Day ${day.day}`,
+              content: buildDayActivitiesContent(day, pkg?.imageMap),
+            };
+          });
       case "flights": {
         // Separate flights and trains into two groups
         const flightEntries = flights.filter((f: any) => (f.type ?? "flight") === "flight");
         const trainEntries = flights.filter((f: any) => f.type === "train");
         const result: any[] = [];
         flightEntries.forEach((f: any, i: number) => {
+          const dayNum = f.day || (i + 1);
+          const dateStr = pkg?.travelDates?.startDate ? computeDate(pkg.travelDates.startDate, dayNum) : undefined;
           result.push({
             badge: f.day ? `Day ${f.day}` : `Flight ${i + 1}`,
             badgeType: "flight",
-            title: `${f.airline} ${f.flightNumber} (${f.from} → ${f.to})`,
-            content: buildFlightContent(f, true),
+            dateStr,
+            title: `${f.airline || "Flight"} ${f.flightNumber ? `• ${f.flightNumber}` : ""} (${f.from || "Origin"} → ${f.to || "Destination"})`,
+            content: buildFlightContent(f, true, dateStr),
           });
         });
         trainEntries.forEach((f: any, i: number) => {
+          const dayNum = f.day || (i + 1);
+          const dateStr = pkg?.travelDates?.startDate ? computeDate(pkg.travelDates.startDate, dayNum) : undefined;
           result.push({
             badge: f.day ? `Day ${f.day}` : `Train ${i + 1}`,
             badgeType: "train",
-            title: `${f.airline} ${f.flightNumber} (${f.from} → ${f.to})`,
-            content: buildFlightContent(f, true),
+            dateStr,
+            title: `${f.airline || "Train"} ${f.flightNumber ? `• ${f.flightNumber}` : ""} (${f.from || "Origin"} → ${f.to || "Destination"})`,
+            content: buildFlightContent(f, true, dateStr),
           });
         });
+        if (result.length === 0 && pkg?.flightsIncluded) {
+          result.push({
+            badge: "Airfare",
+            badgeType: "flight",
+            title: "Round-Trip Flights Included in Package",
+            content: `<div style="padding:16px;background:var(--iv);border-radius:12px;border:1px solid var(--line)">
+              <p style="font-size:15px;font-weight:700;color:var(--ink);margin:0 0 6px">✈️ Round-Trip Airfare Bundled</p>
+              <p style="font-size:13px;color:var(--ink3);line-height:1.6;margin:0">
+                All round-trip flights and airline transit are covered in your package quote. Flight timings, seat allocations, and boarding passes will be issued based on your travel dates${pkg?.travelDates?.startDate ? ` (${new Date(pkg.travelDates.startDate).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}${pkg.travelDates.endDate ? ` – ${new Date(pkg.travelDates.endDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}` : ""})` : ""} upon booking confirmation.
+              </p>
+            </div>`,
+          });
+        }
         return result;
       }
-      case "stay":
-        return stays.map((s: any, i: number) => ({
-          badge: `Stay ${i + 1}`,
-          badgeType: "stay",
-          title: s.name,
-          content: buildStayContent(s),
-        }));
+      case "stay": {
+        let accumulatedNights = 0;
+        return stays.map((s: any, i: number) => {
+          const nights = s.nights || 1;
+          const dateStr = pkg?.travelDates?.startDate ? computeStayDateRange(pkg.travelDates.startDate, accumulatedNights, nights) : undefined;
+          accumulatedNights += nights;
+          return {
+            badge: `Stay ${i + 1}`,
+            badgeType: "stay",
+            dateStr,
+            title: s.name,
+            content: buildStayContent(s),
+          };
+        });
+      }
       case "transfers": {
-        return transfers.map((t: any, i: number) => ({
-          badge: t.day ? `Day ${t.day}` : `Transfer ${i + 1}`,
-          badgeType: "transfer",
-          title: t.title,
-          content: buildTransferContent(t),
-        }));
+        return transfers.map((t: any, i: number) => {
+          const dateStr = t.day && pkg?.travelDates?.startDate ? computeDate(pkg.travelDates.startDate, t.day) : undefined;
+          return {
+            badge: t.day ? `Day ${t.day}` : `Transfer ${i + 1}`,
+            badgeType: "transfer",
+            dateStr,
+            title: t.title,
+            content: buildTransferContent(t),
+          };
+        });
       }
       case "policies":
         return [

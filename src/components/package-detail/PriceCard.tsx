@@ -99,8 +99,13 @@ export default function PriceCard({ pkg, slug, effectivePrice, hotelUpgradePerPa
 
   const metaRows = [
     duration ? { icon: "calendar_today", label: "Duration:", value: `${duration.nights} Nights / ${duration.days} Days` } : null,
+    pkg?.travelDates?.startDate ? {
+      icon: "event",
+      label: "Travel Dates:",
+      value: `${new Date(pkg.travelDates.startDate).toLocaleDateString("en-IN", { day: "numeric", month: "short" })}${pkg.travelDates.endDate ? ` – ${new Date(pkg.travelDates.endDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}` : ""}`
+    } : null,
     hotelRating ? { icon: "hotel", label: "Stay:", value: hotelRating } : null,
-    { icon: "flight_takeoff", label: "Flights:", value: flightsIncluded ? "Included" : "Not included" },
+    { icon: "flight_takeoff", label: "Flights:", value: flightsIncluded ? (pkg?.flights?.length ? `${pkg.flights.length} Leg(s) Included` : "Included") : "Not included" },
     // Trains: for international packages, only show row when trains are actually included
     // (trains not applicable for most international travel — hiding "Not included" avoids false alarm)
     !pkg?.hideTrainInfo && (!pkg?.isInternational || pkg?.trainsIncluded) && (pkg?.trainsIncluded || pkg?.flights?.some((f: any) => f.type === "train"))

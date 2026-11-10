@@ -85,6 +85,23 @@ export default function PackageInfo({ pkg }: PackageInfoProps) {
             <span>{hotelRating}</span>
           </span>
         )}
+        {pkg?.travelDates?.startDate && (
+          <span className="syne" style={{ fontSize: 12, fontWeight: 700, background: "rgba(245,166,35,.15)", color: "var(--cu-d)", padding: "5px 14px", borderRadius: 50, display: "flex", alignItems: "center", gap: 5, maxWidth: "100%", boxSizing: "border-box" }}>
+            <span className="material-symbols-rounded" style={{ fontSize: 14, flexShrink: 0 }}>event</span>
+            <span>
+              {new Date(pkg.travelDates.startDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}
+              {pkg.travelDates.endDate ? ` – ${new Date(pkg.travelDates.endDate).toLocaleDateString("en-IN", { day: "numeric", month: "short", year: "numeric" })}` : ""}
+            </span>
+          </span>
+        )}
+        {(pkg?.travellerCount || pkg?.adultCount) && (
+          <span className="syne" style={{ fontSize: 12, fontWeight: 600, background: "rgba(99,102,241,.1)", color: "#4f46e5", padding: "5px 14px", borderRadius: 50, display: "flex", alignItems: "center", gap: 5, maxWidth: "100%", boxSizing: "border-box" }}>
+            <span className="material-symbols-rounded" style={{ fontSize: 14, flexShrink: 0 }}>group</span>
+            <span>
+              {pkg.travellerCount || `${pkg.adultCount || 1} Adult${(pkg.adultCount || 1) > 1 ? "s" : ""}${pkg.childCount ? `, ${pkg.childCount} Child${pkg.childCount > 1 ? "ren" : ""}` : ""}`}
+            </span>
+          </span>
+        )}
         {rating > 0 && (
           <div className="syne" style={{ display: "flex", alignItems: "center", gap: 6, fontSize: 13, fontWeight: 600, color: "var(--ink2)" }}>
             <span style={{ color: "var(--cu)", fontSize: 14, letterSpacing: 1 }}>{starStr}</span>
