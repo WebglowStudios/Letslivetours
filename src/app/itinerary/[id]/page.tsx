@@ -33,6 +33,39 @@ function formatDateLong(d?: string | Date): string {
   }
 }
 
+function formatDateRange(startDate?: string | Date, endDate?: string | Date): string {
+  if (!startDate) return "";
+  try {
+    const s = new Date(startDate);
+    if (isNaN(s.getTime())) return "";
+    const sDay = s.getDate();
+    const sMonth = s.toLocaleDateString("en-IN", { month: "short" });
+    const sYear = s.getFullYear();
+
+    if (!endDate) {
+      return `${sDay} ${sMonth} ${sYear}`;
+    }
+
+    const e = new Date(endDate);
+    if (isNaN(e.getTime())) {
+      return `${sDay} ${sMonth} ${sYear}`;
+    }
+    const eDay = e.getDate();
+    const eMonth = e.toLocaleDateString("en-IN", { month: "short" });
+    const eYear = e.getFullYear();
+
+    if (sYear === eYear) {
+      if (sMonth === eMonth) {
+        return `${sDay} – ${eDay} ${sMonth} ${sYear}`;
+      }
+      return `${sDay} ${sMonth} – ${eDay} ${eMonth} ${sYear}`;
+    }
+    return `${sDay} ${sMonth} ${sYear} – ${eDay} ${eMonth} ${eYear}`;
+  } catch {
+    return "";
+  }
+}
+
 function computeFlightDate(startDate?: string | Date, dayNum: number = 1): string {
   if (!startDate) return "";
   try {
@@ -200,113 +233,164 @@ export default function CustomItineraryPage() {
             {/* ── CUSTOM ITINERARY TRIP PARTICULARS & OVERVIEW ── */}
             <div style={{
               background: "#ffffff",
-              borderRadius: "var(--r-xl)",
-              border: "1.5px solid var(--line)",
-              padding: "24px 28px",
-              boxShadow: "var(--sh)",
-              marginBottom: 32,
+              borderRadius: "20px",
+              border: "1px solid rgba(15, 23, 42, 0.08)",
+              boxShadow: "0 10px 28px -10px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02)",
+              padding: "20px 22px",
+              marginBottom: 30,
             }}>
-              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", gap: 12, flexWrap: "wrap", borderBottom: "1px solid var(--line2)", paddingBottom: 16, marginBottom: 20 }}>
-                <div>
-                  <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                    <span className="material-symbols-rounded" style={{ fontSize: 20, color: "var(--cu-d)" }}>verified</span>
-                    <h3 className="syne" style={{ fontSize: 16, fontWeight: 700, color: "var(--ink)", margin: 0 }}>
-                      Custom Itinerary Particulars
-                    </h3>
-                  </div>
-                  <p style={{ fontSize: 13, color: "var(--ink3)", margin: "4px 0 0 28px" }}>
-                    {pkg.clientName ? `Tailored travel schedule curated exclusively for ${pkg.clientName}` : "Tailored travel schedule and booking details"}
-                  </p>
+              {/* Header Bar */}
+              <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 12, flexWrap: "wrap", marginBottom: 16 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
+                  <span className="syne" style={{
+                    fontSize: 10,
+                    fontWeight: 800,
+                    letterSpacing: "1.2px",
+                    textTransform: "uppercase",
+                    color: "var(--cu-d)",
+                    background: "rgba(194, 141, 84, 0.09)",
+                    border: "1px solid rgba(194, 141, 84, 0.22)",
+                    padding: "3px 10px",
+                    borderRadius: 999,
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 4
+                  }}>
+                    ✦ PRIVATE DOSSIER
+                  </span>
+                  <h3 className="syne" style={{ fontSize: 15, fontWeight: 700, color: "var(--ink)", margin: 0 }}>
+                    {pkg.clientName ? `Curated for ${pkg.clientName}` : "Curated Trip Overview"}
+                  </h3>
                 </div>
-                <span className="syne" style={{ fontSize: 11, fontWeight: 700, background: "var(--iv2)", color: "var(--ink3)", padding: "4px 12px", borderRadius: 50, border: "1px solid var(--line)" }}>
+
+                <span className="syne" style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: "var(--ink3)",
+                  background: "var(--iv)",
+                  padding: "4px 12px",
+                  borderRadius: 50,
+                  border: "1px solid var(--line2)",
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 6
+                }}>
+                  <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--gn2)", display: "inline-block" }} />
                   Ref: #{String(pkg.slug || id).slice(-8).toUpperCase()}
                 </span>
               </div>
 
-              {/* 4-Item Grid */}
-              <div style={{
-                display: "grid",
-                gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))",
-                gap: 16,
+              {/* 4-Column Sleek Ribbon */}
+              <div className="itinerary-dossier-grid" style={{
+                background: "linear-gradient(180deg, #fcfbf9 0%, #f7f8fa 100%)",
+                borderRadius: "14px",
+                border: "1px solid var(--line2)",
+                overflow: "hidden"
               }}>
                 {/* 1. Dates of Travel */}
-                <div style={{ background: "var(--iv)", padding: "14px 16px", borderRadius: "var(--r)", border: "1px solid var(--line2)" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                    <span className="material-symbols-rounded" style={{ fontSize: 17, color: "var(--cu-d)" }}>event</span>
-                    <span className="syne" style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: "var(--ink4)" }}>
-                      Dates of Travel
+                <div className="itinerary-dossier-col">
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}>
+                      <span className="material-symbols-rounded" style={{ fontSize: 15, color: "var(--cu-d)" }}>calendar_month</span>
+                      <span className="syne" style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: "var(--ink4)" }}>
+                        Travel Dates
+                      </span>
+                    </div>
+                    <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--ink)", lineHeight: 1.35, wordBreak: "break-word" }}>
+                      {pkg.travelDates?.startDate ? formatDateRange(pkg.travelDates.startDate, pkg.travelDates.endDate) : `${pkg.duration?.days || 0} Days Custom Journey`}
+                    </div>
+                  </div>
+                  <div style={{ marginTop: 6 }}>
+                    <span className="syne" style={{
+                      fontSize: 10.5,
+                      fontWeight: 700,
+                      background: "rgba(22, 163, 74, 0.08)",
+                      color: "#15803d",
+                      padding: "2px 8px",
+                      borderRadius: 4,
+                      display: "inline-flex",
+                      alignItems: "center",
+                      gap: 4
+                    }}>
+                      <span className="material-symbols-rounded" style={{ fontSize: 12 }}>schedule</span>
+                      {pkg.duration?.nights || 0}N · {pkg.duration?.days || 0}D
                     </span>
                   </div>
-                  {pkg.travelDates?.startDate ? (
-                    <>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)", lineHeight: 1.4 }}>
-                        {formatDateLong(pkg.travelDates.startDate)}
-                      </div>
-                      {pkg.travelDates.endDate && (
-                        <div style={{ fontSize: 13, fontWeight: 600, color: "var(--ink2)", marginTop: 2 }}>
-                          to {formatDateLong(pkg.travelDates.endDate)}
-                        </div>
-                      )}
-                      <div style={{ fontSize: 11, fontWeight: 600, color: "var(--gn2)", marginTop: 4 }}>
-                        {pkg.duration?.nights || 0} Nights / {pkg.duration?.days || 0} Days
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>
-                        {pkg.duration?.nights || 0} Nights / {pkg.duration?.days || 0} Days
-                      </div>
-                      <div style={{ fontSize: 12, color: "var(--ink3)", marginTop: 2 }}>
-                        Flexible Custom Departure
-                      </div>
-                    </>
-                  )}
                 </div>
 
                 {/* 2. Travellers & Configuration */}
-                <div style={{ background: "var(--iv)", padding: "14px 16px", borderRadius: "var(--r)", border: "1px solid var(--line2)" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                    <span className="material-symbols-rounded" style={{ fontSize: 17, color: "var(--gn3)" }}>group</span>
-                    <span className="syne" style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: "var(--ink4)" }}>
-                      Travellers
-                    </span>
+                <div className="itinerary-dossier-col">
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}>
+                      <span className="material-symbols-rounded" style={{ fontSize: 15, color: "var(--gn3)" }}>group</span>
+                      <span className="syne" style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: "var(--ink4)" }}>
+                        Party & Guests
+                      </span>
+                    </div>
+                    <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--ink)", lineHeight: 1.35 }}>
+                      {pkg.travellerCount || `${pkg.adultCount || 1} Adult${(pkg.adultCount || 1) > 1 ? "s" : ""}${pkg.childCount ? `, ${pkg.childCount} Child${pkg.childCount > 1 ? "ren" : ""}` : ""}`}
+                    </div>
                   </div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>
-                    {pkg.travellerCount || `${pkg.adultCount || 1} Adult${(pkg.adultCount || 1) > 1 ? "s" : ""}${pkg.childCount ? `, ${pkg.childCount} Child${pkg.childCount > 1 ? "ren" : ""}` : ""}`}
-                  </div>
-                  <div style={{ fontSize: 12, color: "var(--ink3)", marginTop: 2 }}>
+                  <div style={{ marginTop: 6, fontSize: 11.5, color: "var(--ink3)" }}>
                     Priced per <strong style={{ color: "var(--ink2)", textTransform: "capitalize" }}>{pkg.priceUnit || "person"}</strong>
                   </div>
                 </div>
 
                 {/* 3. Flights & Airfare Status */}
-                <div style={{ background: "var(--iv)", padding: "14px 16px", borderRadius: "var(--r)", border: "1px solid var(--line2)" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                    <span className="material-symbols-rounded" style={{ fontSize: 17, color: "#4f46e5" }}>flight</span>
-                    <span className="syne" style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: "var(--ink4)" }}>
-                      Flights & Transit
-                    </span>
+                <div className="itinerary-dossier-col">
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}>
+                      <span className="material-symbols-rounded" style={{ fontSize: 15, color: "#4f46e5" }}>flight_takeoff</span>
+                      <span className="syne" style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: "var(--ink4)" }}>
+                        Airfare & Flights
+                      </span>
+                    </div>
+                    <div style={{ fontSize: 13.5, fontWeight: 700, color: pkg.flightsIncluded ? "#4338ca" : "var(--ink)", lineHeight: 1.35 }}>
+                      {pkg.flightsIncluded ? "Flights Included" : (pkg.flights?.length ? `${pkg.flights.length} Scheduled Flights` : "Self-Arranged")}
+                    </div>
                   </div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: pkg.flightsIncluded ? "var(--gn)" : "var(--ink)" }}>
-                    {pkg.flightsIncluded ? "Flights Included" : "Flights Self-Arranged"}
-                  </div>
-                  <div style={{ fontSize: 12, color: "var(--ink3)", marginTop: 2 }}>
-                    {pkg.flights?.length ? `${pkg.flights.length} Scheduled Leg${pkg.flights.length > 1 ? "s" : ""}` : (pkg.flightPrice ? `Airfare: ₹${pkg.flightPrice.toLocaleString('en-IN')}` : "Direct Booking")}
+                  <div style={{ marginTop: 6 }}>
+                    {pkg.flightsIncluded ? (
+                      <span className="syne" style={{
+                        fontSize: 10.5,
+                        fontWeight: 700,
+                        background: "rgba(79, 70, 229, 0.08)",
+                        color: "#4f46e5",
+                        padding: "2px 8px",
+                        borderRadius: 4,
+                        display: "inline-flex",
+                        alignItems: "center",
+                        gap: 3
+                      }}>
+                        <span className="material-symbols-rounded" style={{ fontSize: 12 }}>verified</span>
+                        Bundled in Price
+                      </span>
+                    ) : pkg.flightPrice ? (
+                      <span style={{ fontSize: 11.5, fontWeight: 600, color: "var(--ink2)" }}>
+                        Airfare: ₹{pkg.flightPrice.toLocaleString('en-IN')}
+                      </span>
+                    ) : (
+                      <span style={{ fontSize: 11.5, color: "var(--ink3)" }}>
+                        Direct Booking
+                      </span>
+                    )}
                   </div>
                 </div>
 
                 {/* 4. Hotel Class & Stays */}
-                <div style={{ background: "var(--iv)", padding: "14px 16px", borderRadius: "var(--r)", border: "1px solid var(--line2)" }}>
-                  <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 6 }}>
-                    <span className="material-symbols-rounded" style={{ fontSize: 17, color: "var(--gn2)" }}>hotel</span>
-                    <span className="syne" style={{ fontSize: 11, fontWeight: 700, textTransform: "uppercase", letterSpacing: 1, color: "var(--ink4)" }}>
-                      Accommodations
-                    </span>
+                <div className="itinerary-dossier-col">
+                  <div>
+                    <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 5 }}>
+                      <span className="material-symbols-rounded" style={{ fontSize: 15, color: "var(--gn2)" }}>hotel</span>
+                      <span className="syne" style={{ fontSize: 10, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: "var(--ink4)" }}>
+                        Accommodations
+                      </span>
+                    </div>
+                    <div style={{ fontSize: 13.5, fontWeight: 700, color: "var(--ink)", lineHeight: 1.35 }}>
+                      {pkg.hotelRating || "Handpicked Stays"}
+                    </div>
                   </div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: "var(--ink)" }}>
-                    {pkg.hotelRating || "Handpicked Stays"}
-                  </div>
-                  <div style={{ fontSize: 12, color: "var(--ink3)", marginTop: 2 }}>
+                  <div style={{ marginTop: 6, fontSize: 11.5, color: "var(--ink3)" }}>
                     {pkg.stays?.length ? `${pkg.stays.length} Hotel / Resort Stay(s)` : "Included in Package"}
                   </div>
                 </div>
@@ -317,21 +401,21 @@ export default function CustomItineraryPage() {
             {pkg.flights && pkg.flights.length > 0 ? (
               <div style={{
                 background: "#ffffff",
-                borderRadius: "var(--r-xl)",
-                border: "1.5px solid var(--line)",
-                padding: "24px 28px",
-                boxShadow: "var(--sh)",
-                marginBottom: 32,
+                borderRadius: "20px",
+                border: "1px solid rgba(15, 23, 42, 0.08)",
+                padding: "20px 22px",
+                boxShadow: "0 10px 28px -10px rgba(0, 0, 0, 0.04), 0 1px 3px rgba(0, 0, 0, 0.02)",
+                marginBottom: 30,
               }}>
-                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 18, flexWrap: "wrap", gap: 8 }}>
+                <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 16, flexWrap: "wrap", gap: 8 }}>
                   <div>
                     <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
-                      <span className="material-symbols-rounded" style={{ fontSize: 22, color: "#4f46e5" }}>airplane_ticket</span>
-                      <h3 className="syne" style={{ fontSize: 17, fontWeight: 700, color: "var(--ink)", margin: 0 }}>
+                      <span className="material-symbols-rounded" style={{ fontSize: 20, color: "#4f46e5" }}>airplane_ticket</span>
+                      <h3 className="syne" style={{ fontSize: 16, fontWeight: 700, color: "var(--ink)", margin: 0 }}>
                         Flight & Transit Schedule
                       </h3>
                     </div>
-                    <p style={{ fontSize: 12.5, color: "var(--ink3)", margin: "4px 0 0 30px" }}>
+                    <p style={{ fontSize: 12.5, color: "var(--ink3)", margin: "4px 0 0 28px" }}>
                       Confirmed transit details, airlines, timings, and baggage allowance
                     </p>
                   </div>
@@ -344,7 +428,7 @@ export default function CustomItineraryPage() {
                   </span>
                 </div>
 
-                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
                   {pkg.flights.map((f: any, idx: number) => {
                     const isTrain = (f.type ?? "flight") === "train";
                     const flightDate = computeFlightDate(pkg.travelDates?.startDate, f.day || (idx + 1));
@@ -353,9 +437,9 @@ export default function CustomItineraryPage() {
                         key={idx}
                         style={{
                           background: "var(--iv)",
-                          border: "1.5px solid var(--line)",
-                          borderRadius: "var(--r)",
-                          padding: "18px 20px",
+                          border: "1px solid var(--line2)",
+                          borderRadius: "14px",
+                          padding: "16px 18px",
                           position: "relative",
                         }}
                       >
