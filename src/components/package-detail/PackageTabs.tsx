@@ -707,14 +707,23 @@ function buildStayContent(stay: any, dateInfo?: StayDateInfo): string {
         <div>
           <div style="font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:0.8px;color:var(--ink4)">Duration of Stay</div>
           <div style="font-size:12.5px;font-weight:700;color:var(--ink);margin-top:1px">${dateInfo.nights} ${dateInfo.nights > 1 ? 'Nights' : 'Night'}</div>
-          <div style="font-size:10.5px;color:var(--ink3)">${stay.roomType || 'Standard Room'}</div>
+          <div style="font-size:10.5px;color:var(--ink3)">${
+            stay.roomCategories && stay.roomCategories.length > 0
+              ? stay.roomCategories.map((rc: any) => `${rc.rooms ? rc.rooms + '× ' : ''}${rc.roomType}`).join(' | ')
+              : (stay.roomType || 'Standard Room')
+          }</div>
         </div>
       </div>
     </div>`;
   }
   const meta: string[] = [];
   if (stay.nights) meta.push(`${stay.nights} Night${stay.nights > 1 ? "s" : ""}`);
-  if (stay.roomType) meta.push(stay.roomType);
+  if (stay.roomCategories && stay.roomCategories.length > 0) {
+    const roomLabel = stay.roomCategories.map((rc: any) => `${rc.rooms ? rc.rooms + '× ' : ''}${rc.roomType}`).join(' · ');
+    meta.push(roomLabel);
+  } else if (stay.roomType) {
+    meta.push(stay.roomType);
+  }
   if (meta.length > 0) {
     html += `<p style="font-size:13px;color:var(--ink3);margin-bottom:10px">${meta.join(" · ")}</p>`;
   }
@@ -1530,7 +1539,11 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
                                       <div>
                                         <div style={{ fontSize: 9.5, fontWeight: 700, textTransform: "uppercase", letterSpacing: "0.8px", color: "var(--ink4)" }}>Duration of Stay</div>
                                         <div style={{ fontSize: 12.5, fontWeight: 700, color: "var(--ink)", marginTop: 1 }}>{dateInfo.nights} {dateInfo.nights > 1 ? "Nights" : "Night"}</div>
-                                        <div style={{ fontSize: 10.5, color: "var(--ink3)" }}>{stay.roomType || "Standard Room"}</div>
+                                        <div style={{ fontSize: 10.5, color: "var(--ink3)" }}>
+                                          {stay.roomCategories && stay.roomCategories.length > 0
+                                            ? stay.roomCategories.map((rc: any) => `${rc.rooms ? rc.rooms + '× ' : ''}${rc.roomType}`).join(' | ')
+                                            : (stay.roomType || "Standard Room")}
+                                        </div>
                                       </div>
                                     </div>
                                   </div>
