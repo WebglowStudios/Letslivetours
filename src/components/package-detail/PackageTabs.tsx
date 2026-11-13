@@ -999,7 +999,7 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
   const getTabData = (tabId: string) => {
     switch (tabId) {
       case "itinerary":
-        return itinerary.map((day: any) => {
+        return [...itinerary].sort((a: any, b: any) => (a.day || 0) - (b.day || 0)).map((day: any) => {
           const dayFlights = flights.filter((f: any) => f.day == day.day || (day.day === 1 && (!f.day || f.day === 0)));
           const dateStr = pkg?.travelDates?.startDate ? computeDate(pkg.travelDates.startDate, day.day) : undefined;
           return {
@@ -1012,7 +1012,7 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
         });
       case "activities":
         // Show activity and recommendation entries from each itinerary day
-        return itinerary
+        return [...itinerary].sort((a: any, b: any) => (a.day || 0) - (b.day || 0))
           .filter((day: any) => (day.activities && day.activities.length > 0) || (day.recommendations && day.recommendations.length > 0))
           .map((day: any) => {
             const dateStr = pkg?.travelDates?.startDate ? computeDate(pkg.travelDates.startDate, day.day) : undefined;
@@ -1025,9 +1025,9 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
             };
           });
       case "flights": {
-        // Separate flights and trains into two groups
-        const flightEntries = flights.filter((f: any) => (f.type ?? "flight") === "flight");
-        const trainEntries = flights.filter((f: any) => f.type === "train");
+        // Separate flights and trains into two groups, sorted by day
+        const flightEntries = [...flights].filter((f: any) => (f.type ?? "flight") === "flight").sort((a: any, b: any) => (a.day || 999) - (b.day || 999));
+        const trainEntries = [...flights].filter((f: any) => f.type === "train").sort((a: any, b: any) => (a.day || 999) - (b.day || 999));
         const result: any[] = [];
         flightEntries.forEach((f: any, i: number) => {
           const dayNum = f.day || (i + 1);
@@ -1081,7 +1081,7 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
         });
       }
       case "transfers": {
-        return transfers.map((t: any, i: number) => {
+        return [...transfers].sort((a: any, b: any) => (a.day || 0) - (b.day || 0)).map((t: any, i: number) => {
           const dateStr = t.day && pkg?.travelDates?.startDate ? computeDate(pkg.travelDates.startDate, t.day) : undefined;
           return {
             badge: t.day ? `Day ${t.day}` : `Transfer ${i + 1}`,
