@@ -39,6 +39,41 @@ export default function PayInstallmentPage() {
       });
   }, [paymentId]);
 
+  // Auto-check payment status when tab regains focus or while paying (handles UPI app switch)
+  useEffect(() => {
+    if (!paymentId || success) return;
+
+    const checkStatus = () => {
+      api.get(`/operations/public-payments/${paymentId}/details`).then((res) => {
+        if (res.status === "success" && (res.data.status === "paid" || res.data.amountDue <= 0)) {
+          setSuccess(true);
+          setPaying(false);
+          setDetails((prev: any) => ({ ...prev, amountDue: 0, status: "paid" }));
+        }
+      }).catch(() => {});
+    };
+
+    const handleFocus = () => {
+      if (document.visibilityState === "visible") {
+        checkStatus();
+      }
+    };
+
+    window.addEventListener("focus", handleFocus);
+    document.addEventListener("visibilitychange", handleFocus);
+
+    let pollInterval: NodeJS.Timeout | null = null;
+    if (paying) {
+      pollInterval = setInterval(checkStatus, 3000);
+    }
+
+    return () => {
+      window.removeEventListener("focus", handleFocus);
+      document.removeEventListener("visibilitychange", handleFocus);
+      if (pollInterval) clearInterval(pollInterval);
+    };
+  }, [paymentId, paying, success]);
+
   const handlePay = async () => {
     if (!details) return;
     const finalAmount = Number(customAmountToPay);
