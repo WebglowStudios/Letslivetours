@@ -86,6 +86,7 @@ interface ItineraryDay {
 interface Stay {
   name: string; rating: string; nights: number; roomType: string; amenities: string[];
   rooms?: number;
+  roomCategories?: { roomType: string; rooms?: number }[];
   checkIn?: string; checkOut?: string; address?: string; confirmationNo?: string;
   remark?: string; showRemarkToCustomer?: boolean;
 }
@@ -2467,11 +2468,17 @@ const AccommodationSection = ({ pkg }: { pkg: PackageData }) => {
         (s.checkIn || "") === (stay.checkIn || "") &&
         (s.checkOut || "") === (stay.checkOut || "")
     );
+    const stayRoomTypes: { roomType: string; rooms?: number }[] =
+      stay.roomCategories && stay.roomCategories.length > 0
+        ? stay.roomCategories.map((rc: any) => ({ roomType: rc.roomType, rooms: rc.rooms }))
+        : [{ roomType: stay.roomType, rooms: stay.rooms }];
+
     if (existing) {
-      existing.roomTypes.push({ roomType: stay.roomType, rooms: stay.rooms });
-      if (stay.rooms) existing.rooms = (existing.rooms || 0) + stay.rooms;
+      stayRoomTypes.forEach((rt: any) => existing.roomTypes.push(rt));
+      const addedRooms = stayRoomTypes.reduce((sum: number, rt: any) => sum + (rt.rooms || 0), 0);
+      if (addedRooms) existing.rooms = (existing.rooms || 0) + addedRooms;
     } else {
-      groupedStays.push({ ...stay, roomTypes: [{ roomType: stay.roomType, rooms: stay.rooms }] });
+      groupedStays.push({ ...stay, roomTypes: stayRoomTypes });
     }
   }
 
