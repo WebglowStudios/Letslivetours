@@ -213,73 +213,52 @@ function AccordionItem({
     >
       <button
         onClick={onToggle}
-        style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "space-between",
-          padding: "16px 18px",
-          cursor: "pointer",
-          gap: 12,
-          width: "100%",
-          textAlign: "left",
-          background: "none",
-          border: "none",
-          minWidth: 0,
-          boxSizing: "border-box",
-        }}
+        className="itin-card-header"
       >
-        <div style={{ display: "flex", alignItems: "center", gap: 10, flex: 1, minWidth: 0, flexWrap: "wrap" }}>
-          <span
-            className="syne"
-            style={{
-              fontSize: 10.5,
-              fontWeight: 800,
-              letterSpacing: 1,
-              textTransform: "uppercase",
-              padding: "4px 12px",
-              borderRadius: 50,
-              whiteSpace: "nowrap",
-              flexShrink: 0,
-              ...(badgeStyles[item.badgeType || "day"] || badgeStyles.day),
-            }}
-          >
-            {item.badge}
-          </span>
-          {item.dateStr && (
+        <div className="itin-card-meta">
+          <div className="itin-card-badges">
             <span
               className="syne"
               style={{
-                fontSize: 11,
-                fontWeight: 700,
-                color: "#0284c7",
-                background: "rgba(14, 165, 233, 0.09)",
-                border: "1px solid rgba(14, 165, 233, 0.22)",
-                padding: "3px 10px",
+                fontSize: 10.5,
+                fontWeight: 800,
+                letterSpacing: 1,
+                textTransform: "uppercase",
+                padding: "3.5px 11px",
                 borderRadius: 50,
+                whiteSpace: "nowrap",
                 flexShrink: 0,
-                display: "inline-flex",
-                alignItems: "center",
-                gap: 5,
+                ...(badgeStyles[item.badgeType || "day"] || badgeStyles.day),
               }}
             >
-              <span className="material-symbols-rounded" style={{ fontSize: 13, color: "#0284c7" }}>calendar_month</span>
-              {item.dateStr}
+              {item.badge}
             </span>
-          )}
+            {item.dateStr && (
+              <span
+                className="syne"
+                style={{
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: "#0284c7",
+                  background: "rgba(14, 165, 233, 0.09)",
+                  border: "1px solid rgba(14, 165, 233, 0.22)",
+                  padding: "2.5px 9px",
+                  borderRadius: 50,
+                  flexShrink: 0,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 4,
+                }}
+              >
+                <span className="material-symbols-rounded" style={{ fontSize: 13, color: "#0284c7" }}>calendar_month</span>
+                {item.dateStr}
+              </span>
+            )}
+          </div>
           <span
-            className="syne"
+            className="syne itin-card-title"
             style={{
-              fontSize: 14,
-              fontWeight: 600,
               color: isOpen ? "var(--gn)" : "var(--ink)",
-              lineHeight: 1.4,
-              display: "flex",
-              alignItems: "center",
-              gap: 6,
-              flex: 1,
-              minWidth: 0,
-              wordBreak: "break-word",
-              overflowWrap: "anywhere",
             }}
           >
             {item.badgeType === 'flight' && (
@@ -291,16 +270,9 @@ function AccordionItem({
           </span>
         </div>
         <div
+          className="itin-card-toggle"
           style={{
-            width: 28,
-            height: 28,
-            borderRadius: "50%",
             background: isOpen ? "var(--gn)" : "var(--gn-gl)",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "center",
-            flexShrink: 0,
-            transition: "var(--tr)",
             transform: isOpen ? "rotate(45deg)" : "none",
           }}
         >
@@ -1350,23 +1322,10 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
                         {/* Stay Accordion Header */}
                         <button
                           onClick={() => toggleItem("stay", idx)}
-                          style={{
-                            display: "flex",
-                            alignItems: "center",
-                            justifyContent: "space-between",
-                            padding: "16px 18px",
-                            cursor: "pointer",
-                            gap: 12,
-                            width: "100%",
-                            textAlign: "left",
-                            background: "none",
-                            border: "none",
-                            minWidth: 0,
-                            boxSizing: "border-box",
-                          }}
+                          className="itin-card-header"
                         >
                           <div style={{ display: "flex", flexDirection: "column", gap: 6, flex: 1, minWidth: 0 }}>
-                            <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", minWidth: 0 }}>
+                            <div style={{ display: "flex", alignItems: "center", gap: 8, flexWrap: "wrap", minWidth: 0 }}>
                               <span
                                 className="syne"
                                 style={{
@@ -1374,7 +1333,7 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
                                   fontWeight: 800,
                                   letterSpacing: 1,
                                   textTransform: "uppercase",
-                                  padding: "4px 12px",
+                                  padding: "3.5px 11px",
                                   borderRadius: 50,
                                   whiteSpace: "nowrap",
                                   flexShrink: 0,
@@ -1406,13 +1365,11 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
                               {chosenOpt && (
                                 <span
                                   style={{
-                                    marginLeft: "auto",
-                                    marginRight: 8,
                                     fontSize: 11.5,
                                     fontWeight: 700,
                                     background: chosenOpt.priceDifference > 0 ? "rgba(245,166,35,0.12)" : "rgba(16,185,129,0.1)",
                                     color: chosenOpt.priceDifference > 0 ? "var(--cu-d)" : "#059669",
-                                    padding: "3px 10px",
+                                    padding: "2.5px 9px",
                                     borderRadius: 50,
                                     display: "inline-flex",
                                     alignItems: "center",
@@ -1454,16 +1411,9 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
                             </div>
                           </div>
                           <div
+                            className="itin-card-toggle"
                             style={{
-                              width: 28,
-                              height: 28,
-                              borderRadius: "50%",
                               background: isOpen ? "var(--gn)" : "var(--gn-gl)",
-                              display: "flex",
-                              alignItems: "center",
-                              justifyContent: "center",
-                              flexShrink: 0,
-                              transition: "var(--tr)",
                               transform: isOpen ? "rotate(45deg)" : "none",
                             }}
                           >
