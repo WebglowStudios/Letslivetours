@@ -264,6 +264,9 @@ function AccordionItem({
             {item.badgeType === 'flight' && (
               <span className="material-symbols-rounded" style={{ fontSize: 18, color: "var(--gn3)", flexShrink: 0 }}>flight_takeoff</span>
             )}
+            {item.badgeType === 'train' && (
+              <span className="material-symbols-rounded" style={{ fontSize: 18, color: "#c2410c", flexShrink: 0 }}>train</span>
+            )}
             <span style={{ flex: 1, minWidth: 0, wordBreak: "break-word", overflowWrap: "anywhere" }}>
               {item.title}
             </span>
@@ -949,7 +952,7 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
   const flights = pkg?.flights || [];
   const hasFlights = flights.some((f: any) => (f.type ?? "flight") === "flight");
   const hasTrains = flights.some((f: any) => f.type === "train");
-  const hasAnyFlightOrTrain = flights.length > 0 || Boolean(pkg?.flightsIncluded);
+  const hasAnyFlightOrTrain = flights.length > 0 || Boolean(pkg?.flightsIncluded) || Boolean(pkg?.trainsIncluded);
   const hasTransfers = transfers.length > 0 || !!pkg?.transferSummary;
   const hasPolicies = (pkg?.paymentPolicy?.length > 0) || (pkg?.cancellationPolicy?.length > 0) || (pkg?.flightCancellationPolicy?.length > 0);
 
@@ -1032,6 +1035,19 @@ export default function PackageTabs({ pkg, selectedHotelOptions, onSelectHotelOp
             content: buildFlightContent(f, true, dateStr),
           });
         });
+        if (result.length === 0 && pkg?.trainsIncluded) {
+          result.push({
+            badge: "Train",
+            badgeType: "train",
+            title: "Train Tickets Included in Package",
+            content: `<div style="padding:16px;background:var(--iv);border-radius:12px;border:1px solid var(--line)">
+              <p style="font-size:15px;font-weight:700;color:var(--ink);margin:0 0 6px">🚆 Train Reservations Covered</p>
+              <p style="font-size:13px;color:var(--ink3);line-height:1.6;margin:0">
+                Train tickets and railway transit are covered in your package quote. Train timings, coach/berth allocations, and e-tickets will be issued based on your travel dates upon booking confirmation.
+              </p>
+            </div>`,
+          });
+        }
         if (result.length === 0 && pkg?.flightsIncluded) {
           result.push({
             badge: "Airfare",
